@@ -1,3 +1,6 @@
 [submodule ".kilocode/glm5-instructions"]
 	path = .kilocode/glm5-instructions
 	url = https://github.com/Adrixan/kilo-glm5-instructions.git
+[submodule "external/pascal.js"]
+	path = external/pascal.js
+	url = https://github.com/kanaka/pascal.js.git

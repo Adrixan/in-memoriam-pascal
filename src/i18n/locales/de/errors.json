@@ -1,0 +1,124 @@
+{
+    "syntax": {
+        "unexpectedToken": "Unerwartetes Token an Position {{position}}",
+        "missingSemicolon": "Semikolon erwartet nach {{statement}}",
+        "missingEnd": "Fehlendes 'end' für 'begin' Block",
+        "invalidIdentifier": "Ungültiger Bezeichner: {{identifier}}"
+    },
+    "runtime": {
+        "divisionByZero": "Division durch Null ist nicht erlaubt",
+        "arrayOutOfBounds": "Array-Index außerhalb des gültigen Bereichs",
+        "typeMismatch": "Typinkompatibilität: {{expected}} erwartet, {{actual}} gefunden",
+        "undefinedVariable": "Unbekannte Variable: {{variable}}"
+    },
+    "compilation": {
+        "unknownType": "Unbekannter Typ: {{type}}",
+        "duplicateIdentifier": "Bezeichner bereits definiert: {{identifier}}",
+        "missingProgram": "Programmkopf fehlt"
+    },
+    "validation": {
+        "outputMismatch": "Die Ausgabe entspricht nicht dem erwarteten Ergebnis.",
+        "missingKeyword": "Das Schlüsselwort '{{keyword}}' fehlt in deinem Code.",
+        "compilationFailed": "Dein Code konnte nicht kompiliert werden.",
+        "success": "Erfolgreich validiert!",
+        "unknownRule": "Unbekannte Validierungsregel.",
+        "levelComplete": "Level abgeschlossen!",
+        "congratulations": "Glückwunsch! Du hast dieses Level erfolgreich abgeschlossen.",
+        "failed": "Validierung fehlgeschlagen",
+        "level1": {
+            "outputMismatch": "Deine Ausgabe muss genau 'Hello World!' lauten. Achte auf Groß- und Kleinschreibung!",
+            "missingWriteLn": "Verwende WriteLn, um Text auszugeben."
+        },
+        "level2": {
+            "outputMismatch": "Die Ausgabe sollte 'Value: 42' lauten.",
+            "missingVar": "Deklariere deine Variable im 'var' Abschnitt.",
+            "missingAssignment": "Verwende ':=', um der Variable einen Wert zuzuweisen."
+        },
+        "level3": {
+            "outputMismatch": "Die Ausgabe sollte '5 + 3 = 8' lauten.",
+            "missingOperator": "Verwende den + Operator für die Addition."
+        },
+        "level4": {
+            "missingGreeting": "Die Ausgabe sollte eine Begrüßung enthalten.",
+            "missingStringType": "Deklariere die Variable als String-Typ."
+        },
+        "level5": {
+            "missingReadLn": "Verwende ReadLn, um Eingaben zu lesen.",
+            "missingWrite": "Verwende Write für die Eingabeaufforderung."
+        },
+        "level6": {
+            "outputMismatch": "Die Ausgabe sollte 'Negative' lauten, da -5 kleiner als 0 ist.",
+            "missingIf": "Verwende eine if-Anweisung für die Bedingung.",
+            "missingElse": "Füge einen else-Zweig für den anderen Fall hinzu."
+        },
+        "level7": {
+            "outputMismatch": "Die Ausgabe sollte die Zahlen 1 bis 5 sein, jede in einer neuen Zeile.",
+            "missingFor": "Verwende eine for-Schleife.",
+            "missingTo": "Verwende 'to' für aufwärts Zählen."
+        },
+        "level8": {
+            "outputMismatch": "Die Ausgabe sollte 5, 4, 3, 2, 1 und dann 'Liftoff!' sein.",
+            "missingWhile": "Verwende eine while-Schleife."
+        },
+        "level9": {
+            "outputMismatch": "Die Ausgabe sollte 'Hello, World!' lauten.",
+            "missingProcedure": "Definiere eine Prozedur."
+        },
+        "level10": {
+            "outputMismatch": "Die Ausgabe sollte '5 squared is 25' lauten.",
+            "missingFunction": "Definiere eine Funktion."
+        }
+    },
+    "hints": {
+        "level1": {
+            "1": "Schau dir die 'WriteLn' Prozedur an.",
+            "2": "WriteLn gibt Text auf dem Bildschirm aus.",
+            "3": "Verwende WriteLn('Hello World!'); um den Text auszugeben."
+        },
+        "level2": {
+            "1": "Variablen müssen im 'var' Abschnitt deklariert werden.",
+            "2": "Das Format ist: Variablenname: Typ;",
+            "3": "Beispiel: var zahl: Integer; und dann zahl := 42;"
+        },
+        "level3": {
+            "1": "Du kannst mehrere Werte in einem WriteLn ausgeben.",
+            "2": "Trenne Werte mit Kommas: WriteLn(a, ' + ', b, ' = ', sum);",
+            "3": "Berechne zuerst sum := a + b; und gib dann das Ergebnis aus."
+        },
+        "level4": {
+            "1": "String ist der Datentyp für Text.",
+            "2": "Deklariere: var name: String;",
+            "3": "Weise zu: name := 'Pascal'; und gib aus: WriteLn('Hello, ', name, '!');"
+        },
+        "level5": {
+            "1": "Write gibt Text ohne Zeilenumbruch aus.",
+            "2": "ReadLn wartet auf eine Eingabe und speichert sie.",
+            "3": "Write('Name: '); ReadLn(name); WriteLn('Hallo ', name);"
+        },
+        "level6": {
+            "1": "if prüft eine Bedingung.",
+            "2": "Der Aufbau ist: if bedingung then anweisung else anweisung;",
+            "3": "if number >= 0 then WriteLn('Positiv') else WriteLn('Negativ');"
+        },
+        "level7": {
+            "1": "for-Schleifen zählen von einem Start- zu einem Endwert.",
+            "2": "for i := 1 to 5 do führt Code 5 Mal aus.",
+            "3": "for i := 1 to 5 do WriteLn(i); gibt 1 bis 5 aus."
+        },
+        "level8": {
+            "1": "while wiederholt, solange eine Bedingung wahr ist.",
+            "2": "Du musst begin-end für mehrere Anweisungen verwenden.",
+            "3": "while count > 0 do begin WriteLn(count); count := count - 1; end;"
+        },
+        "level9": {
+            "1": "Prozeduren werden vor dem main-Programm definiert.",
+            "2": "procedure Name(Parameter: Typ); beginnt eine Prozedur.",
+            "3": "procedure Greet(name: String); begin WriteLn('Hello, ', name); end;"
+        },
+        "level10": {
+            "1": "Funktionen geben einen Wert zurück.",
+            "2": "Der Rückgabetyp wird nach dem Funktionsnamen angegeben.",
+            "3": "function Square(n: Integer): Integer; begin Square := n * n; end;"
+        }
+    }
+}

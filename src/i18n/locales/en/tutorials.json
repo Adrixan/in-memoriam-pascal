@@ -1,0 +1,41 @@
+{
+    "intro": {
+        "welcome": "Welcome to In Memoriam Pascal!",
+        "description": "Learn the basics of Pascal programming with interactive tutorials.",
+        "startLearning": "Start Learning Now"
+    },
+    "progress": {
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "notStarted": "Not Started",
+        "level": "Level",
+        "points": "Points"
+    },
+    "editor": {
+        "title": "Code Editor",
+        "placeholder": "Write your Pascal code here...",
+        "lineNumbers": "Line Numbers",
+        "autoComplete": "Auto Complete",
+        "executionTime": "Execution time: {{time}}ms",
+        "output": "Output",
+        "clearOutput": "Clear"
+    },
+    "output": {
+        "title": "Output",
+        "empty": "Run your code to see the output.",
+        "executionTime": "Execution Time"
+    },
+    "objectives": "Learning Objectives",
+    "concepts": "Concepts",
+    "examples": "Examples",
+    "example": "Example",
+    "hints": "Hints",
+    "hintLevel": "Hint {{level}}",
+    "hintsAvailable": "{{count}} hints available",
+    "revealHint": "Reveal Hint {{level}} ({{cost}} points)",
+    "expectedOutput": "Expected Output",
+    "estimatedTime": "Estimated time: {{time}} minutes",
+    "showLess": "Show Less",
+    "showAll": "Show All ({{count}})",
+    "levels": "Levels"
+}

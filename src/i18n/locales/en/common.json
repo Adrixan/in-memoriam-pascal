@@ -1,0 +1,97 @@
+{
+    "app": {
+        "title": "In Memoriam Pascal",
+        "description": "Learn Pascal programming with interactive tutorials"
+    },
+    "navigation": {
+        "home": "Home",
+        "tutorials": "Tutorials",
+        "tutorial": "Tutorial",
+        "about": "About",
+        "settings": "Settings",
+        "previous": "Previous Lesson",
+        "next": "Next Lesson"
+    },
+    "actions": {
+        "run": "Run",
+        "reset": "Reset",
+        "next": "Next",
+        "previous": "Back",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "save": "Save",
+        "load": "Load",
+        "clear": "Clear",
+        "hint": "Show Hint"
+    },
+    "status": {
+        "loading": "Loading...",
+        "success": "Success!",
+        "error": "An error occurred",
+        "running": "Running...",
+        "idle": "Ready"
+    },
+    "editor": {
+        "title": "Editor",
+        "run": "Run",
+        "running": "Running...",
+        "loading": "Loading...",
+        "output": "Output",
+        "clearOutput": "Clear",
+        "noOutput": "No output yet. Run your program to see results.",
+        "executionTime": "Execution time: {{time}}ms"
+    },
+    "home": {
+        "startLearning": "Start Learning",
+        "learnMore": "Learn More",
+        "history": "Turbo Pascal • 1983 • The golden age of programming",
+        "features": {
+            "title": "Features",
+            "interactive": {
+                "title": "Interactive Editor",
+                "description": "Write and run Pascal code directly in the browser with syntax highlighting."
+            },
+            "realtime": {
+                "title": "Real-time Execution",
+                "description": "See your code executed instantly with our integrated Pascal interpreter."
+            },
+            "guided": {
+                "title": "Guided Tutorials",
+                "description": "Learn step by step with structured lessons for beginners."
+            },
+            "progress": {
+                "title": "Save Progress",
+                "description": "Save your progress and continue anytime."
+            },
+            "multilang": {
+                "title": "Multilingual",
+                "description": "Available in multiple languages for learners worldwide."
+            },
+            "free": {
+                "title": "100% Free",
+                "description": "Open source and free. No account required."
+            }
+        },
+        "cta": {
+            "title": "Ready to start?",
+            "description": "Begin your journey into the world of programming with Pascal.",
+            "button": "Start Tutorial"
+        }
+    },
+    "tutorial": {
+        "levels": "Lessons",
+        "progress": "Progress",
+        "completed": "completed",
+        "objectives": "Learning Objectives",
+        "hints": "Hints",
+        "hintsAvailable": "{{count}} hints available"
+    },
+    "accessibility": {
+        "skipToContent": "Skip to main content",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu"
+    },
+    "footer": {
+        "tagline": "Turbo Pascal • 1983 • Forever in our hearts"
+    }
+}

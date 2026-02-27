@@ -1,0 +1,134 @@
+{
+    "level1": {
+        "title": "Hello World",
+        "description": "Your first Pascal program – print 'Hello World!' and begin your programming journey.",
+        "objective1": "Understand the basic structure of a Pascal program",
+        "objective2": "Use the WriteLn procedure for text output",
+        "objective3": "End the program with 'end.'",
+        "concept1": {
+            "title": "Program Structure",
+            "content": "Every Pascal program starts with 'program Name;' and ends with 'end.'. The code between 'begin' and 'end.' is executed."
+        },
+        "concept2": {
+            "title": "Text Output",
+            "content": "WriteLn prints text to the screen. The text must be enclosed in single quotes."
+        },
+        "example1": "A complete Hello World program"
+    },
+    "level2": {
+        "title": "Variables",
+        "description": "Learn how to declare and use variables in Pascal to store data.",
+        "objective1": "Use the 'var' section for variable declaration",
+        "objective2": "Create Integer variables for whole numbers",
+        "objective3": "Assign values using ':='",
+        "concept1": {
+            "title": "Variable Declaration",
+            "content": "Variables are declared in the 'var' section. The format is: variableName: type;"
+        },
+        "concept2": {
+            "title": "Value Assignment",
+            "content": "In Pascal, the assignment operator ':=' is used to assign a value to a variable."
+        },
+        "example1": "Declaring and using an Integer variable"
+    },
+    "level3": {
+        "title": "Simple Math",
+        "description": "Perform arithmetic calculations and output the results.",
+        "objective1": "Use arithmetic operators (+, -, *, div)",
+        "objective2": "Output multiple values with WriteLn",
+        "objective3": "Perform calculations with variables",
+        "concept1": {
+            "title": "Arithmetic Operators",
+            "content": "Pascal supports + (addition), - (subtraction), * (multiplication), and div (integer division)."
+        },
+        "example1": "Adding two numbers and outputting the result"
+    },
+    "level4": {
+        "title": "Strings",
+        "description": "Work with text: learn the String data type and string concatenation.",
+        "objective1": "Declare and use String variables",
+        "objective2": "Output strings with commas in WriteLn",
+        "objective3": "Write text in single quotes",
+        "concept1": {
+            "title": "String Type",
+            "content": "String stores text. Strings are written in single quotes: 'Example'"
+        },
+        "example1": "Using a String variable for output"
+    },
+    "level5": {
+        "title": "Input and Output",
+        "description": "Interact with the user – learn to read and process input.",
+        "objective1": "Use Write for output without line break",
+        "objective2": "Use ReadLn for user input",
+        "objective3": "Process input in output",
+        "concept1": {
+            "title": "Reading Input",
+            "content": "ReadLn reads user input and stores it in a variable. Write outputs text without a line break."
+        },
+        "example1": "A program that asks the user for their name"
+    },
+    "level6": {
+        "title": "Conditions",
+        "description": "Make decisions in your program with if-then-else statements.",
+        "objective1": "Understand if-then-else structures",
+        "objective2": "Use comparison operators",
+        "objective3": "Control program flow based on conditions",
+        "concept1": {
+            "title": "Conditional Statements",
+            "content": "if checks a condition. If true, the then-block is executed, otherwise the else-block."
+        },
+        "example1": "Checking if a number is positive or negative"
+    },
+    "level7": {
+        "title": "For Loop",
+        "description": "Repeat code with the for-do loop for counting iterations.",
+        "objective1": "Understand the for-do loop structure",
+        "objective2": "Use to and downto for counting up and down",
+        "objective3": "Use loop variables correctly",
+        "concept1": {
+            "title": "For Loop Upward",
+            "content": "for i := 1 to 5 do executes the code 5 times, with i counting from 1 to 5."
+        },
+        "concept2": {
+            "title": "For Loop Downward",
+            "content": "for i := 5 downto 1 do counts backwards from 5 to 1."
+        },
+        "example1": "Output numbers from 1 to 5"
+    },
+    "level8": {
+        "title": "While Loop",
+        "description": "Repeat code while a condition is true.",
+        "objective1": "Understand the while-do loop structure",
+        "objective2": "Use compound statements with begin-end",
+        "objective3": "Avoid infinite loops",
+        "concept1": {
+            "title": "While Loop",
+            "content": "while condition do repeats the code as long as the condition is true. Make sure to change the condition in the loop body!"
+        },
+        "example1": "Countdown from 5 to 1 with while"
+    },
+    "level9": {
+        "title": "Procedures",
+        "description": "Structure your code with procedures for reusable code blocks.",
+        "objective1": "Declare and call procedures",
+        "objective2": "Pass parameters to procedures",
+        "objective3": "Organize code with procedures",
+        "concept1": {
+            "title": "Procedure Declaration",
+            "content": "procedure Name(Parameter: Type) defines a procedure. Procedures execute code without returning a value."
+        },
+        "example1": "A greeting procedure with parameter"
+    },
+    "level10": {
+        "title": "Functions",
+        "description": "Create functions that calculate and return values.",
+        "objective1": "Declare functions with return type",
+        "objective2": "Set return values by assigning to function name",
+        "objective3": "Use functions in expressions",
+        "concept1": {
+            "title": "Function Declaration",
+            "content": "function Name(Parameter: Type): ReturnType defines a function. The return value is set by assigning to the function name."
+        },
+        "example1": "A function to calculate the square of a number"
+    }
+}

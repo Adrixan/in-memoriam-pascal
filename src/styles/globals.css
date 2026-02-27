@@ -1,0 +1,747 @@
+@import 'tailwindcss';
+
+/* ============================================
+   RETRO 80s THEME - CRT-Inspired Design System
+   Era: Early 1980s (Turbo Pascal 1983)
+   Aesthetic: CRT monitors, terminal interfaces
+   ============================================ */
+
+/* ============================================
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   ============================================ */
+:root {
+    /* --- Retro Color Palette --- */
+
+    /* Terminal Greens (Phosphor CRT) */
+    --retro-green-bright: #33FF33;
+    --retro-green: #00FF00;
+    --retro-green-dim: #20C20E;
+    --retro-green-dark: #0A8A0A;
+    --retro-green-glow: rgba(51, 255, 51, 0.6);
+
+    /* Amber (Amber CRT Monitors) */
+    --retro-amber-bright: #FFB000;
+    --retro-amber: #FFA500;
+    --retro-amber-dim: #CC8400;
+    --retro-amber-glow: rgba(255, 176, 0, 0.6);
+
+    /* Cyan (CGA/EGA Era) */
+    --retro-cyan-bright: #00FFFF;
+    --retro-cyan: #00CCCC;
+    --retro-cyan-dim: #009999;
+    --retro-cyan-glow: rgba(0, 255, 255, 0.6);
+
+    /* Magenta (CGA/EGA Era) */
+    --retro-magenta-bright: #FF00FF;
+    --retro-magenta: #CC00CC;
+    --retro-magenta-dim: #990099;
+
+    /* CRT Black Backgrounds */
+    --crt-black: #0D0D0D;
+    --crt-dark: #0A0A0A;
+    --crt-surface: #1A1A1A;
+    --crt-surface-light: #252525;
+    --crt-surface-lighter: #333333;
+
+    /* Status Colors */
+    --retro-red: #FF3333;
+    --retro-red-dim: #CC2929;
+    --retro-yellow: #FFFF00;
+    --retro-yellow-dim: #CCCC00;
+
+    /* --- Theme Color Mappings --- */
+    --color-primary: var(--retro-green);
+    --color-primary-bright: var(--retro-green-bright);
+    --color-primary-dim: var(--retro-green-dim);
+    --color-primary-glow: var(--retro-green-glow);
+
+    --color-secondary: var(--retro-amber);
+    --color-secondary-bright: var(--retro-amber-bright);
+    --color-secondary-glow: var(--retro-amber-glow);
+
+    --color-accent: var(--retro-cyan);
+    --color-accent-bright: var(--retro-cyan-bright);
+    --color-accent-glow: var(--retro-cyan-glow);
+
+    --color-background: var(--crt-black);
+    --color-surface: var(--crt-surface);
+    --color-surface-light: var(--crt-surface-light);
+    --color-surface-lighter: var(--crt-surface-lighter);
+
+    --color-text: #E0E0E0;
+    --color-text-bright: #FFFFFF;
+    --color-text-muted: #888888;
+    --color-text-dim: #666666;
+
+    --color-border: #333333;
+    --color-border-light: #444444;
+    --color-border-focus: var(--retro-green);
+
+    /* --- Typography --- */
+    /* VT323: Classic terminal font */
+    --font-terminal: 'VT323', 'Share Tech Mono', monospace;
+    /* Press Start 2P: Pixel font for headings */
+    --font-pixel: 'Press Start 2P', cursive;
+    /* IBM Plex Mono: Modern readable mono for code */
+    --font-mono: 'IBM Plex Mono', 'Fira Code', 'Consolas', monospace;
+    /* System font for body text */
+    --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /* Font Sizes */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+
+    /* --- Spacing Scale --- */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --spacing-3xl: 4rem;
+
+    /* --- Border Radius --- */
+    --radius-none: 0;
+    --radius-sm: 0.125rem;
+    --radius-md: 0.25rem;
+    --radius-lg: 0.5rem;
+    --radius-full: 9999px;
+
+    /* --- Shadows --- */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-glow-green: 0 0 10px var(--retro-green-glow), 0 0 20px var(--retro-green-glow);
+    --shadow-glow-amber: 0 0 10px var(--retro-amber-glow), 0 0 20px var(--retro-amber-glow);
+    --shadow-glow-cyan: 0 0 10px var(--retro-cyan-glow), 0 0 20px var(--retro-cyan-glow);
+    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+
+    /* --- Transitions --- */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+    --transition-glow: 200ms ease-out;
+
+    /* --- Z-Index Scale --- */
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-overlay: 300;
+    --z-modal: 400;
+    --z-toast: 500;
+
+    /* --- CRT Effect Settings --- */
+    --scanline-opacity: 0.08;
+    --crt-curve: 0;
+    --flicker-opacity: 0.97;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus styles for keyboard navigation */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Skip link for screen readers */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-primary);
+    color: var(--color-background);
+    padding: var(--spacing-sm) var(--spacing-md);
+    z-index: var(--z-toast);
+    text-decoration: none;
+    font-family: var(--font-terminal);
+    font-size: var(--text-lg);
+    border: 2px solid var(--color-primary-bright);
+    transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+    top: var(--spacing-md);
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ============================================
+   CRT EFFECTS
+   ============================================ */
+
+/* CRT Scanline Overlay */
+.crt-scanlines {
+    position: relative;
+}
+
+.crt-scanlines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, var(--scanline-opacity)),
+            rgba(0, 0, 0, var(--scanline-opacity)) 1px,
+            transparent 1px,
+            transparent 2px);
+    pointer-events: none;
+    z-index: var(--z-overlay);
+}
+
+/* CRT Screen Glow Effect */
+.crt-glow {
+    box-shadow:
+        inset 0 0 60px rgba(0, 255, 0, 0.05),
+        inset 0 0 100px rgba(0, 255, 0, 0.03),
+        0 0 40px rgba(0, 255, 0, 0.1);
+}
+
+/* CRT Flicker Animation (subtle) */
+@keyframes crt-flicker {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: var(--flicker-opacity);
+    }
+}
+
+.crt-flicker {
+    animation: crt-flicker 0.1s infinite;
+}
+
+/* Text Glow Effects */
+.terminal-glow {
+    text-shadow:
+        0 0 5px var(--color-primary-glow),
+        0 0 10px var(--color-primary-glow);
+}
+
+.terminal-glow-amber {
+    text-shadow:
+        0 0 5px var(--color-secondary-glow),
+        0 0 10px var(--color-secondary-glow);
+}
+
+.terminal-glow-cyan {
+    text-shadow:
+        0 0 5px var(--color-accent-glow),
+        0 0 10px var(--color-accent-glow);
+}
+
+/* ============================================
+   TYPOGRAPHY UTILITIES
+   ============================================ */
+
+/* Terminal Font */
+.font-terminal {
+    font-family: var(--font-terminal);
+    letter-spacing: 0.05em;
+}
+
+/* Pixel Font (for headings) */
+.font-pixel {
+    font-family: var(--font-pixel);
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+}
+
+/* Code Font */
+.font-mono {
+    font-family: var(--font-mono);
+}
+
+/* ============================================
+   RETRO BUTTON STYLES
+   ============================================ */
+
+/* Base Retro Button */
+.retro-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-terminal);
+    font-size: var(--text-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 2px solid var(--color-primary);
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast),
+        box-shadow var(--transition-glow);
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.retro-btn:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-background);
+    box-shadow: var(--shadow-glow-green);
+}
+
+.retro-btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.retro-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Primary Button (filled) */
+.retro-btn-primary {
+    background: var(--color-primary);
+    color: var(--color-background);
+}
+
+.retro-btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-bright);
+    box-shadow: var(--shadow-glow-green);
+}
+
+/* Secondary Button (amber) */
+.retro-btn-secondary {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+}
+
+.retro-btn-secondary:hover:not(:disabled) {
+    background: var(--color-secondary);
+    color: var(--color-background);
+    box-shadow: var(--shadow-glow-amber);
+}
+
+/* Accent Button (cyan) */
+.retro-btn-accent {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.retro-btn-accent:hover:not(:disabled) {
+    background: var(--color-accent);
+    color: var(--color-background);
+    box-shadow: var(--shadow-glow-cyan);
+}
+
+/* Ghost Button (minimal) */
+.retro-btn-ghost {
+    border-color: transparent;
+    background: transparent;
+}
+
+.retro-btn-ghost:hover:not(:disabled) {
+    background: rgba(51, 255, 51, 0.1);
+    border-color: var(--color-primary);
+}
+
+/* ============================================
+   RETRO PANEL STYLES
+   ============================================ */
+
+/* Base Retro Panel */
+.retro-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-md);
+    position: relative;
+}
+
+/* Panel with glow border */
+.retro-panel-glow {
+    border-color: var(--color-primary);
+    box-shadow:
+        inset 0 0 20px rgba(0, 255, 0, 0.03),
+        0 0 10px rgba(0, 255, 0, 0.1);
+}
+
+/* Panel with header bar */
+.retro-panel-header {
+    border-top: 3px solid var(--color-primary);
+}
+
+/* Terminal-style panel */
+.retro-panel-terminal {
+    background: var(--crt-dark);
+    border: 2px solid var(--color-primary-dim);
+    font-family: var(--font-terminal);
+}
+
+.retro-panel-terminal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: var(--color-surface-light);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* ============================================
+   RETRO CARD STYLES
+   ============================================ */
+
+.retro-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-lg);
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-glow);
+}
+
+.retro-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+}
+
+.retro-card-active {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-glow-green);
+}
+
+/* ============================================
+   PROGRESS BAR STYLES
+   ============================================ */
+
+.retro-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.retro-progress-bar {
+    height: 100%;
+    background: var(--color-primary);
+    transition: width var(--transition-normal);
+    box-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.retro-progress-animated .retro-progress-bar {
+    background: linear-gradient(90deg,
+            var(--color-primary-dim) 0%,
+            var(--color-primary-bright) 50%,
+            var(--color-primary-dim) 100%);
+    background-size: 200% 100%;
+    animation: progress-shine 2s linear infinite;
+}
+
+@keyframes progress-shine {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============================================
+   NAVIGATION STYLES
+   ============================================ */
+
+.retro-nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-terminal);
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition:
+        color var(--transition-fast),
+        border-color var(--transition-fast);
+    min-height: 44px;
+}
+
+.retro-nav-link:hover {
+    color: var(--color-primary);
+}
+
+.retro-nav-link-active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+
+.retro-input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    background: var(--crt-dark);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    transition: border-color var(--transition-fast);
+    min-height: 44px;
+}
+
+.retro-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 5px var(--color-primary-glow);
+}
+
+.retro-input::placeholder {
+    color: var(--color-text-dim);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+/* Typing cursor animation */
+@keyframes blink-cursor {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+.cursor-blink {
+    animation: blink-cursor 1s step-end infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px var(--color-primary-glow);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--color-primary-glow), 0 0 30px var(--color-primary-glow);
+    }
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in var(--transition-normal) ease-out;
+}
+
+/* Slide up animation */
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slide-up var(--transition-normal) ease-out;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .crt-flicker {
+        animation: none;
+    }
+
+    .retro-progress-animated .retro-progress-bar {
+        animation: none;
+    }
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) var(--color-surface);
+}
+
+/* ============================================
+   SELECTION
+   ============================================ */
+::selection {
+    background: var(--color-primary);
+    color: var(--color-background);
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   Mobile: < 640px
+   Tablet: 640px - 1024px
+   Desktop: > 1024px
+   ============================================ */
+
+/* Mobile-first base styles are in components */
+/* Use Tailwind responsive classes: sm:, md:, lg:, xl: */
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Border colors */
+.border-primary {
+    border-color: var(--color-primary);
+}
+
+.border-secondary {
+    border-color: var(--color-secondary);
+}
+
+.border-accent {
+    border-color: var(--color-accent);
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--color-primary);
+}
+
+.text-secondary {
+    color: var(--color-secondary);
+}
+
+.text-accent {
+    color: var(--color-accent);
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+/* Background colors */
+.bg-crt-black {
+    background-color: var(--crt-black);
+}
+
+.bg-crt-surface {
+    background-color: var(--crt-surface);
+}
+
+.bg-crt-surface-light {
+    background-color: var(--crt-surface-light);
+}
+
+/* Glow shadows */
+.shadow-glow-green {
+    box-shadow: var(--shadow-glow-green);
+}
+
+.shadow-glow-amber {
+    box-shadow: var(--shadow-glow-amber);
+}
+
+.shadow-glow-cyan {
+    box-shadow: var(--shadow-glow-cyan);
+}

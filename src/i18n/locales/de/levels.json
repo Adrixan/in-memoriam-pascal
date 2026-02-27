@@ -1,0 +1,134 @@
+{
+    "level1": {
+        "title": "Hello World",
+        "description": "Dein erstes Pascal-Programm – gib 'Hello World!' aus und beginne deine Reise in die Programmierung.",
+        "objective1": "Die grundlegende Struktur eines Pascal-Programms verstehen",
+        "objective2": "Die WriteLn-Prozedur zur Textausgabe verwenden",
+        "objective3": "Das Programm mit 'end.' abschließen",
+        "concept1": {
+            "title": "Programmstruktur",
+            "content": "Jedes Pascal-Programm beginnt mit 'program Name;' und endet mit 'end.'. Der Code zwischen 'begin' und 'end.' wird ausgeführt."
+        },
+        "concept2": {
+            "title": "Textausgabe",
+            "content": "WriteLn gibt Text auf dem Bildschirm aus. Der Text muss in einfachen Anführungszeichen stehen."
+        },
+        "example1": "Ein vollständiges Hello World Programm"
+    },
+    "level2": {
+        "title": "Variablen",
+        "description": "Lerne, wie man Variablen in Pascal deklariert und verwendet, um Daten zu speichern.",
+        "objective1": "Den 'var'-Abschnitt zur Variablendeklaration verwenden",
+        "objective2": "Integer-Variablen für ganze Zahlen erstellen",
+        "objective3": "Werte mit ':=' zuweisen",
+        "concept1": {
+            "title": "Variablendeklaration",
+            "content": "Variablen werden im 'var'-Abschnitt deklariert. Das Format ist: Variablenname: Typ;"
+        },
+        "concept2": {
+            "title": "Wertzuweisung",
+            "content": "In Pascal wird der Zuweisungsoperator ':=' verwendet, um einer Variable einen Wert zuzuweisen."
+        },
+        "example1": "Deklaration und Verwendung einer Integer-Variable"
+    },
+    "level3": {
+        "title": "Einfache Mathematik",
+        "description": "Führe arithmetische Berechnungen durch und gib die Ergebnisse aus.",
+        "objective1": "Arithmetische Operatoren (+, -, *, div) verwenden",
+        "objective2": "Mehrere Werte mit WriteLn ausgeben",
+        "objective3": "Berechnungen mit Variablen durchführen",
+        "concept1": {
+            "title": "Arithmetische Operatoren",
+            "content": "Pascal unterstützt + (Addition), - (Subtraktion), * (Multiplikation) und div (Integer-Division)."
+        },
+        "example1": "Addition zweier Zahlen und Ausgabe des Ergebnisses"
+    },
+    "level4": {
+        "title": "Zeichenketten",
+        "description": "Arbeite mit Text: Lerne den String-Datentyp und die Verkettung von Zeichenketten.",
+        "objective1": "String-Variablen deklarieren und verwenden",
+        "objective2": "Zeichenketten mit Kommas in WriteLn ausgeben",
+        "objective3": "Text in einfachen Anführungszeichen schreiben",
+        "concept1": {
+            "title": "String-Typ",
+            "content": "String speichert Text. Zeichenketten werden in einfachen Anführungszeichen geschrieben: 'Beispiel'"
+        },
+        "example1": "Verwendung einer String-Variable für die Ausgabe"
+    },
+    "level5": {
+        "title": "Eingabe und Ausgabe",
+        "description": "Interagiere mit dem Benutzer:in – lerne, Eingaben zu lesen und zu verarbeiten.",
+        "objective1": "Write für Ausgabe ohne Zeilenumbruch verwenden",
+        "objective2": "ReadLn für Benutzereingaben verwenden",
+        "objective3": "Eingaben in der Ausgabe verarbeiten",
+        "concept1": {
+            "title": "Eingabe lesen",
+            "content": "ReadLn liest eine Benutzereingabe und speichert sie in einer Variable. Write gibt Text ohne Zeilenumbruch aus."
+        },
+        "example1": "Ein Programm, das den:die Benutzer:in nach dem Namen fragt"
+    },
+    "level6": {
+        "title": "Bedingungen",
+        "description": "Triff Entscheidungen in deinem Programm mit if-then-else Anweisungen.",
+        "objective1": "if-then-else Strukturen verstehen",
+        "objective2": "Vergleichsoperatoren verwenden",
+        "objective3": "Programmfluss basierend auf Bedingungen steuern",
+        "concept1": {
+            "title": "Bedingte Anweisungen",
+            "content": "if prüft eine Bedingung. Wenn wahr, wird der then-Block ausgeführt, sonst der else-Block."
+        },
+        "example1": "Überprüfung, ob eine Zahl positiv oder negativ ist"
+    },
+    "level7": {
+        "title": "For-Schleife",
+        "description": "Wiederhole Code mit der for-do Schleife für zählende Wiederholungen.",
+        "objective1": "Die for-do Schleifenstruktur verstehen",
+        "objective2": "to und downto für Aufwärts- und Abwärtszählen verwenden",
+        "objective3": "Schleifenvariablen korrekt einsetzen",
+        "concept1": {
+            "title": "For-Schleife aufwärts",
+            "content": "for i := 1 to 5 do führt den Code 5 Mal aus, wobei i von 1 bis 5 zählt."
+        },
+        "concept2": {
+            "title": "For-Schleife abwärts",
+            "content": "for i := 5 downto 1 do zählt rückwärts von 5 bis 1."
+        },
+        "example1": "Zahlen von 1 bis 5 ausgeben"
+    },
+    "level8": {
+        "title": "While-Schleife",
+        "description": "Wiederhole Code, solange eine Bedingung erfüllt ist.",
+        "objective1": "Die while-do Schleifenstruktur verstehen",
+        "objective2": "Zusammengesetzte Anweisungen mit begin-end verwenden",
+        "objective3": "Endlosschleifen vermeiden",
+        "concept1": {
+            "title": "While-Schleife",
+            "content": "while Bedingung do wiederholt den Code, solange die Bedingung wahr ist. Achte darauf, die Bedingung im Schleifenkörper zu ändern!"
+        },
+        "example1": "Countdown von 5 bis 1 mit while"
+    },
+    "level9": {
+        "title": "Prozeduren",
+        "description": "Strukturiere deinen Code mit Prozeduren für wiederverwendbare Code-Blöcke.",
+        "objective1": "Prozeduren deklarieren und aufrufen",
+        "objective2": "Parameter an Prozeduren übergeben",
+        "objective3": "Code durch Prozeduren organisieren",
+        "concept1": {
+            "title": "Prozedur-Deklaration",
+            "content": "procedure Name(Parameter: Typ) definiert eine Prozedur. Prozeduren führen Code aus, ohne einen Wert zurückzugeben."
+        },
+        "example1": "Eine Begrüßungs-Prozedur mit Parameter"
+    },
+    "level10": {
+        "title": "Funktionen",
+        "description": "Erstelle Funktionen, die Werte berechnen und zurückgeben.",
+        "objective1": "Funktionen deklarieren mit Rückgabetyp",
+        "objective2": "Rückgabewerte durch Zuweisung an Funktionsnamen setzen",
+        "objective3": "Funktionen in Ausdrücken verwenden",
+        "concept1": {
+            "title": "Funktions-Deklaration",
+            "content": "function Name(Parameter: Typ): Rückgabetyp definiert eine Funktion. Der Rückgabewert wird durch Zuweisung an den Funktionsnamen gesetzt."
+        },
+        "example1": "Eine Funktion zur Berechnung des Quadrats einer Zahl"
+    }
+}

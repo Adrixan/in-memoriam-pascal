@@ -1,0 +1,878 @@
+/**
+ * Tutorial Level Definitions
+ * 
+ * 10 progressive levels teaching Pascal programming fundamentals
+ * Following the exact progression specified in the task requirements.
+ */
+
+import type { TutorialLevel, ValidationRule, Hint } from '@/types';
+
+/**
+ * Level 1: Hello World
+ * 
+ * Teaches: Program structure, begin/end, WriteLn
+ * Historical note: First program tradition since Bell Labs
+ */
+const level1: TutorialLevel = {
+    id: 'hello-world',
+    number: 1,
+    track: 'basic',
+    titleKey: 'level1.title',
+    descriptionKey: 'level1.description',
+    objectives: [
+        'level1.objective1',
+        'level1.objective2',
+        'level1.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level1.concept1.title',
+            contentKey: 'level1.concept1.content',
+            codeExample: `program Name;
+begin
+  { statements }
+end.`,
+        },
+        {
+            titleKey: 'level1.concept2.title',
+            contentKey: 'level1.concept2.content',
+            codeExample: `WriteLn('Hello World!');`,
+        },
+    ],
+    examples: [
+        {
+            code: `program HelloWorld;
+begin
+  WriteLn('Hello World!');
+end.`,
+            explanationKey: 'level1.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program HelloWorld;
+begin
+  { Write your code here }
+end.`,
+    expectedOutput: 'Hello World!',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: 'Hello World!' },
+            errorKey: 'validation.level1.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'WriteLn' },
+            errorKey: 'validation.level1.missingWriteLn',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level1.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level1.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level1.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 5,
+    prerequisites: [],
+};
+
+/**
+ * Level 2: Variables
+ * 
+ * Teaches: var section, Integer, String, Real types, declaration, assignment (:=)
+ */
+const level2: TutorialLevel = {
+    id: 'variables',
+    number: 2,
+    track: 'basic',
+    titleKey: 'level2.title',
+    descriptionKey: 'level2.description',
+    objectives: [
+        'level2.objective1',
+        'level2.objective2',
+        'level2.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level2.concept1.title',
+            contentKey: 'level2.concept1.content',
+            codeExample: `var
+  age: Integer;    { Whole number }
+  name: String;    { Text }
+  price: Real;     { Decimal number }`,
+        },
+        {
+            titleKey: 'level2.concept2.title',
+            contentKey: 'level2.concept2.content',
+            codeExample: `age := 25;
+name := 'Pascal';
+price := 19.99;`,
+        },
+    ],
+    examples: [
+        {
+            code: `program Variables;
+var
+  age: Integer;
+  name: String;
+  price: Real;
+begin
+  age := 25;
+  name := 'Pascal';
+  price := 19.99;
+  WriteLn('Name: ', name);
+  WriteLn('Age: ', age);
+  WriteLn('Price: ', price:0:2);
+end.`,
+            explanationKey: 'level2.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program Variables;
+var
+  number: Integer;
+  text: String;
+  value: Real;
+begin
+  { Assign values to variables and print them }
+end.`,
+    expectedOutput: 'Number: 42',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: 'Number: 42' },
+            errorKey: 'validation.level2.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'var' },
+            errorKey: 'validation.level2.missingVar',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: ':=' },
+            errorKey: 'validation.level2.missingAssignment',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level2.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level2.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level2.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 8,
+    prerequisites: ['hello-world'],
+};
+
+/**
+ * Level 3: Input/Output
+ * 
+ * Teaches: ReadLn, Write, user interaction
+ */
+const level3: TutorialLevel = {
+    id: 'input-output',
+    number: 3,
+    track: 'basic',
+    titleKey: 'level3.title',
+    descriptionKey: 'level3.description',
+    objectives: [
+        'level3.objective1',
+        'level3.objective2',
+        'level3.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level3.concept1.title',
+            contentKey: 'level3.concept1.content',
+            codeExample: `Write('Enter name: ');  { no newline }
+ReadLn(name);           { reads input }`,
+        },
+        {
+            titleKey: 'level3.concept2.title',
+            contentKey: 'level3.concept2.content',
+            codeExample: `Write('Age: ');    { Prompt without newline }
+ReadLn(age);       { Read user input }
+WriteLn('You are ', age, ' years old.');`,
+        },
+    ],
+    examples: [
+        {
+            code: `program InputOutput;
+var
+  name: String;
+begin
+  Write('Enter your name: ');
+  ReadLn(name);
+  WriteLn('Hello, ', name, '!');
+end.`,
+            explanationKey: 'level3.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program InputOutput;
+var
+  name: String;
+begin
+  { Ask for name and greet the user }
+end.`,
+    expectedOutput: 'Hello, World!',
+    validation: [
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'ReadLn' },
+            errorKey: 'validation.level3.missingReadLn',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'Write' },
+            errorKey: 'validation.level3.missingWrite',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level3.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level3.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level3.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 8,
+    prerequisites: ['variables'],
+};
+
+/**
+ * Level 4: Arithmetic
+ * 
+ * Teaches: Operators, expressions, order of operations
+ */
+const level4: TutorialLevel = {
+    id: 'arithmetic',
+    number: 4,
+    track: 'basic',
+    titleKey: 'level4.title',
+    descriptionKey: 'level4.description',
+    objectives: [
+        'level4.objective1',
+        'level4.objective2',
+        'level4.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level4.concept1.title',
+            contentKey: 'level4.concept1.content',
+            codeExample: `sum := a + b;        { Addition }
+diff := a - b;       { Subtraction }
+product := a * b;    { Multiplication }
+quotient := a div b; { Integer division }
+remainder := a mod b; { Modulo (remainder) }`,
+        },
+        {
+            titleKey: 'level4.concept2.title',
+            contentKey: 'level4.concept2.content',
+            codeExample: `result := 2 + 3 * 4;    { = 14, not 20 }
+result := (2 + 3) * 4;  { = 20, parentheses first }`,
+        },
+    ],
+    examples: [
+        {
+            code: `program Arithmetic;
+var
+  a, b, sum, product: Integer;
+begin
+  a := 10;
+  b := 3;
+  sum := a + b;
+  product := a * b;
+  WriteLn(a, ' + ', b, ' = ', sum);
+  WriteLn(a, ' * ', b, ' = ', product);
+end.`,
+            explanationKey: 'level4.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program Arithmetic;
+var
+  a, b, sum: Integer;
+begin
+  a := 5;
+  b := 3;
+  { Calculate the sum and print the result }
+end.`,
+    expectedOutput: '5 + 3 = 8',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: '5 + 3 = 8' },
+            errorKey: 'validation.level4.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: '+' },
+            errorKey: 'validation.level4.missingOperator',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level4.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level4.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level4.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 10,
+    prerequisites: ['input-output'],
+};
+
+/**
+ * Level 5: Conditionals
+ * 
+ * Teaches: if/then/else, boolean expressions
+ */
+const level5: TutorialLevel = {
+    id: 'conditionals',
+    number: 5,
+    track: 'basic',
+    titleKey: 'level5.title',
+    descriptionKey: 'level5.description',
+    objectives: [
+        'level5.objective1',
+        'level5.objective2',
+        'level5.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level5.concept1.title',
+            contentKey: 'level5.concept1.content',
+            codeExample: `if number >= 0 then
+  WriteLn('Positive')
+else
+  WriteLn('Negative');`,
+        },
+        {
+            titleKey: 'level5.concept2.title',
+            contentKey: 'level5.concept2.content',
+            codeExample: `if (age >= 18) and (age < 65) then
+  WriteLn('Working age');
+  
+if (day = 'Sat') or (day = 'Sun') then
+  WriteLn('Weekend');`,
+        },
+    ],
+    examples: [
+        {
+            code: `program Conditionals;
+var
+  number: Integer;
+begin
+  number := -5;
+  if number >= 0 then
+    WriteLn('Positive')
+  else
+    WriteLn('Negative');
+end.`,
+            explanationKey: 'level5.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program Conditionals;
+var
+  number: Integer;
+begin
+  number := -5;
+  { Check if number is positive or negative }
+end.`,
+    expectedOutput: 'Negative',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: 'Negative' },
+            errorKey: 'validation.level5.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'if' },
+            errorKey: 'validation.level5.missingIf',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'else' },
+            errorKey: 'validation.level5.missingElse',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level5.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level5.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level5.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 10,
+    prerequisites: ['arithmetic'],
+};
+
+/**
+ * Level 6: Loops (For)
+ * 
+ * Teaches: For loops, counting, iteration
+ */
+const level6: TutorialLevel = {
+    id: 'for-loop',
+    number: 6,
+    track: 'basic',
+    titleKey: 'level6.title',
+    descriptionKey: 'level6.description',
+    objectives: [
+        'level6.objective1',
+        'level6.objective2',
+        'level6.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level6.concept1.title',
+            contentKey: 'level6.concept1.content',
+            codeExample: `for i := 1 to 5 do
+  WriteLn(i);  { Counts up: 1, 2, 3, 4, 5 }`,
+        },
+        {
+            titleKey: 'level6.concept2.title',
+            contentKey: 'level6.concept2.content',
+            codeExample: `for i := 5 downto 1 do
+  WriteLn(i);  { Counts down: 5, 4, 3, 2, 1 }`,
+        },
+    ],
+    examples: [
+        {
+            code: `program ForLoop;
+var
+  i: Integer;
+begin
+  for i := 1 to 5 do
+    WriteLn(i);
+end.`,
+            explanationKey: 'level6.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program ForLoop;
+var
+  i: Integer;
+begin
+  { Use a for loop to print numbers 1 to 5 }
+end.`,
+    expectedOutput: '1\n2\n3\n4\n5',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: '1\n2\n3\n4\n5' },
+            errorKey: 'validation.level6.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'for' },
+            errorKey: 'validation.level6.missingFor',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'to' },
+            errorKey: 'validation.level6.missingTo',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level6.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level6.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level6.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 10,
+    prerequisites: ['conditionals'],
+};
+
+/**
+ * Level 7: Loops (While/Repeat)
+ * 
+ * Teaches: While and repeat-until loops
+ */
+const level7: TutorialLevel = {
+    id: 'while-repeat-loop',
+    number: 7,
+    track: 'basic',
+    titleKey: 'level7.title',
+    descriptionKey: 'level7.description',
+    objectives: [
+        'level7.objective1',
+        'level7.objective2',
+        'level7.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level7.concept1.title',
+            contentKey: 'level7.concept1.content',
+            codeExample: `while count > 0 do
+begin
+  WriteLn(count);
+  count := count - 1;
+end;`,
+        },
+        {
+            titleKey: 'level7.concept2.title',
+            contentKey: 'level7.concept2.content',
+            codeExample: `repeat
+  WriteLn(count);
+  count := count - 1;
+until count = 0;  { Runs at least once }`,
+        },
+    ],
+    examples: [
+        {
+            code: `program WhileRepeatLoop;
+var
+  count: Integer;
+begin
+  count := 5;
+  while count > 0 do
+  begin
+    WriteLn(count);
+    count := count - 1;
+  end;
+  WriteLn('Liftoff!');
+end.`,
+            explanationKey: 'level7.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program WhileRepeatLoop;
+var
+  count: Integer;
+begin
+  count := 5;
+  { Use a while loop to count down from 5 to 1 }
+  WriteLn('Liftoff!');
+end.`,
+    expectedOutput: '5\n4\n3\n2\n1\nLiftoff!',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: '5\n4\n3\n2\n1\nLiftoff!' },
+            errorKey: 'validation.level7.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'while' },
+            errorKey: 'validation.level7.missingWhile',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level7.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level7.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level7.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 12,
+    prerequisites: ['for-loop'],
+};
+
+/**
+ * Level 8: Procedures
+ * 
+ * Teaches: Procedure definition, parameters, modularity
+ */
+const level8: TutorialLevel = {
+    id: 'procedures',
+    number: 8,
+    track: 'basic',
+    titleKey: 'level8.title',
+    descriptionKey: 'level8.description',
+    objectives: [
+        'level8.objective1',
+        'level8.objective2',
+        'level8.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level8.concept1.title',
+            contentKey: 'level8.concept1.content',
+            codeExample: `procedure Greet(name: String);
+begin
+  WriteLn('Hello, ', name, '!');
+end;`,
+        },
+        {
+            titleKey: 'level8.concept2.title',
+            contentKey: 'level8.concept2.content',
+            codeExample: `procedure Add(a, b: Integer);
+begin
+  WriteLn(a, ' + ', b, ' = ', a + b);
+end;
+
+{ Call it: }
+Add(5, 3);`,
+        },
+    ],
+    examples: [
+        {
+            code: `program Procedures;
+
+procedure Greet(name: String);
+begin
+  WriteLn('Hello, ', name, '!');
+end;
+
+begin
+  Greet('World');
+end.`,
+            explanationKey: 'level8.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program Procedures;
+
+{ Define a procedure called Greet that takes a name parameter }
+
+begin
+  { Call your procedure }
+end.`,
+    expectedOutput: 'Hello, World!',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: 'Hello, World!' },
+            errorKey: 'validation.level8.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'procedure' },
+            errorKey: 'validation.level8.missingProcedure',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level8.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level8.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level8.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 12,
+    prerequisites: ['while-repeat-loop'],
+};
+
+/**
+ * Level 9: Functions
+ * 
+ * Teaches: Function definition, return values, recursion intro
+ */
+const level9: TutorialLevel = {
+    id: 'functions',
+    number: 9,
+    track: 'basic',
+    titleKey: 'level9.title',
+    descriptionKey: 'level9.description',
+    objectives: [
+        'level9.objective1',
+        'level9.objective2',
+        'level9.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level9.concept1.title',
+            contentKey: 'level9.concept1.content',
+            codeExample: `function Square(n: Integer): Integer;
+begin
+  Square := n * n;  { Return value assigned to function name }
+end;`,
+        },
+        {
+            titleKey: 'level9.concept2.title',
+            contentKey: 'level9.concept2.content',
+            codeExample: `function Factorial(n: Integer): Integer;
+begin
+  if n <= 1 then
+    Factorial := 1
+  else
+    Factorial := n * Factorial(n - 1);  { Recursion! }
+end;`,
+        },
+    ],
+    examples: [
+        {
+            code: `program Functions;
+
+function Square(n: Integer): Integer;
+begin
+  Square := n * n;
+end;
+
+var
+  result: Integer;
+begin
+  result := Square(5);
+  WriteLn('5 squared is ', result);
+end.`,
+            explanationKey: 'level9.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program Functions;
+
+{ Define a function called Square that returns n * n }
+
+var
+  result: Integer;
+begin
+  { Call your function and print the result }
+end.`,
+    expectedOutput: '5 squared is 25',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: '5 squared is 25' },
+            errorKey: 'validation.level9.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'function' },
+            errorKey: 'validation.level9.missingFunction',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level9.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level9.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level9.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 15,
+    prerequisites: ['procedures'],
+};
+
+/**
+ * Level 10: Arrays
+ * 
+ * Teaches: Array declaration, indexing, traversal
+ */
+const level10: TutorialLevel = {
+    id: 'arrays',
+    number: 10,
+    track: 'basic',
+    titleKey: 'level10.title',
+    descriptionKey: 'level10.description',
+    objectives: [
+        'level10.objective1',
+        'level10.objective2',
+        'level10.objective3',
+    ],
+    concepts: [
+        {
+            titleKey: 'level10.concept1.title',
+            contentKey: 'level10.concept1.content',
+            codeExample: `var
+  numbers: array[1..5] of Integer;
+  names: array[1..3] of String;`,
+        },
+        {
+            titleKey: 'level10.concept2.title',
+            contentKey: 'level10.concept2.content',
+            codeExample: `numbers[1] := 10;     { Assign to index 1 }
+numbers[2] := 20;     { Assign to index 2 }
+WriteLn(numbers[1]);  { Access index 1 }`,
+        },
+        {
+            titleKey: 'level10.concept3.title',
+            contentKey: 'level10.concept3.content',
+            codeExample: `for i := 1 to 5 do
+  WriteLn(numbers[i]);  { Traverse array }`,
+        },
+    ],
+    examples: [
+        {
+            code: `program Arrays;
+var
+  numbers: array[1..5] of Integer;
+  i: Integer;
+begin
+  { Initialize array }
+  numbers[1] := 10;
+  numbers[2] := 20;
+  numbers[3] := 30;
+  numbers[4] := 40;
+  numbers[5] := 50;
+  
+  { Print all elements }
+  for i := 1 to 5 do
+    WriteLn('numbers[', i, '] = ', numbers[i]);
+end.`,
+            explanationKey: 'level10.example1',
+            editable: false,
+        },
+    ],
+    starterCode: `program Arrays;
+var
+  numbers: array[1..5] of Integer;
+  i: Integer;
+begin
+  { Initialize the array with values 10, 20, 30, 40, 50 }
+  { Then print all elements using a for loop }
+end.`,
+    expectedOutput: 'numbers[1] = 10\nnumbers[2] = 20\nnumbers[3] = 30\nnumbers[4] = 40\nnumbers[5] = 50',
+    validation: [
+        {
+            type: 'output_match',
+            config: { expected: 'numbers[1] = 10\nnumbers[2] = 20\nnumbers[3] = 30\nnumbers[4] = 40\nnumbers[5] = 50' },
+            errorKey: 'validation.level10.outputMismatch',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'array' },
+            errorKey: 'validation.level10.missingArray',
+        },
+        {
+            type: 'contains_keyword',
+            config: { keyword: 'for' },
+            errorKey: 'validation.level10.missingForLoop',
+        },
+    ] as ValidationRule[],
+    hints: [
+        { level: 1, contentKey: 'hints.level10.1', cost: 0, type: 'gentle' },
+        { level: 2, contentKey: 'hints.level10.2', cost: 5, type: 'specific' },
+        { level: 3, contentKey: 'hints.level10.3', cost: 10, type: 'detailed' },
+    ] as Hint[],
+    estimatedTime: 15,
+    prerequisites: ['functions'],
+};
+
+/**
+ * All tutorial levels in order
+ */
+export const tutorialLevels: TutorialLevel[] = [
+    level1,
+    level2,
+    level3,
+    level4,
+    level5,
+    level6,
+    level7,
+    level8,
+    level9,
+    level10,
+];
+
+/**
+ * Get a level by its ID
+ */
+export function getLevelById(id: string): TutorialLevel | undefined {
+    return tutorialLevels.find((level) => level.id === id);
+}
+
+/**
+ * Get a level by its number (1-based)
+ */
+export function getLevelByNumber(number: number): TutorialLevel | undefined {
+    return tutorialLevels.find((level) => level.number === number);
+}
+
+/**
+ * Get the next level after the given level ID
+ */
+export function getNextLevel(currentId: string): TutorialLevel | undefined {
+    const currentIndex = tutorialLevels.findIndex((level) => level.id === currentId);
+    if (currentIndex < 0 || currentIndex >= tutorialLevels.length - 1) {
+        return undefined;
+    }
+    return tutorialLevels[currentIndex + 1];
+}
+
+/**
+ * Get the previous level before the given level ID
+ */
+export function getPreviousLevel(currentId: string): TutorialLevel | undefined {
+    const currentIndex = tutorialLevels.findIndex((level) => level.id === currentId);
+    if (currentIndex <= 0) {
+        return undefined;
+    }
+    return tutorialLevels[currentIndex - 1];
+}
+
+export default tutorialLevels;
