@@ -179,16 +179,21 @@ function TutorialPage(): ReactElement {
         }
     }, [currentLevel, progress, updateProgress]);
 
+    // Interactive mode state - when enabled, user can enter their own input
+    const [interactiveMode, setInteractiveMode] = useState(false);
+
     // Handle code execution with validation
     const handleRunCode = useCallback(async () => {
         // Clear previous validation
         setValidationResult(null);
         setShowSuccess(false);
 
-        // Run the code with test input if available
-        const inputQueue = currentLevel?.testInput;
+        // Run the code:
+        // - If interactiveMode is true: use empty array (user enters input manually)
+        // - Otherwise: use testInput from level (for automated testing)
+        const inputQueue = interactiveMode ? [] : currentLevel?.testInput;
         await runCode(inputQueue);
-    }, [runCode, currentLevel]);
+    }, [runCode, currentLevel, interactiveMode]);
 
     // Track if we've already processed the current execution to prevent infinite loops
     const lastProcessedStatusRef = useRef<{ status: string; timestamp: number } | null>(null);
@@ -409,6 +414,21 @@ function TutorialPage(): ReactElement {
                                     isReady={interpreterReady && editorReady}
                                     disabled={!code.trim()}
                                 />
+                                {/* Interactive mode toggle */}
+                                <label
+                                    className="flex items-center gap-2 cursor-pointer text-sm"
+                                    title={t('editor.interactiveMode', 'Enter your own input instead of using test data')}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={interactiveMode}
+                                        onChange={(e) => setInteractiveMode(e.target.checked)}
+                                        className="w-4 h-4 accent-[var(--color-primary)]"
+                                    />
+                                    <span className="font-terminal text-[var(--color-text-muted)]">
+                                        {t('editor.interactive', 'Interactive')}
+                                    </span>
+                                </label>
                             </div>
 
                             {/* Code editor */}
