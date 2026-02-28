@@ -47,3 +47,30 @@
 - Node.js (check package.json for version)
 - Vite 6
 - TypeScript 5.x
+
+## Recent Changes (2026-02-28)
+
+### Task Description Section Added
+
+- Added `taskDescriptionKey` field to TutorialLevel type in `src/types/index.ts`
+- Implemented "Your Task" / "Deine Aufgabe" section in tutorial UI
+- Section appears between Concepts and Examples
+- Added task descriptions for all 10 tutorial levels (German and English)
+- Reordered sections: Concepts → Your Task → Expected Output → Examples
+
+### Output Clearing on Level Change
+
+- Added `clearOutput()` call in TutorialPage when changing levels
+- Ensures OUTPUT.TXT is cleared when navigating between levels
+
+### Files Modified
+
+- `src/types/index.ts` - Added taskDescriptionKey field
+- `src/components/tutorial/LevelInstructions/LevelInstructions.tsx` - UI changes
+- `src/data/tutorials/levels.ts` - Added taskDescriptionKey to all levels
+- `src/data/levels.ts` - Added taskDescriptionKey to all levels
+- `src/i18n/locales/de/levels.json` - German translations
+- `src/i18n/locales/en/levels.json` - English translations
+- `src/i18n/locales/de/tutorials.json` - UI labels
+- `src/i18n/locales/en/tutorials.json` - UI labels
+- `src/pages/TutorialPage/TutorialPage.tsx` - Clear output on level change
