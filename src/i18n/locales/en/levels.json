@@ -13,7 +13,8 @@
             "title": "Text Output",
             "content": "WriteLn prints text to the screen. The text must be enclosed in single quotes."
         },
-        "example1": "A complete Hello World program"
+        "example1": "A complete Hello World program",
+        "task": "Write a program that outputs 'Hello World!'."
     },
     "level2": {
         "title": "Variables",
@@ -29,7 +30,8 @@
             "title": "Value Assignment",
             "content": "In Pascal, the assignment operator ':=' is used to assign a value to a variable."
         },
-        "example1": "Declaring and using an Integer variable"
+        "example1": "Declaring and using an Integer variable",
+        "task": "Declare an Integer variable 'number', assign it the value 42, and output 'Number: 42'."
     },
     "level3": {
         "title": "Simple Math",
@@ -41,7 +43,8 @@
             "title": "Arithmetic Operators",
             "content": "Pascal supports + (addition), - (subtraction), * (multiplication), and div (integer division)."
         },
-        "example1": "Adding two numbers and outputting the result"
+        "example1": "Adding two numbers and outputting the result",
+        "task": "Calculate the sum of two numbers and output the result."
     },
     "level4": {
         "title": "Strings",
@@ -53,7 +56,8 @@
             "title": "String Type",
             "content": "String stores text. Strings are written in single quotes: 'Example'"
         },
-        "example1": "Using a String variable for output"
+        "example1": "Using a String variable for output",
+        "task": "Declare a String variable and output it."
     },
     "level5": {
         "title": "Input and Output",
@@ -65,7 +69,8 @@
             "title": "Reading Input",
             "content": "ReadLn reads user input and stores it in a variable. Write outputs text without a line break."
         },
-        "example1": "A program that asks the user for their name"
+        "example1": "A program that asks the user for their name",
+        "task": "Ask the user for their name and output a greeting."
     },
     "level6": {
         "title": "Conditions",
@@ -77,7 +82,8 @@
             "title": "Conditional Statements",
             "content": "if checks a condition. If true, the then-block is executed, otherwise the else-block."
         },
-        "example1": "Checking if a number is positive or negative"
+        "example1": "Checking if a number is positive or negative",
+        "task": "Check if an input number is positive or negative and output the result."
     },
     "level7": {
         "title": "For Loop",
@@ -93,7 +99,8 @@
             "title": "For Loop Downward",
             "content": "for i := 5 downto 1 do counts backwards from 5 to 1."
         },
-        "example1": "Output numbers from 1 to 5"
+        "example1": "Output numbers from 1 to 5",
+        "task": "Use a for loop to output the numbers from 1 to 5."
     },
     "level8": {
         "title": "While Loop",
@@ -105,7 +112,8 @@
             "title": "While Loop",
             "content": "while condition do repeats the code as long as the condition is true. Make sure to change the condition in the loop body!"
         },
-        "example1": "Countdown from 5 to 1 with while"
+        "example1": "Countdown from 5 to 1 with while",
+        "task": "Use a while loop to output a countdown from 5 to 1."
     },
     "level9": {
         "title": "Procedures",
@@ -117,7 +125,8 @@
             "title": "Procedure Declaration",
             "content": "procedure Name(Parameter: Type) defines a procedure. Procedures execute code without returning a value."
         },
-        "example1": "A greeting procedure with parameter"
+        "example1": "A greeting procedure with parameter",
+        "task": "Create a procedure that takes a name as a parameter and outputs a greeting."
     },
     "level10": {
         "title": "Functions",
@@ -129,6 +138,7 @@
             "title": "Function Declaration",
             "content": "function Name(Parameter: Type): ReturnType defines a function. The return value is set by assigning to the function name."
         },
-        "example1": "A function to calculate the square of a number"
+        "example1": "A function to calculate the square of a number",
+        "task": "Create a function that squares a number and returns the result."
     }
 }

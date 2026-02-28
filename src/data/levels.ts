@@ -19,6 +19,7 @@ const level1: TutorialLevel = {
     track: 'basic',
     titleKey: 'level1.title',
     descriptionKey: 'level1.description',
+    taskDescriptionKey: 'level1.task',
     objectives: [
         'level1.objective1',
         'level1.objective2',
@@ -86,6 +87,7 @@ const level2: TutorialLevel = {
     track: 'basic',
     titleKey: 'level2.title',
     descriptionKey: 'level2.description',
+    taskDescriptionKey: 'level2.task',
     objectives: [
         'level2.objective1',
         'level2.objective2',
@@ -173,6 +175,7 @@ const level3: TutorialLevel = {
     track: 'basic',
     titleKey: 'level3.title',
     descriptionKey: 'level3.description',
+    taskDescriptionKey: 'level3.task',
     objectives: [
         'level3.objective1',
         'level3.objective2',
@@ -246,6 +249,7 @@ const level4: TutorialLevel = {
     track: 'basic',
     titleKey: 'level4.title',
     descriptionKey: 'level4.description',
+    taskDescriptionKey: 'level4.task',
     objectives: [
         'level4.objective1',
         'level4.objective2',
@@ -326,6 +330,7 @@ const level5: TutorialLevel = {
     track: 'basic',
     titleKey: 'level5.title',
     descriptionKey: 'level5.description',
+    taskDescriptionKey: 'level5.task',
     objectives: [
         'level5.objective1',
         'level5.objective2',
@@ -411,6 +416,7 @@ const level6: TutorialLevel = {
     track: 'basic',
     titleKey: 'level6.title',
     descriptionKey: 'level6.description',
+    taskDescriptionKey: 'level6.task',
     objectives: [
         'level6.objective1',
         'level6.objective2',
@@ -487,6 +493,7 @@ const level7: TutorialLevel = {
     track: 'basic',
     titleKey: 'level7.title',
     descriptionKey: 'level7.description',
+    taskDescriptionKey: 'level7.task',
     objectives: [
         'level7.objective1',
         'level7.objective2',
@@ -570,6 +577,7 @@ const level8: TutorialLevel = {
     track: 'basic',
     titleKey: 'level8.title',
     descriptionKey: 'level8.description',
+    taskDescriptionKey: 'level8.task',
     objectives: [
         'level8.objective1',
         'level8.objective2',
@@ -652,6 +660,7 @@ const level9: TutorialLevel = {
     track: 'basic',
     titleKey: 'level9.title',
     descriptionKey: 'level9.description',
+    taskDescriptionKey: 'level9.task',
     objectives: [
         'level9.objective1',
         'level9.objective2',
@@ -739,6 +748,7 @@ const level10: TutorialLevel = {
     track: 'basic',
     titleKey: 'level10.title',
     descriptionKey: 'level10.description',
+    taskDescriptionKey: 'level10.task',
     objectives: [
         'level10.objective1',
         'level10.objective2',

@@ -136,6 +136,8 @@ function TutorialPage(): ReactElement {
 
         if (levelId !== storeState.currentLevelId) {
             setCurrentLevel(levelId);
+            // Clear output when changing levels
+            clearOutput();
             // Reset validation state when changing levels
             setValidationResult(null);
             setShowSuccess(false);
@@ -149,9 +151,10 @@ function TutorialPage(): ReactElement {
         if (levelId === currentLevelId) return;
 
         setCurrentLevel(levelId);
+        clearOutput();
         setValidationResult(null);
         setShowSuccess(false);
-    }, [levels.length, levelId, currentLevelId, setCurrentLevel, setValidationResult, setShowSuccess]);
+    }, [levels.length, levelId, currentLevelId, setCurrentLevel, clearOutput, setValidationResult, setShowSuccess]);
 
     // Set starter code when level is loaded
     // Use currentLevelId as dependency to avoid infinite loops from object reference changes

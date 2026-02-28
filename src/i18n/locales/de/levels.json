@@ -13,7 +13,8 @@
             "title": "Textausgabe",
             "content": "WriteLn gibt Text auf dem Bildschirm aus. Der Text muss in einfachen Anführungszeichen stehen."
         },
-        "example1": "Ein vollständiges Hello World Programm"
+        "example1": "Ein vollständiges Hello World Programm",
+        "task": "Schreibe ein Programm, das 'Hello World!' ausgibt."
     },
     "level2": {
         "title": "Variablen",
@@ -29,7 +30,8 @@
             "title": "Wertzuweisung",
             "content": "In Pascal wird der Zuweisungsoperator ':=' verwendet, um einer Variable einen Wert zuzuweisen."
         },
-        "example1": "Deklaration und Verwendung einer Integer-Variable"
+        "example1": "Deklaration und Verwendung einer Integer-Variable",
+        "task": "Deklariere eine Integer-Variable 'number', weise ihr den Wert 42 zu und gib 'Number: 42' aus."
     },
     "level3": {
         "title": "Einfache Mathematik",
@@ -41,7 +43,8 @@
             "title": "Arithmetische Operatoren",
             "content": "Pascal unterstützt + (Addition), - (Subtraktion), * (Multiplikation) und div (Integer-Division)."
         },
-        "example1": "Addition zweier Zahlen und Ausgabe des Ergebnisses"
+        "example1": "Addition zweier Zahlen und Ausgabe des Ergebnisses",
+        "task": "Berechne die Summe zweier Zahlen und gib das Ergebnis aus."
     },
     "level4": {
         "title": "Zeichenketten",
@@ -53,7 +56,8 @@
             "title": "String-Typ",
             "content": "String speichert Text. Zeichenketten werden in einfachen Anführungszeichen geschrieben: 'Beispiel'"
         },
-        "example1": "Verwendung einer String-Variable für die Ausgabe"
+        "example1": "Verwendung einer String-Variable für die Ausgabe",
+        "task": "Deklariere eine String-Variable und gib sie aus."
     },
     "level5": {
         "title": "Eingabe und Ausgabe",
@@ -65,7 +69,8 @@
             "title": "Eingabe lesen",
             "content": "ReadLn liest eine Benutzereingabe und speichert sie in einer Variable. Write gibt Text ohne Zeilenumbruch aus."
         },
-        "example1": "Ein Programm, das den:die Benutzer:in nach dem Namen fragt"
+        "example1": "Ein Programm, das den:die Benutzer:in nach dem Namen fragt",
+        "task": "Frage den:die Benutzer:in nach dem Namen und gib eine Begrüßung aus."
     },
     "level6": {
         "title": "Bedingungen",
@@ -77,7 +82,8 @@
             "title": "Bedingte Anweisungen",
             "content": "if prüft eine Bedingung. Wenn wahr, wird der then-Block ausgeführt, sonst der else-Block."
         },
-        "example1": "Überprüfung, ob eine Zahl positiv oder negativ ist"
+        "example1": "Überprüfung, ob eine Zahl positiv oder negativ ist",
+        "task": "Prüfe, ob eine eingegebene Zahl positiv oder negativ ist, und gib das Ergebnis aus."
     },
     "level7": {
         "title": "For-Schleife",
@@ -93,7 +99,8 @@
             "title": "For-Schleife abwärts",
             "content": "for i := 5 downto 1 do zählt rückwärts von 5 bis 1."
         },
-        "example1": "Zahlen von 1 bis 5 ausgeben"
+        "example1": "Zahlen von 1 bis 5 ausgeben",
+        "task": "Verwende eine for-Schleife, um die Zahlen von 1 bis 5 auszugeben."
     },
     "level8": {
         "title": "While-Schleife",
@@ -105,7 +112,8 @@
             "title": "While-Schleife",
             "content": "while Bedingung do wiederholt den Code, solange die Bedingung wahr ist. Achte darauf, die Bedingung im Schleifenkörper zu ändern!"
         },
-        "example1": "Countdown von 5 bis 1 mit while"
+        "example1": "Countdown von 5 bis 1 mit while",
+        "task": "Verwende eine while-Schleife, um einen Countdown von 5 bis 1 auszugeben."
     },
     "level9": {
         "title": "Prozeduren",
@@ -117,7 +125,8 @@
             "title": "Prozedur-Deklaration",
             "content": "procedure Name(Parameter: Typ) definiert eine Prozedur. Prozeduren führen Code aus, ohne einen Wert zurückzugeben."
         },
-        "example1": "Eine Begrüßungs-Prozedur mit Parameter"
+        "example1": "Eine Begrüßungs-Prozedur mit Parameter",
+        "task": "Erstelle eine Prozedur, die einen Namen als Parameter erhält und eine Begrüßung ausgibt."
     },
     "level10": {
         "title": "Funktionen",
@@ -129,6 +138,7 @@
             "title": "Funktions-Deklaration",
             "content": "function Name(Parameter: Typ): Rückgabetyp definiert eine Funktion. Der Rückgabewert wird durch Zuweisung an den Funktionsnamen gesetzt."
         },
-        "example1": "Eine Funktion zur Berechnung des Quadrats einer Zahl"
+        "example1": "Eine Funktion zur Berechnung des Quadrats einer Zahl",
+        "task": "Erstelle eine Funktion, die eine Zahl quadriert und das Ergebnis zurückgibt."
     }
 }

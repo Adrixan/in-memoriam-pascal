@@ -22,6 +22,9 @@ export interface TutorialLevel {
     /** i18n key for level description */
     descriptionKey: string;
 
+    /** i18n key for task description - explains what program to write */
+    taskDescriptionKey?: string;
+
     /** Learning objectives (i18n keys) */
     objectives: string[];
 

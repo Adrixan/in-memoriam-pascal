@@ -226,6 +226,23 @@ function LevelInstructions({
                 </RetroPanel>
             )}
 
+            {/* Task Description - what the program should do */}
+            {level.taskDescriptionKey && (
+                <RetroPanel variant="default" className="p-4 mb-4">
+                    <h3 className="font-pixel text-sm text-[var(--color-primary)] mb-3">
+                        {t('tutorials:task', 'Your Task')}
+                    </h3>
+                    <p className="font-terminal text-[var(--color-text-muted)]">
+                        {t(`levels:${level.taskDescriptionKey}`, level.taskDescriptionKey)}
+                    </p>
+                </RetroPanel>
+            )}
+
+            {/* Expected output */}
+            {showExpectedOutput && level.expectedOutput && (
+                <ExpectedOutputSection output={level.expectedOutput} />
+            )}
+
             {/* Code examples */}
             {level.examples.length > 0 && (
                 <div className="mb-4">
@@ -245,11 +262,6 @@ function LevelInstructions({
                         <ExampleSection key={index} example={example} />
                     ))}
                 </div>
-            )}
-
-            {/* Expected output */}
-            {showExpectedOutput && level.expectedOutput && (
-                <ExpectedOutputSection output={level.expectedOutput} />
             )}
 
             {/* Hints */}
