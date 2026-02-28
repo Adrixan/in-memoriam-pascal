@@ -15,6 +15,7 @@ export class OutputCapture {
     private handlers: OutputHandler[] = [];
     private originalPrint: ((output: string) => void) | undefined;
     private originalModulePrint: ((output: string) => void) | undefined;
+    private originalConsoleLog: ((...args: unknown[]) => void) | undefined;
     private isCapturing = false;
 
     /**
@@ -30,9 +31,19 @@ export class OutputCapture {
         this.outputLines = [];
         this.isCapturing = true;
 
-        // Store and override print function if in browser
+        // Store and override both print function AND console.log
         if (typeof window !== 'undefined') {
             const win = window as unknown as Record<string, unknown>;
+
+            // Also capture console.log output from Pascal.js
+            // Pascal.js sometimes uses console.log directly
+            this.originalConsoleLog = console.log.bind(console);
+            const captureConsoleLog = (...args: unknown[]): void => {
+                const output = args.map(arg => String(arg)).join(' ');
+                // Directly add to array without any logging to avoid infinite recursion
+                this.addOutput(output);
+            };
+            console.log = captureConsoleLog;
 
             // Check if the current print function is the browser's native print dialog
             // Native browser print has no custom properties and is a built-in function
@@ -58,7 +69,7 @@ export class OutputCapture {
 
             // Create a custom print function that captures output
             const capturePrint = (output: string): void => {
-                console.log('[OutputCapture] capturePrint called with:', output?.substring(0, 50));
+                // Directly add to array without any logging to avoid infinite recursion
                 this.addOutput(output);
             };
 
@@ -86,6 +97,12 @@ export class OutputCapture {
 
         console.log('[OutputCapture] Stopping capture');
         this.isCapturing = false;
+
+        // Restore original console.log
+        if (this.originalConsoleLog !== undefined) {
+            console.log = this.originalConsoleLog;
+            console.log('[OutputCapture] Restored console.log');
+        }
 
         // Restore original print function
         if (typeof window !== 'undefined') {

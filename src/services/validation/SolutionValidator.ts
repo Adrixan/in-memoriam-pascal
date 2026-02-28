@@ -54,6 +54,21 @@ export class SolutionValidator {
         const hasError = !executionOutput.success || executionOutput.errors.length > 0;
         const errorMessage = executionOutput.errors.join('\n');
 
+        // Check for runtime errors first - if code fails to execute, level is not complete
+        if (hasError) {
+            return {
+                success: false,
+                levelCompleted: false,
+                levelId: level.id,
+                messageKey: 'validation.runtimeError',
+                details: {
+                    failedRule: 'no_runtime_error',
+                    expected: 'Code should execute without errors',
+                    actual: errorMessage || 'Execution failed',
+                },
+            };
+        }
+
         // Convert validation rules to extended format
         const extendedRules = this.convertValidationRules(level.validation);
 

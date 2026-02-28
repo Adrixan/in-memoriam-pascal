@@ -1,0 +1,237 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "Zum Hauptinhalt springen" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - banner [ref=e5]:
+      - generic [ref=e7]:
+        - link "In Memoriam Pascal" [ref=e8] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e9]: ">_"
+          - generic [ref=e10]: In Memoriam Pascal
+        - navigation "Main navigation" [ref=e11]:
+          - link "Startseite" [ref=e12] [cursor=pointer]:
+            - /url: /
+          - link "Tutorial" [ref=e13] [cursor=pointer]:
+            - /url: /tutorial/level-1
+        - button "Open menu" [ref=e14] [cursor=pointer]
+    - main "Tutorial page" [ref=e21]:
+      - generic [ref=e22]:
+        - complementary "Level navigation" [ref=e23]:
+          - generic [ref=e24]:
+            - generic [ref=e26]: LEVELS.SYS
+            - generic [ref=e28]:
+              - generic [ref=e29]:
+                - generic [ref=e30]:
+                  - generic [ref=e31]:
+                    - generic [ref=e32]: Fortschritt
+                    - generic [ref=e33]: 0%
+                  - progressbar [ref=e34]
+                - generic [ref=e35]: 0 / 10 abgeschlossen
+              - navigation "Tutorial levels" [ref=e36]:
+                - list [ref=e37]:
+                  - listitem [ref=e38]:
+                    - 'link "Level 1: Hello World" [ref=e39] [cursor=pointer]':
+                      - /url: /tutorial/hello-world
+                      - generic [ref=e41]:
+                        - generic [ref=e42]: "[▶]"
+                        - generic [ref=e43]:
+                          - generic [ref=e44]: LEVEL 01
+                          - generic [ref=e45]: Hello World
+                        - generic [ref=e46]: ">"
+                  - listitem [ref=e47]:
+                    - 'link "Level 2: Variablen" [ref=e48] [cursor=pointer]':
+                      - /url: /tutorial/variables
+                      - generic [ref=e50]:
+                        - generic [ref=e51]: "[ ]"
+                        - generic [ref=e52]:
+                          - generic [ref=e53]: LEVEL 02
+                          - generic [ref=e54]: Variablen
+                        - generic [ref=e55]: ">"
+                  - listitem [ref=e56]:
+                    - 'link "Level 3: Einfache Mathematik" [ref=e57] [cursor=pointer]':
+                      - /url: /tutorial/simple-math
+                      - generic [ref=e59]:
+                        - generic [ref=e60]: "[ ]"
+                        - generic [ref=e61]:
+                          - generic [ref=e62]: LEVEL 03
+                          - generic [ref=e63]: Einfache Mathematik
+                        - generic [ref=e64]: ">"
+                  - listitem [ref=e65]:
+                    - 'link "Level 4: Zeichenketten" [ref=e66] [cursor=pointer]':
+                      - /url: /tutorial/strings
+                      - generic [ref=e68]:
+                        - generic [ref=e69]: "[ ]"
+                        - generic [ref=e70]:
+                          - generic [ref=e71]: LEVEL 04
+                          - generic [ref=e72]: Zeichenketten
+                        - generic [ref=e73]: ">"
+                  - listitem [ref=e74]:
+                    - 'link "Level 5: Eingabe und Ausgabe" [ref=e75] [cursor=pointer]':
+                      - /url: /tutorial/input-output
+                      - generic [ref=e77]:
+                        - generic [ref=e78]: "[ ]"
+                        - generic [ref=e79]:
+                          - generic [ref=e80]: LEVEL 05
+                          - generic [ref=e81]: Eingabe und Ausgabe
+                        - generic [ref=e82]: ">"
+                  - listitem [ref=e83]:
+                    - 'link "Level 6: Bedingungen" [ref=e84] [cursor=pointer]':
+                      - /url: /tutorial/conditionals
+                      - generic [ref=e86]:
+                        - generic [ref=e87]: "[ ]"
+                        - generic [ref=e88]:
+                          - generic [ref=e89]: LEVEL 06
+                          - generic [ref=e90]: Bedingungen
+                        - generic [ref=e91]: ">"
+                  - listitem [ref=e92]:
+                    - 'link "Level 7: For-Schleife" [ref=e93] [cursor=pointer]':
+                      - /url: /tutorial/for-loop
+                      - generic [ref=e95]:
+                        - generic [ref=e96]: "[ ]"
+                        - generic [ref=e97]:
+                          - generic [ref=e98]: LEVEL 07
+                          - generic [ref=e99]: For-Schleife
+                        - generic [ref=e100]: ">"
+                  - listitem [ref=e101]:
+                    - 'link "Level 8: While-Schleife" [ref=e102] [cursor=pointer]':
+                      - /url: /tutorial/while-loop
+                      - generic [ref=e104]:
+                        - generic [ref=e105]: "[ ]"
+                        - generic [ref=e106]:
+                          - generic [ref=e107]: LEVEL 08
+                          - generic [ref=e108]: While-Schleife
+                        - generic [ref=e109]: ">"
+                  - listitem [ref=e110]:
+                    - 'link "Level 9: Prozeduren" [ref=e111] [cursor=pointer]':
+                      - /url: /tutorial/procedures
+                      - generic [ref=e113]:
+                        - generic [ref=e114]: "[ ]"
+                        - generic [ref=e115]:
+                          - generic [ref=e116]: LEVEL 09
+                          - generic [ref=e117]: Prozeduren
+                        - generic [ref=e118]: ">"
+                  - listitem [ref=e119]:
+                    - 'link "Level 10: Funktionen" [ref=e120] [cursor=pointer]':
+                      - /url: /tutorial/functions
+                      - generic [ref=e122]:
+                        - generic [ref=e123]: "[ ]"
+                        - generic [ref=e124]:
+                          - generic [ref=e125]: LEVEL 10
+                          - generic [ref=e126]: Funktionen
+                        - generic [ref=e127]: ">"
+        - generic [ref=e128]:
+          - button "Open level navigation" [ref=e129] [cursor=pointer]:
+            - generic [ref=e130]:
+              - generic [ref=e131]: ☰
+              - generic [ref=e132]: Lektionen
+          - generic [ref=e133]:
+            - generic [ref=e135]: LEVEL 01
+            - heading "Hello World" [level=1] [ref=e136]
+            - paragraph [ref=e137]: Dein erstes Pascal-Programm – gib 'Hello World!' aus und beginne deine Reise in die Programmierung.
+          - generic [ref=e138]:
+            - region "Code editor section" [ref=e139]:
+              - generic [ref=e140]:
+                - heading "Editor" [level=2] [ref=e141]
+                - button "Ausführen" [ref=e142]:
+                  - img [ref=e143]
+                  - generic [ref=e145]: Ausführen
+              - generic [ref=e146]:
+                - generic [ref=e148]: CODE.PAS
+                - region "Pascal Code Editor" [ref=e151]:
+                  - code [ref=e154]:
+                    - generic [ref=e155]:
+                      - textbox "Pascal Code Editor"
+                      - textbox [ref=e156]
+                      - generic [ref=e158]:
+                        - generic [ref=e161]: "1"
+                        - generic [ref=e162]:
+                          - generic [ref=e163] [cursor=pointer]: 
+                          - generic [ref=e164]: "2"
+                        - generic [ref=e166]: "3"
+                        - generic [ref=e168]: "4"
+                      - generic [ref=e175]:
+                        - generic [ref=e177]: program HelloWorld;
+                        - generic [ref=e179]: begin
+                        - generic [ref=e181]: "{ Write your code here }"
+                        - generic [ref=e183]: end.
+            - region "Output section" [ref=e185]:
+              - generic [ref=e186]:
+                - heading "Ausgabe" [level=2] [ref=e187]
+                - button "Löschen" [ref=e188] [cursor=pointer]
+              - generic [ref=e189]:
+                - generic [ref=e191]: OUTPUT.TXT
+                - region "Program Output" [ref=e194]:
+                  - generic [ref=e199]: Output
+                  - log "Output content" [ref=e200]:
+                    - generic [ref=e201]: No output yet. Run your program to see results.
+              - generic [ref=e204]: Bereit
+          - region "Tutorial content" [ref=e205]:
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - paragraph [ref=e208]: Dein erstes Pascal-Programm – gib 'Hello World!' aus und beginne deine Reise in die Programmierung.
+                - generic [ref=e209]: "Geschätzte Zeit: 5 Minuten"
+              - generic [ref=e210]:
+                - heading "Lernziele" [level=3] [ref=e211]
+                - list [ref=e212]:
+                  - listitem [ref=e213]:
+                    - generic [ref=e214]: ">"
+                    - generic [ref=e215]: Die grundlegende Struktur eines Pascal-Programms verstehen
+                  - listitem [ref=e216]:
+                    - generic [ref=e217]: ">"
+                    - generic [ref=e218]: Die WriteLn-Prozedur zur Textausgabe verwenden
+                  - listitem [ref=e219]:
+                    - generic [ref=e220]: ">"
+                    - generic [ref=e221]: Das Programm mit 'end.' abschließen
+              - generic [ref=e222]:
+                - heading "Konzepte" [level=3] [ref=e223]
+                - generic [ref=e224]:
+                  - heading "1. Programmstruktur" [level=4] [ref=e225]
+                  - paragraph [ref=e226]: Jedes Pascal-Programm beginnt mit 'program Name;' und endet mit 'end.'. Der Code zwischen 'begin' und 'end.' wird ausgeführt.
+                  - code [ref=e228]: "program Name; begin { statements } end."
+                - generic [ref=e229]:
+                  - heading "2. Textausgabe" [level=4] [ref=e230]
+                  - paragraph [ref=e231]: WriteLn gibt Text auf dem Bildschirm aus. Der Text muss in einfachen Anführungszeichen stehen.
+                  - code [ref=e233]: WriteLn('Hello World!');
+              - generic [ref=e234]:
+                - heading "Beispiele" [level=3] [ref=e236]
+                - generic [ref=e237]:
+                  - heading "Beispiel" [level=4] [ref=e238]
+                  - generic [ref=e239]:
+                    - code [ref=e241]: program HelloWorld; begin WriteLn('Hello World!'); end.
+                    - paragraph [ref=e242]: Ein vollständiges Hello World Programm
+              - generic [ref=e243]:
+                - generic [ref=e245]: EXPECTED.OUT
+                - generic [ref=e247]:
+                  - heading "Erwartete Ausgabe" [level=3] [ref=e248]
+                  - code [ref=e250]: Hello World!
+              - generic [ref=e251]:
+                - heading "Hinweise" [level=3] [ref=e252]
+                - generic [ref=e253]:
+                  - paragraph [ref=e254]: 3 Hinweise verfügbar
+                  - button "Hinweis 1 anzeigen (5 Punkte)" [ref=e255] [cursor=pointer]
+                  - button "Hinweis 2 anzeigen (10 Punkte)" [ref=e256] [cursor=pointer]
+                  - button "Hinweis 3 anzeigen (15 Punkte)" [ref=e257] [cursor=pointer]
+          - navigation "Level navigation" [ref=e258]:
+            - link "Nächste Lektion" [ref=e259] [cursor=pointer]:
+              - /url: /tutorial/variables
+              - button "Nächste Lektion" [ref=e260]:
+                - text: Nächste Lektion
+                - generic [ref=e261]: →
+    - contentinfo [ref=e262]:
+      - generic [ref=e263]:
+        - generic [ref=e264]:
+          - paragraph [ref=e265]: © 2026 In Memoriam Pascal
+          - paragraph [ref=e266]: Turbo Pascal • 1983 • Für immer in unseren Herzen
+          - navigation "Footer navigation" [ref=e267]:
+            - list [ref=e268]:
+              - listitem [ref=e269]:
+                - link "GitHub" [ref=e270] [cursor=pointer]:
+                  - /url: https://github.com
+        - generic [ref=e272]: C:\TURBO\PASCAL>_
+  - generic [ref=e273]:
+    - alert
+    - alert
+```

@@ -21,6 +21,9 @@ interface InterpreterStore extends InterpreterState {
     /** Set execution time */
     setExecutionTime: (time: number | undefined) => void;
 
+    /** Set waiting for input state */
+    setIsWaitingForInput: (waiting: boolean) => void;
+
     /** Reset interpreter state */
     reset: () => void;
 }
@@ -30,6 +33,7 @@ const initialState: InterpreterState = {
     output: [],
     error: undefined,
     executionTime: undefined,
+    isWaitingForInput: false,
 };
 
 export const useInterpreterStore = create<InterpreterStore>((set) => ({
@@ -66,6 +70,11 @@ export const useInterpreterStore = create<InterpreterStore>((set) => ({
 
     setExecutionTime: (executionTime) => {
         set({ executionTime });
+    },
+
+    setIsWaitingForInput: (isWaitingForInput) => {
+        console.log('[InterpreterStore] setIsWaitingForInput:', isWaitingForInput);
+        set({ isWaitingForInput });
     },
 
     reset: () => {

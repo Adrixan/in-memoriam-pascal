@@ -158,7 +158,7 @@ function HomePage(): ReactElement {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-                            <Link to="/tutorial/level-1">
+                            <Link to="/tutorial/hello-world">
                                 <RetroButton
                                     variant="primary"
                                     pulseGlow
@@ -299,7 +299,7 @@ function HomePage(): ReactElement {
                             'Begin your journey into the world of programming with Pascal.'
                         )}
                     </p>
-                    <Link to="/tutorial/level-1">
+                    <Link to="/tutorial/hello-world">
                         <RetroButton
                             variant="primary"
                             pulseGlow

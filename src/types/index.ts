@@ -37,6 +37,9 @@ export interface TutorialLevel {
     /** Expected output for validation */
     expectedOutput?: string;
 
+    /** Test input for validation (fed to ReadLn/Read) */
+    testInput?: string[];
+
     /** Validation rules */
     validation: ValidationRule[];
 
@@ -214,6 +217,9 @@ export interface InterpreterState {
 
     /** Execution time in milliseconds */
     executionTime: number | undefined;
+
+    /** Whether the interpreter is waiting for user input */
+    isWaitingForInput: boolean;
 }
 
 export interface OutputLine {

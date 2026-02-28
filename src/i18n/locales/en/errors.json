@@ -25,6 +25,7 @@
         "levelComplete": "Level complete!",
         "congratulations": "Congratulations! You have successfully completed this level.",
         "failed": "Validation failed",
+        "runtimeError": "Your code could not be executed. Error: {{error}}",
         "level1": {
             "outputMismatch": "Your output must be exactly 'Hello World!'. Pay attention to capitalization!",
             "missingWriteLn": "Use WriteLn to output text."

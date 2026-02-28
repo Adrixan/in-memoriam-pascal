@@ -20,7 +20,7 @@ import { RetroPanel, RetroButton } from '@/components/common';
 import { LevelNav, LevelInstructions, HintSystem } from '@/components/tutorial';
 import { useInterpreter } from '@/hooks/useInterpreter';
 import { useEditorStore, useTutorialStore } from '@/stores';
-import { tutorialLevels } from '@/data/tutorials';
+import { tutorialLevels, getLevelById } from '@/data/tutorials';
 import { SolutionValidator, type LevelValidationResult } from '@/services/validation';
 import ErrorAnalyzer, { type AnalyzedError } from '@/services/validation/ErrorAnalyzer';
 
@@ -60,6 +60,8 @@ function TutorialPage(): ReactElement {
         error,
         executionTime,
         isReady: interpreterReady,
+        isWaitingForInput,
+        provideInput,
         runCode,
         clearOutput,
     } = useInterpreter();
@@ -85,18 +87,26 @@ function TutorialPage(): ReactElement {
         setIsSidebarOpen(false);
     }, []);
 
-    // Initialize levels from tutorial data
+    // Initialize levels from tutorial data on mount
+    // Empty dependency array ensures this runs once when component mounts
     useEffect(() => {
-        if (levels.length === 0) {
+        const { levels: storeLevels } = useTutorialStore.getState();
+        if (storeLevels.length === 0) {
             setLevels(tutorialLevels);
         }
-    }, [levels.length, setLevels]);
+    }, []);
 
-    // Get current level from levels array
+    // Get current level - use getLevelById directly to bypass store issues
+    // This ensures level is always available regardless of store state
     const currentLevel = useMemo(() => {
-        if (!currentLevelId) return null;
-        return levels.find((level) => level.id === currentLevelId) ?? null;
-    }, [levels, currentLevelId]);
+        if (!levelId) return null;
+        // Try to get from store first, then fallback to direct lookup
+        if (currentLevelId && levels.length > 0) {
+            return levels.find((level) => level.id === currentLevelId) ?? null;
+        }
+        // Direct lookup from tutorial data - this is guaranteed to work
+        return getLevelById(levelId) ?? null;
+    }, [levelId, currentLevelId, levels]);
 
     // Get current level index for navigation
     const currentLevelIndex = useMemo(() => {
@@ -114,15 +124,34 @@ function TutorialPage(): ReactElement {
         return levels[currentLevelIndex + 1];
     }, [levels, currentLevelIndex]);
 
-    // Set current level when levelId changes
+    // Set current level when levelId changes - use getState to avoid dependency issues
     useEffect(() => {
-        if (levelId && levelId !== currentLevelId) {
+        if (!levelId) return;
+
+        // Get fresh state from store to check levels
+        const storeState = useTutorialStore.getState();
+        const storeLevels = storeState.levels;
+
+        if (storeLevels.length === 0) return;
+
+        if (levelId !== storeState.currentLevelId) {
             setCurrentLevel(levelId);
             // Reset validation state when changing levels
             setValidationResult(null);
             setShowSuccess(false);
         }
-    }, [levelId, currentLevelId, setCurrentLevel]);
+    }, [levelId, setCurrentLevel, setValidationResult, setShowSuccess]);
+
+    // Separate effect to handle level setting when levels become available
+    // This ensures we re-run when levels are loaded
+    useEffect(() => {
+        if (!levelId || levels.length === 0) return;
+        if (levelId === currentLevelId) return;
+
+        setCurrentLevel(levelId);
+        setValidationResult(null);
+        setShowSuccess(false);
+    }, [levels.length, levelId, currentLevelId, setCurrentLevel, setValidationResult, setShowSuccess]);
 
     // Set starter code when level is loaded
     // Use currentLevelId as dependency to avoid infinite loops from object reference changes
@@ -156,9 +185,10 @@ function TutorialPage(): ReactElement {
         setValidationResult(null);
         setShowSuccess(false);
 
-        // Run the code
-        await runCode();
-    }, [runCode]);
+        // Run the code with test input if available
+        const inputQueue = currentLevel?.testInput;
+        await runCode(inputQueue);
+    }, [runCode, currentLevel]);
 
     // Track if we've already processed the current execution to prevent infinite loops
     const lastProcessedStatusRef = useRef<{ status: string; timestamp: number } | null>(null);
@@ -430,6 +460,8 @@ function TutorialPage(): ReactElement {
                                         output={output}
                                         error={errorMessage}
                                         height="350px"
+                                        isWaitingForInput={isWaitingForInput}
+                                        onInputSubmit={provideInput}
                                     />
                                 </div>
                             </RetroPanel>

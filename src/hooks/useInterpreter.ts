@@ -28,11 +28,17 @@ export interface UseInterpreterReturn {
     /** Whether the interpreter is ready to run code */
     isReady: boolean;
 
+    /** Whether the interpreter is waiting for user input */
+    isWaitingForInput: boolean;
+
     /** Run the current code in the editor */
-    runCode: () => Promise<void>;
+    runCode: (inputQueue?: string[]) => Promise<void>;
 
     /** Run specific code (not from editor) */
-    runCodeString: (code: string) => Promise<void>;
+    runCodeString: (code: string, inputQueue?: string[]) => Promise<void>;
+
+    /** Provide input to the interpreter */
+    provideInput: (input: string) => void;
 
     /** Stop execution */
     stopExecution: () => void;
@@ -80,6 +86,11 @@ export function useInterpreter(): UseInterpreterReturn {
     const { code } = useEditorStore();
     const interpreterRef = useRef<PascalInterpreter | null>(null);
     const [isReady, setIsReady] = useState(false);
+    const [isWaitingForInput, setIsWaitingForInput] = useState(false);
+    // Track if prompt was called during execution (for re-run logic)
+    const promptCalledRef = useRef(false);
+    // Store the code being run for potential re-run
+    const pendingCodeRef = useRef<string>('');
 
     // Initialize interpreter on mount
     useEffect(() => {
@@ -89,6 +100,12 @@ export function useInterpreter(): UseInterpreterReturn {
                     timeout: 10000, // 10 second timeout
                     maxOutputLines: 1000,
                     debug: false,
+                });
+
+                // Set up the input needed callback
+                interpreterRef.current.setOnInputNeeded(() => {
+                    console.log('[useInterpreter] Input needed callback triggered');
+                    setIsWaitingForInput(true);
                 });
 
                 // Pre-load the interpreter scripts
@@ -111,7 +128,7 @@ export function useInterpreter(): UseInterpreterReturn {
                 interpreterRef.current.stop();
             }
         };
-    }, [setError]);
+    }, [setError, setIsWaitingForInput]);
 
     /**
      * Handle run result
@@ -163,7 +180,7 @@ export function useInterpreter(): UseInterpreterReturn {
      * Run code string
      */
     const runCodeString = useCallback(
-        async (codeToRun: string): Promise<void> => {
+        async (codeToRun: string, inputQueue?: string[]): Promise<void> => {
             console.log('[useInterpreter] runCodeString called with code length:', codeToRun?.length);
             console.log('[useInterpreter] code preview (first 100 chars):', codeToRun?.substring(0, 100));
 
@@ -183,13 +200,38 @@ export function useInterpreter(): UseInterpreterReturn {
                 return;
             }
 
+            // Store code for potential re-run
+            pendingCodeRef.current = codeToRun;
+
             setStatus('running');
             clearOutput();
             setError(undefined);
             setExecutionTime(undefined);
+            setIsWaitingForInput(false);
+
+            // Reset prompt tracking
+            promptCalledRef.current = false;
+
+            // Override window.prompt to prevent the popup dialog
+            // Instead, it will set a flag and return empty string
+            const originalPrompt = window.prompt;
+            window.prompt = () => {
+                console.log('[useInterpreter] window.prompt called - blocking popup');
+                promptCalledRef.current = true;
+                return ''; // Return empty string, our FS callback will handle the rest
+            };
 
             try {
-                const result = await interpreterRef.current.run(codeToRun);
+                const result = await interpreterRef.current.run(codeToRun, inputQueue);
+
+                // Check if we need more input after execution
+                if (promptCalledRef.current) {
+                    console.log('[useInterpreter] Input was needed during execution - showing input UI');
+                    setIsWaitingForInput(true);
+                    // Don't set status to success/error yet - wait for input
+                    return;
+                }
+
                 handleResult(result);
             } catch (err) {
                 setError({
@@ -197,17 +239,42 @@ export function useInterpreter(): UseInterpreterReturn {
                     type: 'runtime',
                 });
                 setStatus('error');
+            } finally {
+                // Restore original prompt
+                window.prompt = originalPrompt;
             }
         },
-        [isReady, setStatus, clearOutput, setError, setExecutionTime, handleResult]
+        [isReady, setStatus, clearOutput, setError, setExecutionTime, handleResult, setIsWaitingForInput]
     );
 
     /**
      * Run code from editor store
      */
-    const runCode = useCallback(async (): Promise<void> => {
-        await runCodeString(code);
+    const runCode = useCallback(async (inputQueue?: string[]): Promise<void> => {
+        await runCodeString(code, inputQueue);
     }, [code, runCodeString]);
+
+    /**
+     * Provide input to the interpreter
+     */
+    const provideInput = useCallback((input: string): void => {
+        if (interpreterRef.current) {
+            console.log('[useInterpreter] provideInput:', input);
+            // Provide the input
+            interpreterRef.current.provideInput(input);
+            setIsWaitingForInput(false);
+
+            // Re-run the code with the provided input
+            const codeToRun = pendingCodeRef.current;
+            if (codeToRun) {
+                console.log('[useInterpreter] Re-running code with input');
+                // Clear output for fresh run
+                clearOutput();
+                // Run with the input
+                interpreterRef.current.run(codeToRun, [input]).then(handleResult);
+            }
+        }
+    }, [clearOutput, handleResult]);
 
     /**
      * Stop execution
@@ -225,7 +292,11 @@ export function useInterpreter(): UseInterpreterReturn {
     const reset = useCallback((): void => {
         if (interpreterRef.current) {
             interpreterRef.current.reset();
+            interpreterRef.current.resetInput();
         }
+        setIsWaitingForInput(false);
+        pendingCodeRef.current = '';
+        promptCalledRef.current = false;
         resetStore();
     }, [resetStore]);
 
@@ -235,8 +306,10 @@ export function useInterpreter(): UseInterpreterReturn {
         error,
         executionTime,
         isReady,
+        isWaitingForInput,
         runCode,
         runCodeString,
+        provideInput,
         stopExecution,
         reset,
         clearOutput,

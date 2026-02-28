@@ -3,7 +3,7 @@
  * Terminal-style output display for Pascal interpreter results
  */
 
-import { useEffect, useRef, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import type { OutputLine } from '@/types';
 
 /**
@@ -27,6 +27,12 @@ export interface OutputWindowProps {
 
     /** Called when user clears output */
     onClear?: () => void;
+
+    /** Whether the program is waiting for input */
+    isWaitingForInput?: boolean;
+
+    /** Called when user submits input */
+    onInputSubmit?: (input: string) => void;
 }
 
 /**
@@ -44,8 +50,12 @@ export function OutputWindow({
     className,
     height = '200px',
     showTimestamp = false,
+    isWaitingForInput = false,
+    onInputSubmit,
 }: OutputWindowProps): ReactElement {
     const outputRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [inputValue, setInputValue] = useState('');
 
     // Log output changes for debugging
     useEffect(() => {
@@ -58,6 +68,32 @@ export function OutputWindow({
             outputRef.current.scrollTop = outputRef.current.scrollHeight;
         }
     }, [output, error]);
+
+    // Focus input when waiting for input
+    useEffect(() => {
+        if (isWaitingForInput && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isWaitingForInput]);
+
+    /**
+     * Handle input submission
+     */
+    const handleInputSubmit = (): void => {
+        if (inputValue.trim() && onInputSubmit) {
+            onInputSubmit(inputValue);
+            setInputValue('');
+        }
+    };
+
+    /**
+     * Handle key press in input field
+     */
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+        if (e.key === 'Enter') {
+            handleInputSubmit();
+        }
+    };
 
     /**
      * Get color class based on output type
@@ -153,6 +189,44 @@ export function OutputWindow({
                         <span className="font-bold">Error: </span>
                         <span className="terminal-glow">{error}</span>
                     </div>
+                )}
+
+                {/* Input field */}
+                {isWaitingForInput && (
+                    <form
+                        className="flex items-center gap-2 mt-2"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleInputSubmit();
+                        }}
+                        role="form"
+                        aria-label="Program input form"
+                    >
+                        <span className="text-[var(--retro-green)] animate-pulse" aria-hidden="true">&gt;</span>
+                        <label htmlFor="program-input" className="sr-only">
+                            Enter input for program
+                        </label>
+                        <input
+                            id="program-input"
+                            ref={inputRef}
+                            type="text"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyPress}
+                            className="flex-1 bg-transparent border-b border-[var(--retro-green)]/50 outline-none text-[var(--retro-green)] font-mono text-sm placeholder:text-[var(--retro-green)]/30 focus:border-[var(--retro-green)] transition-colors"
+                            placeholder="Type input and press Enter..."
+                            aria-label="Program input"
+                            autoFocus
+                            autoComplete="off"
+                        />
+                        <button
+                            type="submit"
+                            className="px-2 py-1 text-xs bg-[var(--retro-green)] text-[var(--terminal-bg)] font-mono rounded hover:bg-[var(--retro-green)]/80 transition-colors"
+                            aria-label="Submit input"
+                        >
+                            Send
+                        </button>
+                    </form>
                 )}
             </div>
         </div>

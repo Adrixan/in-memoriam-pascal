@@ -337,6 +337,7 @@ begin
   WriteLn('Hello, World!');
 end.`,
     expectedOutput: 'Hello, World!',
+    testInput: ['World'],
     validation: [
         {
             type: 'contains_keyword',

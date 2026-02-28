@@ -20,12 +20,18 @@ import type {
 } from './types';
 
 /**
+ * Callback type for when interpreter needs user input
+ */
+export type InputNeededCallback = () => void;
+
+/**
  * Default interpreter configuration
  */
-const DEFAULT_CONFIG: Required<InterpreterConfig> = {
+const DEFAULT_CONFIG: InterpreterConfig = {
     timeout: 10000, // 10 seconds
     maxOutputLines: 1000,
     debug: false,
+    inputQueue: [],
 };
 
 /**
@@ -33,10 +39,19 @@ const DEFAULT_CONFIG: Required<InterpreterConfig> = {
  * Manages the compilation and execution of Pascal code
  */
 export class PascalInterpreter {
-    private config: Required<InterpreterConfig>;
+    private config: InterpreterConfig;
     private outputCapture: OutputCapture;
     private isLoaded = false;
     private loadPromise: Promise<void> | null = null;
+
+    // Input handling
+    private currentInputIndex = 0;
+    private inputQueueData: string[] = [];
+    private fsInitialized = false;
+    private _isWaitingForInput = false;
+    private onInputNeeded: InputNeededCallback | null = null;
+    private resolveInputPromise: ((value: string) => void) | null = null;
+    private scanfOverrideInstalled = false;
 
     /**
      * Create a new PascalInterpreter instance
@@ -72,23 +87,134 @@ export class PascalInterpreter {
     }
 
     /**
+     * Initialize the filesystem with stdin/stdout handlers
+     */
+    private initFS(): void {
+        if (this.fsInitialized) {
+            return;
+        }
+
+        // Access FS from the global scope (exposed by Pascal.js)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const FS = (window as any).FS;
+
+        if (typeof FS !== 'undefined') {
+            // Set up input callback - returns next character from input queue
+            const inputCallback = (): number => {
+                // Check if we have input available
+                if (this.currentInputIndex >= this.inputQueueData.length) {
+                    // No more input available - signal that we need input
+                    this._isWaitingForInput = true;
+
+                    // Trigger the callback if set
+                    if (this.onInputNeeded) {
+                        this.onInputNeeded();
+                    }
+
+                    // Return EOF to stop reading (program will handle this)
+                    return -1;
+                }
+
+                const currentInput = this.inputQueueData[this.currentInputIndex];
+
+                // If current input is exhausted, move to next
+                if (!currentInput || currentInput.length === 0) {
+                    this.currentInputIndex++;
+                    return 10; // newline character
+                }
+
+                // Return first character and remove it from string
+                const charCode = currentInput.charCodeAt(0);
+                this.inputQueueData[this.currentInputIndex] = currentInput.slice(1);
+
+                // If input is exhausted after this character, move to next
+                if (this.inputQueueData[this.currentInputIndex]?.length === 0) {
+                    this.currentInputIndex++;
+                }
+
+                return charCode;
+            };
+
+            try {
+                // Initialize FS with input callback only
+                // Output is already captured by OutputCapture through window.print
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (FS as any).init(inputCallback, undefined, undefined);
+                this.fsInitialized = true;
+                console.log('[PascalInterpreter] FS initialized with input support');
+            } catch (error) {
+                console.warn('[PascalInterpreter] Failed to initialize FS:', error);
+            }
+        }
+    }
+
+    /**
+     * Provide input to the interpreter (for interactive mode)
+     */
+    provideInput(input: string): void {
+        // Add input to the queue
+        this.inputQueueData.push(input + '\n');
+
+        // If we were waiting for input, clear the flag
+        if (this._isWaitingForInput) {
+            this._isWaitingForInput = false;
+        }
+
+        // If there's a pending promise, resolve it
+        if (this.resolveInputPromise) {
+            this.resolveInputPromise(input);
+            this.resolveInputPromise = null;
+        }
+    }
+
+    /**
+     * Set callback for when input is needed
+     */
+    setOnInputNeeded(callback: InputNeededCallback): void {
+        this.onInputNeeded = callback;
+    }
+
+    /**
+     * Check if the interpreter is waiting for input
+     */
+    isWaitingForInput(): boolean {
+        return this._isWaitingForInput || this.currentInputIndex >= this.inputQueueData.length;
+    }
+
+    /**
+     * Reset input state
+     */
+    resetInput(): void {
+        this.currentInputIndex = 0;
+        this.inputQueueData = [];
+        this._isWaitingForInput = false;
+        this.resolveInputPromise = null;
+    }
+
+    /**
      * Run Pascal code and return the result
      */
-    async run(code: string): Promise<RunResult> {
+    async run(code: string, inputQueue?: string[]): Promise<RunResult> {
         const startTime = performance.now();
 
-        console.log('[PascalInterpreter] run() called with code length:', code?.length);
-        console.log('[PascalInterpreter] code preview (first 100 chars):', code?.substring(0, 100));
+        // Use provided input queue or fall back to config
+        const inputs = inputQueue ?? this.config.inputQueue ?? [];
+        // Reset input queue for this run
+        this.currentInputIndex = 0;
+        this.inputQueueData = [...inputs];
 
         try {
             // Ensure scripts are loaded
             await this.load();
 
+            // Initialize FS with input callback
+            this.initFS();
+
             // Start capturing output
             this.outputCapture.startCapture();
             this.outputCapture.clear();
 
-            // Compile and execute
+            // Compile the Pascal code first (this creates the scanf function)
             const compilation = this.compile(code);
 
             if (!compilation.success) {
@@ -99,6 +225,20 @@ export class PascalInterpreter {
                     exitCode: 1,
                     executionTime: performance.now() - startTime,
                 };
+            }
+
+            // CRITICAL: Install scanf override AFTER compilation but BEFORE execution
+            // The scanf function is only created when LLVM IR is compiled,
+            // so we must install the override after compile() completes
+            if (!this.scanfOverrideInstalled) {
+                const maxRetries = 10;
+                const retryDelay = 100;
+                for (let i = 0; i < maxRetries && !this.scanfOverrideInstalled; i++) {
+                    this.setupScanfOverride();
+                    if (!this.scanfOverrideInstalled) {
+                        await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    }
+                }
             }
 
             // Execute the compiled JavaScript
@@ -195,10 +335,15 @@ export class PascalInterpreter {
         // IMPORTANT: llvm-pre-init.js MUST be loaded before compiler.js to set up the
         // correct read()/load() functions for browser environment using Object.defineProperty
         // to prevent compiler.js from overwriting them.
+        //
+        // CRITICAL: We must load system.js unit BEFORE IR is used, because IR tries to
+        // load the SYSTEM unit from ./units/system.js path which doesn't exist.
+        // By preloading it into window.SYSTEM, IR will use the preloaded version.
         const scripts = [
             '/external/pascal.js/parse.js',
             '/external/pascal.js/ieee754.js',
             '/external/pascal.js/ir.js',
+            '/external/pascal.js/units/system.js', // Preload SYSTEM unit BEFORE IR is used
             '/external/pascal.js/llvm.js/llvm-as.js',
             '/external/pascal.js/llvm.js/llvm-dis.js',
             '/external/pascal.js/llvm-pre-init.js', // Pre-init for browser environment (MUST be before compiler.js)
@@ -261,14 +406,6 @@ export class PascalInterpreter {
                     const hasLLVM = typeof llvmAs !== 'undefined' && typeof llvmDis !== 'undefined' && typeof compile !== 'undefined';
 
                     if (hasCore && hasLLVM) {
-                        console.log('[PascalInterpreter] All scripts loaded and initialized', {
-                            parse: typeof parse,
-                            IR: typeof IR,
-                            llvmAs: typeof llvmAs,
-                            llvmDis: typeof llvmDis,
-                            compile: typeof compile,
-                            elapsed: `${elapsed}ms`,
-                        });
                         resolve();
                         return;
                     }
@@ -286,7 +423,6 @@ export class PascalInterpreter {
                         // If core scripts are available but LLVM is not, we can still proceed
                         // with limited functionality
                         if (hasCore) {
-                            console.warn('[PascalInterpreter] LLVM functions not available, some features may be limited');
                             resolve();
                             return;
                         }
@@ -308,12 +444,100 @@ export class PascalInterpreter {
     }
 
     /**
+     * Override scanf to use prompt() for STRING input in browser environment.
+     * This fixes the freeze that occurs when scanf tries to read from stdin
+     * which blocks waiting for input that never comes.
+     * 
+     * NEW APPROACH: Instead of trying to override scanf, we inject a custom
+     * __pascal_read_string function that the compiled code calls for STRING READ.
+     * This function reads from our input queue instead of blocking on stdin.
+     */
+    private setupScanfOverride(): void {
+        if (typeof window === 'undefined') return;
+
+        const win = window as unknown as Record<string, unknown>;
+
+        // Get Module - the compiled code runs inside Module
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mod = win['Module'] as Record<string, any> | undefined;
+
+        if (!mod) {
+            console.log('[PascalInterpreter] Module not found yet, will retry');
+            return;
+        }
+
+        // Check if __pascal_read_string is already registered
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (mod['__pascal_read_string']) {
+            console.log('[PascalInterpreter] __pascal_read_string already registered');
+            this.scanfOverrideInstalled = true;
+            return;
+        }
+
+        console.log('[PascalInterpreter] Installing __pascal_read_string custom function for STRING READ');
+
+        // Create the custom string read function that reads from our input queue
+        // This function has signature: int (i8* buffer, i32 maxLen)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pascalReadString = (bufferPtr: number, maxLen: number): number => {
+            try {
+                // Get required functions from Module
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const heapU8 = win['HEAPU8'] as Uint8Array | undefined;
+
+                if (!heapU8) {
+                    console.error('[PascalInterpreter] HEAPU8 not available');
+                    return 0;
+                }
+
+                let input = '';
+
+                // Check if we have queued input
+                if (this.inputQueueData.length > 0 && this.currentInputIndex < this.inputQueueData.length) {
+                    const queuedInput = this.inputQueueData[this.currentInputIndex];
+                    if (queuedInput) {
+                        // Remove the newline and get just the string
+                        input = queuedInput.replace(/\n$/, '');
+                        this.currentInputIndex++;
+                        console.log('[PascalInterpreter] READ string from queue:', input);
+                    }
+                } else if (typeof window !== 'undefined' && window.prompt) {
+                    // Fall back to prompt if no queued input
+                    input = window.prompt('Enter a string:') ?? '';
+                    console.log('[PascalInterpreter] READ string from prompt:', input);
+                }
+
+                // Truncate if necessary
+                if (input.length >= maxLen) {
+                    input = input.substring(0, maxLen - 1);
+                }
+
+                // Write the input to the buffer
+                for (let i = 0; i < input.length; i++) {
+                    heapU8[bufferPtr + i] = input.charCodeAt(i);
+                }
+                // Null terminate the string
+                heapU8[bufferPtr + input.length] = 0;
+
+                return input.length > 0 ? 1 : 0;
+            } catch (error) {
+                console.error('[PascalInterpreter] __pascal_read_string error:', error);
+                return 0;
+            }
+        };
+
+        // Add the function directly to Module - the compiled code will look for it there
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mod['__pascal_read_string'] = pascalReadString;
+
+        this.scanfOverrideInstalled = true;
+        console.log('[PascalInterpreter] __pascal_read_string function injected successfully');
+    }
+
+    /**
      * Parse Pascal code to AST
      */
     private parseCode(code: string): unknown {
-        console.log('[PascalInterpreter] parseCode called with code length:', code?.length);
-        console.log('[PascalInterpreter] parseCode code preview (first 100 chars):', code?.substring(0, 100));
-
         if (typeof window === 'undefined') {
             throw new Error('Parser not available outside browser environment');
         }
@@ -322,30 +546,13 @@ export class PascalInterpreter {
         const parse = win['parse'] as PascalParser | undefined;
 
         if (!parse) {
-            console.error('[PascalInterpreter] Parser not found on window.parse');
-            console.log('[PascalInterpreter] Available globals:', Object.keys(win).filter(k => k.includes('parse') || k.includes('Parser')));
             throw new Error('Parser not loaded. Call load() first.');
         }
 
-        console.log('[PascalInterpreter] parse object type:', typeof parse);
-        console.log('[PascalInterpreter] parse.Parser type:', typeof parse?.Parser);
-
         const parser = new parse.Parser();
-        console.log('[PascalInterpreter] parser created, type:', typeof parser);
-        console.log('[PascalInterpreter] parser.parse type:', typeof parser?.parse);
 
         try {
-            const result = parser.parse(code);
-            console.log('[PascalInterpreter] parseCode successful, result type:', typeof result);
-            console.log('[PascalInterpreter] result is object:', result !== null && typeof result === 'object');
-            if (result && typeof result === 'object') {
-                console.log('[PascalInterpreter] result has node property:', 'node' in result);
-                console.log('[PascalInterpreter] result.node value:', (result as Record<string, unknown>)['node']);
-            } else if (typeof result === 'string') {
-                console.error('[PascalInterpreter] WARNING: parse returned a string instead of AST!');
-                console.error('[PascalInterpreter] string result (first 200 chars):', result.substring(0, 200));
-            }
-            return result;
+            return parser.parse(code);
         } catch (error) {
             console.error('[PascalInterpreter] parseCode error:', error);
             throw error;
@@ -378,12 +585,8 @@ export class PascalInterpreter {
 
         const astObj = ast as Record<string, unknown>;
         if (!('node' in astObj)) {
-            console.error('[PascalInterpreter] AST object does not have node property');
-            console.error('[PascalInterpreter] AST keys:', Object.keys(astObj));
             throw new Error('Parser returned invalid AST object - missing node property');
         }
-
-        console.log('[PascalInterpreter] toIR received valid AST with node:', astObj['node']);
 
         if (typeof window === 'undefined') {
             throw new Error('IR module not available outside browser environment');
@@ -394,7 +597,6 @@ export class PascalInterpreter {
         // First try to use the standalone toIR export if available (from CommonJS)
         const toIRExport = win['toIR'] as ((ast: unknown) => string) | undefined;
         if (toIRExport) {
-            console.log('[PascalInterpreter] Using exported toIR function');
             try {
                 return toIRExport(ast);
             } catch (e) {
@@ -407,7 +609,6 @@ export class PascalInterpreter {
         // IR can be called with AST as first argument: new IR(ast)
         const IRAny = win['IR'] as unknown;
         if (typeof IRAny === 'function') {
-            console.log('[PascalInterpreter] Creating IR instance with AST in constructor');
             try {
                 // Call IR constructor with AST - this is what the exported toIR does
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -429,7 +630,6 @@ export class PascalInterpreter {
             throw new Error('IR module not loaded. Call load() first.');
         }
 
-        console.log('[PascalInterpreter] Using fallback: IR constructor without AST');
         const irInstance: IRModule = new IRConstructor();
         return irInstance.normalizeIR(irInstance.toIR(ast));
     }
@@ -501,9 +701,65 @@ export class PascalInterpreter {
         }
 
         try {
+            // Inject the __pascal_read_string function into the compiled code
+            // This function will be called by the compiled Pascal code for STRING READ operations
+            const pascalReadStringImpl = `
+                // Custom string READ function for Pascal STRING type
+                // This bypasses scanf which blocks in the browser
+                function __pascal_read_string(bufferPtr, maxLen) {
+                    try {
+                        var heapU8 = HEAPU8;
+                        if (!heapU8) {
+                            return 0;
+                        }
+
+                        var input = '';
+
+                        // Access the input queue from closure
+                        // The inputQueueData and currentInputIndex are available in the closure
+                        if (typeof window !== 'undefined' && window.pascalInputQueue && window.pascalInputQueue.length > 0) {
+                            var queuedInput = window.pascalInputQueue.shift();
+                            if (queuedInput) {
+                                input = queuedInput.toString().replace(/\\n$/, '');
+                            }
+                        } else if (typeof prompt !== 'undefined') {
+                            // Fall back to prompt if no queued input
+                            input = prompt('Enter a string:') || '';
+                        }
+
+                        // Truncate if necessary
+                        if (input.length >= maxLen) {
+                            input = input.substring(0, maxLen - 1);
+                        }
+
+                        // Write the input to the buffer
+                        for (var i = 0; i < input.length; i++) {
+                            heapU8[bufferPtr + i] = input.charCodeAt(i);
+                        }
+                        // Null terminate the string
+                        heapU8[bufferPtr + input.length] = 0;
+
+                        return input.length > 0 ? 1 : 0;
+                    } catch (e) {
+                        return 0;
+                    }
+                }
+            `;
+
+            // Inject the input queue into window for the custom function to access
+            if (typeof window !== 'undefined') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (window as any).pascalInputQueue = [...this.inputQueueData];
+                // Reset currentInputIndex since we're passing the queue to the function
+                this.currentInputIndex = 0;
+            }
+
+            // Prepend our custom function to the compiled code
+            const modifiedJsCode = pascalReadStringImpl + '\n' + jsCode;
+
             // Create a function from the compiled code and execute it
             // Using Function constructor to avoid direct eval
-            const executeFunc = new Function(jsCode) as () => void;
+            const executeFunc = new Function(modifiedJsCode) as () => void;
 
             // Execute with timeout protection
             await this.executeWithTimeout(executeFunc);

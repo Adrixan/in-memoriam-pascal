@@ -59,6 +59,12 @@ export interface InterpreterConfig {
 
     /** Whether to include debug information */
     debug?: boolean;
+
+    /** Input queue - strings to feed to ReadLn/Read */
+    inputQueue?: string[];
+
+    /** Callback for real-time input requests (for interactive mode) */
+    onInputRequest?: () => Promise<string>;
 }
 
 /**
