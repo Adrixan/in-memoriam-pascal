@@ -431,7 +431,8 @@ export class PascalInterpreter {
      * Load required Pascal.js scripts dynamically
      */
     private async loadScripts(): Promise<void> {
-        // Scripts are served from /external/pascal.js/ (symlinked/submodule in project root)
+        // Scripts are served from /external/pascal.js/ (absolute path from domain root)
+        // This works regardless of the current page URL because it's resolved from the domain root
         // The public/external/pascal.js/pascal-init.js provides browser-compatible globals
         // IMPORTANT: llvm-pre-init.js MUST be loaded before compiler.js to set up the
         // correct read()/load() functions for browser environment using Object.defineProperty
@@ -440,6 +441,7 @@ export class PascalInterpreter {
         // CRITICAL: We must load system.js unit BEFORE IR is used, because IR tries to
         // load the SYSTEM unit from ./units/system.js path which doesn't exist.
         // By preloading it into window.SYSTEM, IR will use the preloaded version.
+
         const scripts = [
             '/external/pascal.js/parse.js',
             '/external/pascal.js/ieee754.js',
