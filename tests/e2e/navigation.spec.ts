@@ -126,15 +126,22 @@ test.describe('Level Navigation', () => {
     });
 
     test('can navigate between levels', async ({ page }) => {
-        // Find all tutorial links in the page
-        const levelLinks = page.locator('a[href*="/tutorial/"]');
+        // Set viewport to desktop size first
+        await page.setViewportSize({ width: 1280, height: 720 });
+
+        // Navigate to tutorial page first
+        await page.goto('/tutorial/hello-world');
+        await page.waitForLoadState('networkidle');
+
+        // Find level navigation sidebar links (specific to the sidebar, not header nav)
+        const levelLinks = page.locator('[data-testid="level-nav"] a, nav[aria-label="Tutorial levels"] a');
         const linkCount = await levelLinks.count();
 
         // Verify there are level links available
-        expect(linkCount).toBeGreaterThanOrEqual(0);
+        expect(linkCount).toBeGreaterThan(0);
 
         if (linkCount > 1) {
-            // Click on a different level
+            // Click on a different level (not the current one)
             await levelLinks.nth(1).click();
 
             // Verify URL changed
