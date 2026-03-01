@@ -114,11 +114,13 @@ export interface IRModule {
 
 /**
  * LLVM module interface (from llvm.js)
+ * Contains both compiler functions and module methods
  */
 export interface LLVMModule {
     llvmAs: (ir: string) => number;
     llvmDis: (module: number) => string;
     compile: (ir: string) => void;
+    print: (output: string) => void;
 }
 
 /**
@@ -130,11 +132,4 @@ export interface PascalJsGlobals {
     llvmAs: (ir: string) => number;
     llvmDis: (module: number) => string;
     compile: (ir: string) => void;
-}
-
-/**
- * Module object used by LLVM.js
- */
-export interface LLVMModule {
-    print: (output: string) => void;
 }

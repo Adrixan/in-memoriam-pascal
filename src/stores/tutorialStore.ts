@@ -160,7 +160,6 @@ export const useTutorialStore = create<TutorialState>()(
 
             resetHints: (levelId) => {
                 const { revealedHints } = get();
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { [levelId]: _removed, ...remaining } = revealedHints;
                 set({ revealedHints: remaining });
             },

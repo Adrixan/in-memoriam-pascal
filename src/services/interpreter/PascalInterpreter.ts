@@ -568,7 +568,6 @@ export class PascalInterpreter {
         }
 
         // Check if __pascal_read_string is already registered
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (mod['__pascal_read_string']) {
             console.log('[PascalInterpreter] __pascal_read_string already registered');
             this.scanfOverrideInstalled = true;
@@ -579,11 +578,9 @@ export class PascalInterpreter {
 
         // Create the custom string read function that reads from our input queue
         // This function has signature: int (i8* buffer, i32 maxLen)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pascalReadString = (bufferPtr: number, maxLen: number): number => {
             try {
                 // Get required functions from Module
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const heapU8 = win['HEAPU8'] as Uint8Array | undefined;
 
                 if (!heapU8) {
@@ -628,7 +625,6 @@ export class PascalInterpreter {
         };
 
         // Add the function directly to Module - the compiled code will look for it there
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         mod['__pascal_read_string'] = pascalReadString;
 
         this.scanfOverrideInstalled = true;
