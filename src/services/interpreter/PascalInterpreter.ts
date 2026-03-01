@@ -442,16 +442,18 @@ export class PascalInterpreter {
         // load the SYSTEM unit from ./units/system.js path which doesn't exist.
         // By preloading it into window.SYSTEM, IR will use the preloaded version.
 
+        const basePath = import.meta.env.BASE_URL || './';
+
         const scripts = [
-            '/external/pascal.js/parse.js',
-            '/external/pascal.js/ieee754.js',
-            '/external/pascal.js/ir.js',
-            '/external/pascal.js/units/system.js', // Preload SYSTEM unit BEFORE IR is used
-            '/external/pascal.js/llvm.js/llvm-as.js',
-            '/external/pascal.js/llvm.js/llvm-dis.js',
-            '/external/pascal.js/llvm-pre-init.js', // Pre-init for browser environment (MUST be before compiler.js)
-            '/external/pascal.js/llvm.js/compiler.js',
-            '/external/pascal.js/pascal-init.js', // Our init script to expose globals
+            `${basePath}external/pascal.js/parse.js`,
+            `${basePath}external/pascal.js/ieee754.js`,
+            `${basePath}external/pascal.js/ir.js`,
+            `${basePath}external/pascal.js/units/system.js`, // Preload SYSTEM unit BEFORE IR is used
+            `${basePath}external/pascal.js/llvm.js/llvm-as.js`,
+            `${basePath}external/pascal.js/llvm.js/llvm-dis.js`,
+            `${basePath}external/pascal.js/llvm-pre-init.js`, // Pre-init for browser environment (MUST be before compiler.js)
+            `${basePath}external/pascal.js/llvm.js/compiler.js`,
+            `${basePath}external/pascal.js/pascal-init.js`, // Our init script to expose globals
         ];
 
         const loadScript = (src: string): Promise<void> => {
