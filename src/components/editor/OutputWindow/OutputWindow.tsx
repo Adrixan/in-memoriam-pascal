@@ -3,7 +3,7 @@
  * Terminal-style output display for Pascal interpreter results
  */
 
-import { useEffect, useRef, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement, type KeyboardEvent } from 'react';
 import type { OutputLine } from '@/types';
 
 /**
@@ -89,7 +89,7 @@ export function OutputWindow({
     /**
      * Handle key press in input field
      */
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === 'Enter') {
             handleInputSubmit();
         }

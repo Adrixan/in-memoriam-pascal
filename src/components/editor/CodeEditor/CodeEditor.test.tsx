@@ -2,6 +2,7 @@
  * CodeEditor Component Tests
  */
 
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { CodeEditor } from './CodeEditor';
@@ -10,8 +11,8 @@ import { CodeEditor } from './CodeEditor';
 vi.mock('@monaco-editor/react', () => {
     // Create a promise-based mock for lazy loading
     const MockEditorComponent = ({ onMount, onChange, value, loading: _loading }: {
-        onMount?: (editor: ReturnType<typeof vi.fn>, monaco: ReturnType<typeof vi.fn>) => void;
-        onChange?: (value: string) => void;
+        onMount?: (_editor: ReturnType<typeof vi.fn>, _monaco: ReturnType<typeof vi.fn>) => void;
+        onChange?: (_value: string) => void;
         value?: string;
         loading?: boolean;
     }) => {

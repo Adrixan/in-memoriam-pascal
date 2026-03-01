@@ -100,6 +100,7 @@ function TutorialPage(): ReactElement {
         if (storeLevels.length === 0) {
             setLevels(tutorialLevels);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Get current level - use getLevelById directly to bypass store issues
@@ -148,7 +149,7 @@ function TutorialPage(): ReactElement {
             setValidationResult(null);
             setShowSuccess(false);
         }
-    }, [levelId, setCurrentLevel, setValidationResult, setShowSuccess]);
+    }, [levelId, setCurrentLevel, setValidationResult, setShowSuccess, clearOutput]);
 
     // Separate effect to handle level setting when levels become available
     // This ensures we re-run when levels are loaded
@@ -390,8 +391,8 @@ function TutorialPage(): ReactElement {
                     {toast && (
                         <div
                             className={`fixed top-4 right-4 z-50 px-4 py-2 rounded font-terminal text-sm animate-fade-in ${toast.type === 'success'
-                                    ? 'bg-green-900/90 text-green-200 border border-green-500'
-                                    : 'bg-blue-900/90 text-blue-200 border border-blue-500'
+                                ? 'bg-green-900/90 text-green-200 border border-green-500'
+                                : 'bg-blue-900/90 text-blue-200 border border-blue-500'
                                 }`}
                             role="status"
                             aria-live="polite"

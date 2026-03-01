@@ -3,7 +3,7 @@
  * Retro-styled button to execute Pascal code
  */
 
-import { type ReactElement } from 'react';
+import { type ReactElement, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -50,7 +50,7 @@ export function RunButton({
         }
     };
 
-    const handleKeyDown = (event: React.KeyboardEvent): void => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             handleClick();

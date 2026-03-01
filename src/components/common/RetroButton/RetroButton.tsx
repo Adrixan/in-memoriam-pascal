@@ -10,7 +10,7 @@
  * Touch-friendly: min 44x44px
  */
 
-import { type ReactElement, type ButtonHTMLAttributes, forwardRef } from 'react';
+import { type ReactElement, type ButtonHTMLAttributes, type ReactNode, forwardRef } from 'react';
 
 export type RetroButtonVariant = 'primary' | 'secondary' | 'accent' | 'ghost' | 'outline';
 
@@ -20,9 +20,9 @@ export interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
     /** Enable pulse glow animation */
     pulseGlow?: boolean;
     /** Icon to display before text */
-    icon?: React.ReactNode;
+    icon?: ReactNode;
     /** Icon to display after text */
-    iconAfter?: React.ReactNode;
+    iconAfter?: ReactNode;
     /** Full width button */
     fullWidth?: boolean;
 }

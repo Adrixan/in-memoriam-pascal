@@ -2,7 +2,7 @@
  * Main Application Component
  */
 
-import { Suspense, lazy, Component, type ReactNode } from 'react';
+import { Suspense, lazy, Component, type ReactNode, type ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -53,7 +53,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         return { hasError: true, error };
     }
 
-    override componentDidCatch(_error: Error, errorInfo: React.ErrorInfo) {
+    override componentDidCatch(_error: Error, errorInfo: ErrorInfo) {
         console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
     }
 

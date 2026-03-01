@@ -7,7 +7,7 @@
  * - Various visual variants
  */
 
-import { type ReactElement, type HTMLAttributes } from 'react';
+import { type ReactElement, type HTMLAttributes, type ReactNode } from 'react';
 
 export type RetroPanelVariant = 'default' | 'glow' | 'terminal' | 'header';
 
@@ -19,7 +19,7 @@ export interface RetroPanelProps extends HTMLAttributes<HTMLDivElement> {
     /** Enable glow effect on hover */
     hoverGlow?: boolean;
     /** Child content */
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 function RetroPanel({

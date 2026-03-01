@@ -9,7 +9,7 @@
  * Accessibility: Respects prefers-reduced-motion
  */
 
-import { type ReactElement } from 'react';
+import { type ReactElement, type ReactNode } from 'react';
 
 export interface CRTOverlayProps {
     /** Enable scanline effect */
@@ -19,7 +19,7 @@ export interface CRTOverlayProps {
     /** Enable subtle flicker animation */
     flicker?: boolean;
     /** Child content to wrap */
-    children: React.ReactNode;
+    children: ReactNode;
     /** Additional CSS classes */
     className?: string;
 }

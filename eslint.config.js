@@ -26,12 +26,28 @@ export default tseslint.config(
     ...tseslint.configs.recommended,
     // Base JS config
     js.configs.recommended,
+    // Test files config with node globals
+    {
+        files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+            },
+        },
+    },
     // Project-specific config
     {
         files: ['**/*.{ts,tsx}'],
         languageOptions: {
             ecmaVersion: 2022,
             globals: globals.browser,
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
         },
         plugins: {
             'react-hooks': reactHooks,
@@ -43,7 +59,8 @@ export default tseslint.config(
                 'warn',
                 { allowConstantExport: true },
             ],
-            '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+            '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            'no-unused-vars': 'off',
         },
     }
 );
