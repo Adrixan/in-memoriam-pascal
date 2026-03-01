@@ -68,7 +68,8 @@ export function RunButton({
             className={`
                 run-button
                 inline-flex items-center justify-center gap-2
-                px-4 py-2
+                px-4 py-3
+                min-h-11
                 font-mono text-sm font-bold
                 border-2 border-[var(--retro-green)]
                 bg-[var(--color-surface)]

@@ -6,6 +6,7 @@ An interactive Pascal programming tutorial web application with a retro 80s CRT 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite)
+[![CI](https://github.com/Adrixan/in-memoriam-pascal/actions/workflows/ci.yml/badge.svg)](https://github.com/Adrixan/in-memoriam-pascal/actions/workflows/ci.yml)
 
 ## Features
 
@@ -22,8 +23,29 @@ An interactive Pascal programming tutorial web application with a retro 80s CRT 
 
 ## Screenshots
 
-<!-- Add screenshots here -->
-*Coming soon*
+<!-- To add actual screenshots:
+1. Take screenshots of each page (recommended: 1280x800 or 1920x1080)
+2. Save as PNG or WebP format in public/screenshots/
+3. Replace the placeholder paths below with actual screenshot filenames
+-->
+
+### Home Page
+
+![In Memoriam Pascal Home Page - Landing screen showing retro CRT aesthetic with "Learn Pascal" call-to-action and level progress overview](/public/screenshots/home-page.png "Home page showing the landing section with retro 80s CRT aesthetic, logo, and navigation")
+
+### Tutorial Page
+
+![In Memoriam Pascal Tutorial Page - Monaco code editor with Pascal syntax highlighting, hint panel, and level navigation](/public/screenshots/tutorial-page.png "Tutorial page displaying the Monaco code editor with Pascal code, hint system panel, and level progress indicator")
+
+### Free-Form Editor
+
+![In Memoriam Pascal Editor Page - Full-screen code editor with CRT theme and output console](/public/screenshots/editor-page.png "Free-form editor page showing Monaco editor with custom Pascal theme, run button, and output window")
+
+> **Note**: Screenshots are placeholder descriptions. To add actual images:
+>
+> - Capture screenshots at 1280x800 or 1920x1080 resolution
+> - Save as optimized PNG or WebP in [`public/screenshots/`](/public/screenshots/)
+> - Use descriptive alt text for accessibility
 
 ## Tech Stack
 

@@ -43,6 +43,9 @@
     --crt-surface-light: #252525;
     --crt-surface-lighter: #333333;
 
+    /* Terminal Background */
+    --terminal-bg: #1a1a1a;
+
     /* Status Colors */
     --retro-red: #FF3333;
     --retro-red-dim: #CC2929;
@@ -70,8 +73,8 @@
 
     --color-text: #E0E0E0;
     --color-text-bright: #FFFFFF;
-    --color-text-muted: #888888;
-    --color-text-dim: #666666;
+    --color-text-muted: #9ca3af;
+    --color-text-dim: #797979;
 
     --color-border: #333333;
     --color-border-light: #444444;

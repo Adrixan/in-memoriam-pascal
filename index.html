@@ -9,12 +9,36 @@
     <meta name="theme-color" content="#33FF33" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.json" />
-    <!-- Google Fonts: Retro 80s Typography -->
+    <!-- Google Fonts: Load async to prevent render blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
+    <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap"
-        rel="stylesheet" />
+        media="print" onload="this.media='all'" />
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap" />
+    </noscript>
+    <style>
+        /* Critical: Prevent layout shift from font loading */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .font-mono,
+        pre,
+        code {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        }
+
+        .font-retro {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .font-terminal {
+            font-family: 'VT323', monospace;
+        }
+    </style>
     <title>In Memoriam Pascal</title>
 </head>
 

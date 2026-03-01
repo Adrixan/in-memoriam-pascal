@@ -74,6 +74,13 @@ function Header(): ReactElement {
                         >
                             {t('navigation.tutorial', 'Tutorial')}
                         </Link>
+                        <Link
+                            to="/editor"
+                            className={`retro-nav-link ${isActive('/editor') ? 'retro-nav-link-active' : ''}`}
+                            aria-current={isActive('/editor') ? 'page' : undefined}
+                        >
+                            {t('navigation.editor', 'Editor')}
+                        </Link>
                     </nav>
 
                     {/* Mobile Menu Button */}
@@ -127,6 +134,14 @@ function Header(): ReactElement {
                             aria-current={location.pathname.startsWith('/tutorial') ? 'page' : undefined}
                         >
                             {t('navigation.tutorial', 'Tutorial')}
+                        </Link>
+                        <Link
+                            to="/editor"
+                            className={`retro-nav-link ${isActive('/editor') ? 'retro-nav-link-active' : ''}`}
+                            onClick={closeMobileMenu}
+                            aria-current={isActive('/editor') ? 'page' : undefined}
+                        >
+                            {t('navigation.editor', 'Editor')}
                         </Link>
                     </div>
                 </nav>

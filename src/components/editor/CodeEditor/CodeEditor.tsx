@@ -208,6 +208,12 @@ export function CodeEditor({
                 useShadows: false,
             },
 
+            // Mobile support
+            automaticLayout: true,
+            // Ensure editor handles touch events properly
+            mouseWheelZoom: true,
+            fixedOverflowWidgets: true,
+
             // Tab settings
             tabSize: 2,
             insertSpaces: true,
@@ -330,9 +336,6 @@ export function CodeEditor({
             inlineSuggest: {
                 enabled: false,
             },
-
-            // DOM
-            fixedOverflowWidgets: false,
         }),
         [effectiveValue, fontSize, readOnly]
     );

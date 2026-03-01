@@ -100,8 +100,29 @@ export default defineConfig({
                     'vendor-i18n': ['i18next', 'react-i18next'],
                     'vendor-state': ['zustand'],
                 },
+                // Ensure CSS is code-split alongside JS chunks
+                chunkFileNames: 'assets/[name]-[hash].js',
+                entryFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash].[ext]',
             },
         },
-        sourcemap: true,
+        sourcemap: false,
+        // Minify for smaller bundle size
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+            },
+        },
+        // Enable CSS code splitting
+        cssCodeSplit: true,
+    },
+
+    // Preview server configuration for caching
+    preview: {
+        headers: {
+            'Cache-Control': 'public, max-age=31536000',
+        },
     },
 });

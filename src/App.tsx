@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const TutorialPage = lazy(() => import('@/pages/TutorialPage'));
+const EditorPage = lazy(() => import('@/pages/EditorPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // Layout components
@@ -89,6 +90,7 @@ function App() {
                     <Suspense fallback={<LoadingFallback />}>
                         <Routes>
                             <Route path="/" element={<HomePage />} />
+                            <Route path="/editor" element={<EditorPage />} />
                             <Route path="/tutorial/:levelId" element={<TutorialPage />} />
                             <Route path="*" element={<NotFoundPage />} />
                         </Routes>
