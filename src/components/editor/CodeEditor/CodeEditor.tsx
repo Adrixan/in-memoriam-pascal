@@ -3,17 +3,15 @@
  * Monaco Editor wrapper with Pascal syntax highlighting and retro theme
  */
 
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, type ReactElement } from 'react';
-import type * as Monaco from 'monaco-editor';
+import { Suspense, useCallback, useEffect, useMemo, useRef, type ReactElement } from 'react';
+import * as Monaco from 'monaco-editor';
 import type { editor } from 'monaco-editor';
+import Editor from '@monaco-editor/react';
 
 import { useEditorStore } from '@/stores/editorStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { registerPascalLanguage } from './PascalLanguage';
 import { PASCAL_RETRO_THEME, registerPascalTheme } from './PascalTheme';
-
-// Lazy load Monaco Editor
-const MonacoEditor = lazy(() => import('@monaco-editor/react'));
 
 /**
  * Props for the CodeEditor component
@@ -375,7 +373,7 @@ export function CodeEditor({
             aria-label="Pascal Code Editor"
         >
             <Suspense fallback={<EditorLoadingFallback />}>
-                <MonacoEditor
+                <Editor
                     height="100%"
                     language="pascal"
                     theme={PASCAL_RETRO_THEME}

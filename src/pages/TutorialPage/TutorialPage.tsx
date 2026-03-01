@@ -303,11 +303,11 @@ function TutorialPage(): ReactElement {
 
     return (
         <main
-            className="min-h-screen"
+            className="min-h-screen overflow-x-hidden"
             role="main"
             aria-label="Tutorial page"
         >
-            <div className="flex flex-col lg:flex-row">
+            <div className="flex flex-col lg:flex-row overflow-x-hidden">
                 {/* Sidebar - Desktop */}
                 <aside
                     className="hidden lg:block w-72 flex-shrink-0 p-4 border-r border-[var(--color-border)] bg-[var(--crt-surface)]"

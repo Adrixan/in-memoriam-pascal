@@ -77,7 +77,7 @@ export default defineConfig({
     assetsInclude: ['**/*.wasm'],
 
     optimizeDeps: {
-        include: ['react', 'react-dom', 'react-router-dom', 'zustand', 'i18next', 'react-i18next'],
+        include: ['react', 'react-dom', 'react-router-dom', 'zustand', 'i18next', 'react-i18next', 'monaco-editor'],
         // Don't pre-bundle external pascal.js files
         exclude: [],
     },

@@ -20,7 +20,7 @@ function Layout({ children }: LayoutProps): ReactElement {
     const { t } = useTranslation('common');
 
     return (
-        <div className="min-h-screen bg-[var(--crt-black)] text-[var(--color-text)] flex flex-col">
+        <div className="min-h-screen bg-[var(--crt-black)] text-[var(--color-text)] flex flex-col overflow-x-hidden">
             {/* Skip link for accessibility */}
             <a
                 href="#main-content"
