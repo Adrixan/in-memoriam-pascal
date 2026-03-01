@@ -140,5 +140,104 @@
         },
         "example1": "Eine Funktion zur Berechnung des Quadrats einer Zahl",
         "task": "Erstelle eine Funktion, die eine Zahl quadriert und das Ergebnis zurückgibt."
+    },
+    "level11": {
+        "title": "Datei-E/A",
+        "description": "Lerne mit Pascals Dateibefehlen aus Dateien zu lesen und in Dateien zu schreiben.",
+        "objective1": "Assign verwenden, um eine Variable mit einer Datei zu verbinden",
+        "objective2": "Reset, Rewrite und Close für Dateioperationen verwenden",
+        "objective3": "Daten aus Textdateien lesen und schreiben",
+        "concept1": {
+            "title": "Dateioperationen",
+            "content": "Assign(f, 'Dateiname') verbindet die Dateivariable f mit einer Datei. Rewrite erstellt eine neue Datei, Reset öffnet zum Lesen, und Close schließt die Datei."
+        },
+        "example1": "Schreiben und Lesen einer Textdatei",
+        "task": "Schreibe 'Hello World!' in eine Datei mit Assign, Rewrite und Close."
+    },
+    "level12": {
+        "title": "Mengen",
+        "description": "Arbeite mit Mengen-Datentypen und führe Mengenoperationen durch.",
+        "objective1": "Mengentypen deklarieren und verwenden",
+        "objective2": "Mit dem 'in' Operator auf Zugehörigkeit prüfen",
+        "objective3": "Mengenoperationen durchführen (Vereinigung, Schnittmenge, Differenz)",
+        "concept1": {
+            "title": "Mengentypen",
+            "content": "Mengen sind Sammlungen von Elementen desselben Typs. Definiere mit 'set of' und nutze Klammern: [1, 2, 3] oder [1..10] für Bereiche."
+        },
+        "example1": "Erstellen und Verwenden von Mengen",
+        "task": "Erstelle eine Menge mit Primzahlen und prüfe, ob 5 in der Menge enthalten ist."
+    },
+    "level13": {
+        "title": "Zeiger",
+        "description": "Lerne dynamische Speicherallokation mit Zeigern und den New/Dispose Befehlen.",
+        "objective1": "Zeigervariablen deklarieren",
+        "objective2": "New zur Speicherallokation und Dispose zum Freigeben verwenden",
+        "objective3": "Werte durch Zeiger-Dereferenzierung (^) zugreifen",
+        "concept1": {
+            "title": "Zeiger-Grundlagen",
+            "content": "Zeiger speichern Speicheradressen. Nutze New(p) um Speicher zu reservieren und p^ um auf den Wert an dieser Adresse zuzugreifen."
+        },
+        "example1": "Zeiger zum Speichern und Zugreifen von Werten verwenden",
+        "task": "Erstelle einen Zeiger auf eine Integer-Variable, reserviere Speicher, weise den Wert 42 zu und gib ihn aus."
+    },
+    "level14": {
+        "title": "Fortgeschrittene Records",
+        "description": "Meistere Variant-Records und verschachtelte Record-Strukturen.",
+        "objective1": "Verschachtelte Record-Typen erstellen",
+        "objective2": "Variant-Records verstehen (case innerhalb von Records)",
+        "objective3": "Auf verschachtelte Record-Felder zugreifen",
+        "concept1": {
+            "title": "Verschachtelte Records",
+            "content": "Records können andere Records als Felder enthalten. Greife auf verschachtelte Felder mit Punktnotation zu: record1.field1.subfield"
+        },
+        "example1": "Verschachtelte Records für komplexe Daten verwenden",
+        "task": "Erstelle einen TEvent-Record mit einem verschachtelten TDate-Record für das Event-Datum."
+    },
+    "level15": {
+        "title": "Unit-System",
+        "description": "Organisiere Code in Units/Modulen für bessere Codeverwaltung.",
+        "objective1": "Die Unit-Struktur verstehen (Interface/Implementation)",
+        "objective2": "Prozeduren und Funktionen in Modulen erstellen",
+        "objective3": "Code mit verwandten Prozeduren organisieren",
+        "concept1": {
+            "title": "Units Übersicht",
+            "content": "Units sind separate Programm-Module mit Interface- und Implementation-Abschnitten. Sie ermöglichen Code-Wiederverwendung und Organisation."
+        },
+        "example1": "Ein Utility-Modul mit Prozeduren erstellen",
+        "task": "Erstelle zwei Prozeduren (Greet und Farewell) und rufe sie auf."
+    },
+    "examples": {
+        "helloWorld": {
+            "title": "Hello World",
+            "description": "Dein erstes Pascal-Programm - der klassische Ausgangspunkt."
+        },
+        "basicCalculations": {
+            "title": "Grundlegende Berechnungen",
+            "description": "Führe arithmetische Operationen mit Variablen durch."
+        },
+        "arrayManipulation": {
+            "title": "Array-Manipulation",
+            "description": "Arbeite mit Arrays um mehrere Werte zu speichern und abzurufen."
+        },
+        "recordUsage": {
+            "title": "Record-Verwendung",
+            "description": "Verwende Records um zusammenhängende Daten zu organisieren."
+        },
+        "hailstone": {
+            "title": "Hailstone-Folge",
+            "description": "Der berühmte Collatz-Algorithmus."
+        },
+        "fibonacci": {
+            "title": "Fibonacci-Folge",
+            "description": "Generiere die Fibonacci-Zahlenfolge."
+        },
+        "bubbleSort": {
+            "title": "Bubble Sort",
+            "description": "Sortiere ein Array mit dem Bubble Sort Algorithmus."
+        },
+        "primeCheck": {
+            "title": "Primzahl-Prüfung",
+            "description": "Prüfe ob eine Zahl eine Primzahl ist."
+        }
     }
 }

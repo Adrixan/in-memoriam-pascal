@@ -3,18 +3,31 @@
         "unexpectedToken": "Unerwartetes Token an Position {{position}}",
         "missingSemicolon": "Semikolon erwartet nach {{statement}}",
         "missingEnd": "Fehlendes 'end' für 'begin' Block",
-        "invalidIdentifier": "Ungültiger Bezeichner: {{identifier}}"
+        "invalidIdentifier": "Ungültiger Bezeichner: {{identifier}}",
+        "missingThen": "THEN-Schlüsselwort erwartet nach IF-Bedingung",
+        "missingDo": "DO-Schlüsselwort erwartet für Schleifenanweisung",
+        "unexpectedEnd": "Unerwartetes END - prüfe auf passendes BEGIN",
+        "description": "Dein Code enthält einen Syntaxfehler. Überprüfe die Schreibweise und Struktur.",
+        "generic": "Ein Syntaxfehler ist aufgetreten. Überprüfe deinen Code auf Tippfehler."
     },
     "runtime": {
         "divisionByZero": "Division durch Null ist nicht erlaubt",
         "arrayOutOfBounds": "Array-Index außerhalb des gültigen Bereichs",
         "typeMismatch": "Typinkompatibilität: {{expected}} erwartet, {{actual}} gefunden",
-        "undefinedVariable": "Unbekannte Variable: {{variable}}"
+        "undefinedVariable": "Unbekannte Variable: {{variable}}",
+        "stackOverflow": "Stack-Überlauf - mögliche unendliche Rekursion",
+        "nilPointer": "Nil-Zeiger-Zugriff",
+        "description": "Dein Code hat einen Laufzeitfehler verursacht. Überprüfe Berechnungen und Variablen.",
+        "generic": "Ein Laufzeitfehler ist während der Ausführung aufgetreten."
     },
     "compilation": {
         "unknownType": "Unbekannter Typ: {{type}}",
         "duplicateIdentifier": "Bezeichner bereits definiert: {{identifier}}",
-        "missingProgram": "Programmkopf fehlt"
+        "missingProgram": "Programmkopf fehlt",
+        "unknownProcedure": "Unbekannte Prozedur oder Funktion: {{name}}",
+        "wrongParamCount": "Falsche Anzahl von Parametern für {{name}}",
+        "description": "Dein Code konnte nicht kompiliert werden. Überprüfe die Deklarationen.",
+        "generic": "Ein Kompilierungsfehler ist aufgetreten. Überprüfe deinen Code."
     },
     "validation": {
         "outputMismatch": "Die Ausgabe entspricht nicht dem erwarteten Ergebnis.",
@@ -26,49 +39,77 @@
         "congratulations": "Glückwunsch! Du hast dieses Level erfolgreich abgeschlossen.",
         "failed": "Validierung fehlgeschlagen",
         "runtimeError": "Dein Code konnte nicht ausgeführt werden. Fehler: {{error}}",
-        "level1": {
-            "outputMismatch": "Deine Ausgabe muss genau 'Hello World!' lauten. Achte auf Groß- und Kleinschreibung!",
-            "missingWriteLn": "Verwende WriteLn, um Text auszugeben."
+        "logicError": "Das Programm läuft, aber das Ergebnis ist nicht korrekt.",
+        "genericError": "Ein Fehler ist aufgetreten. Überprüfe deinen Code."
+    },
+    "suggestions": {
+        "syntax": {
+            "semicolon": "Hast du ein Semikolon am Ende der Anweisung vergessen?",
+            "identifier": "Variablennamen müssen mit einem Buchstaben beginnen und nur Buchstaben, Zahlen und Unterstriche enthalten.",
+            "begin": "Mehrere Anweisungen müssen in BEGIN...END eingeschlossen werden.",
+            "then": "IF-Anweisungen benötigen THEN nach der Bedingung.",
+            "do": "Schleifen (FOR, WHILE) benötigen DO nach der Bedingung."
         },
-        "level2": {
-            "outputMismatch": "Die Ausgabe sollte 'Value: 42' lauten.",
-            "missingVar": "Deklariere deine Variable im 'var' Abschnitt.",
-            "missingAssignment": "Verwende ':=', um der Variable einen Wert zuzuweisen."
+        "runtime": {
+            "divisionByZero": "Überprüfe den Divisor - er darf nicht Null sein.",
+            "arrayBounds": "Array-Indizes müssen innerhalb des deklarierten Bereichs liegen.",
+            "typeMismatch": "Stelle sicher, dass die Datentypen kompatibel sind.",
+            "undefinedVariable": "Deklariere die Variable im VAR-Abschnitt, bevor du sie verwendest.",
+            "overflow": "Der Wert ist zu groß für den Variablentyp."
         },
-        "level3": {
-            "outputMismatch": "Die Ausgabe sollte '5 + 3 = 8' lauten.",
-            "missingOperator": "Verwende den + Operator für die Addition."
+        "compilation": {
+            "unknownType": "Überprüfe den Typnamen - verwende Integer, Real, String, Boolean oder Char.",
+            "duplicate": "Du kannst nicht dieselbe Variable zweimal deklarieren.",
+            "unknownProcedure": "Stelle sicher, dass die Prozedur definiert ist, bevor sie aufgerufen wird.",
+            "parameter": "Überprüfe die Anzahl der Parameter, die an die Prozedur/Funktion übergeben werden."
         },
-        "level4": {
-            "missingGreeting": "Die Ausgabe sollte eine Begrüßung enthalten.",
-            "missingStringType": "Deklariere die Variable als String-Typ."
-        },
-        "level5": {
-            "missingReadLn": "Verwende ReadLn, um Eingaben zu lesen.",
-            "missingWrite": "Verwende Write für die Eingabeaufforderung."
-        },
-        "level6": {
-            "outputMismatch": "Die Ausgabe sollte 'Negative' lauten, da -5 kleiner als 0 ist.",
-            "missingIf": "Verwende eine if-Anweisung für die Bedingung.",
-            "missingElse": "Füge einen else-Zweig für den anderen Fall hinzu."
-        },
-        "level7": {
-            "outputMismatch": "Die Ausgabe sollte die Zahlen 1 bis 5 sein, jede in einer neuen Zeile.",
-            "missingFor": "Verwende eine for-Schleife.",
-            "missingTo": "Verwende 'to' für aufwärts Zählen."
-        },
-        "level8": {
-            "outputMismatch": "Die Ausgabe sollte 5, 4, 3, 2, 1 und dann 'Liftoff!' sein.",
-            "missingWhile": "Verwende eine while-Schleife."
-        },
-        "level9": {
-            "outputMismatch": "Die Ausgabe sollte 'Hello, World!' lauten.",
-            "missingProcedure": "Definiere eine Prozedur."
-        },
-        "level10": {
-            "outputMismatch": "Die Ausgabe sollte '5 squared is 25' lauten.",
-            "missingFunction": "Definiere eine Funktion."
+        "output": {
+            "mismatch": "Überprüfe das genaue Ausgabeformat - Groß- und Kleinschreibung sowie Leerzeichen sind wichtig.",
+            "expected": "Die Ausgabe stimmt nicht überein. Vergleiche erwartet vs. tatsächlich sorgfältig."
         }
+    },
+    "level1": {
+        "outputMismatch": "Deine Ausgabe muss genau 'Hello World!' lauten. Achte auf Groß- und Kleinschreibung!",
+        "missingWriteLn": "Verwende WriteLn, um Text auszugeben."
+    },
+    "level2": {
+        "outputMismatch": "Die Ausgabe sollte 'Value: 42' lauten.",
+        "missingVar": "Deklariere deine Variable im 'var' Abschnitt.",
+        "missingAssignment": "Verwende ':=', um der Variable einen Wert zuzuweisen."
+    },
+    "level3": {
+        "outputMismatch": "Die Ausgabe sollte '5 + 3 = 8' lauten.",
+        "missingOperator": "Verwende den + Operator für die Addition."
+    },
+    "level4": {
+        "missingGreeting": "Die Ausgabe sollte eine Begrüßung enthalten.",
+        "missingStringType": "Deklariere die Variable als String-Typ."
+    },
+    "level5": {
+        "missingReadLn": "Verwende ReadLn, um Eingaben zu lesen.",
+        "missingWrite": "Verwende Write für die Eingabeaufforderung."
+    },
+    "level6": {
+        "outputMismatch": "Die Ausgabe sollte 'Negative' lauten, da -5 kleiner als 0 ist.",
+        "missingIf": "Verwende eine if-Anweisung für die Bedingung.",
+        "missingElse": "Füge einen else-Zweig für den anderen Fall hinzu."
+    },
+    "level7": {
+        "outputMismatch": "Die Ausgabe sollte die Zahlen 1 bis 5 sein, jede in einer neuen Zeile.",
+        "missingFor": "Verwende eine for-Schleife.",
+        "missingTo": "Verwende 'to' für aufwärts Zählen."
+    },
+    "level8": {
+        "outputMismatch": "Die Ausgabe sollte 5, 4, 3, 2, 1 und dann 'Liftoff!' sein.",
+        "missingWhile": "Verwende eine while-Schleife."
+    },
+    "level9": {
+        "outputMismatch": "Die Ausgabe sollte 'Hello, World!' lauten.",
+        "missingProcedure": "Definiere eine Prozedur."
+    },
+    "level10": {
+        "outputMismatch": "Die Ausgabe sollte '5 squared is 25' lauten.",
+        "missingFunction": "Definiere eine Funktion."
     },
     "hints": {
         "level1": {
@@ -79,7 +120,7 @@
         "level2": {
             "1": "Variablen müssen im 'var' Abschnitt deklariert werden.",
             "2": "Das Format ist: Variablenname: Typ;",
-            "3": "Beispiel: var zahl: Integer; und dann zahl := 42;"
+            "3": "Beispiel: varzahl: Integer; und dannzahl := 42;"
         },
         "level3": {
             "1": "Du kannst mehrere Werte in einem WriteLn ausgeben.",

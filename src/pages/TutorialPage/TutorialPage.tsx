@@ -79,6 +79,12 @@ function TutorialPage(): ReactElement {
     // Track which level's starter code has been initialized to prevent infinite loops
     const initializedLevelRef = useRef<string | null>(null);
 
+    // Track if we've already processed the current execution to prevent infinite loops
+    const lastProcessedStatusRef = useRef<{ status: string; timestamp: number } | null>(null);
+
+    // Toast notification state for visual feedback
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+
     const toggleSidebar = useCallback(() => {
         setIsSidebarOpen((prev) => !prev);
     }, []);
@@ -191,6 +197,9 @@ function TutorialPage(): ReactElement {
         setValidationResult(null);
         setShowSuccess(false);
 
+        // Show running indicator
+        setToast({ message: 'Running code...', type: 'info' });
+
         // Run the code:
         // - If interactiveMode is true: use empty array (user enters input manually)
         // - Otherwise: use testInput from level (for automated testing)
@@ -198,8 +207,29 @@ function TutorialPage(): ReactElement {
         await runCode(inputQueue);
     }, [runCode, currentLevel, interactiveMode]);
 
-    // Track if we've already processed the current execution to prevent infinite loops
-    const lastProcessedStatusRef = useRef<{ status: string; timestamp: number } | null>(null);
+    // Save progress handler (Ctrl+S)
+    const handleSaveProgress = useCallback(() => {
+        if (currentLevelId && code) {
+            updateProgress(currentLevelId, { savedCode: code });
+            setToast({ message: 'Progress saved!', type: 'success' });
+            // Clear toast after 2 seconds
+            setTimeout(() => setToast(null), 2000);
+        }
+    }, [currentLevelId, code, updateProgress]);
+
+    // Keyboard shortcut handlers
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ctrl+S or Cmd+S to save progress
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSaveProgress();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleSaveProgress]);
 
     // Validate solution when execution completes
     useEffect(() => {
@@ -356,6 +386,20 @@ function TutorialPage(): ReactElement {
                         )}
                     </header>
 
+                    {/* Toast notification for keyboard shortcuts */}
+                    {toast && (
+                        <div
+                            className={`fixed top-4 right-4 z-50 px-4 py-2 rounded font-terminal text-sm animate-fade-in ${toast.type === 'success'
+                                    ? 'bg-green-900/90 text-green-200 border border-green-500'
+                                    : 'bg-blue-900/90 text-blue-200 border border-blue-500'
+                                }`}
+                            role="status"
+                            aria-live="polite"
+                        >
+                            {toast.message}
+                        </div>
+                    )}
+
                     {/* Success notification */}
                     {showSuccess && (
                         <RetroPanel variant="header" className="p-4 mb-6 border-2 border-[var(--color-primary)]">
@@ -440,6 +484,7 @@ function TutorialPage(): ReactElement {
                                     <CodeEditor
                                         value={code}
                                         onChange={setCode}
+                                        onRun={handleRunCode}
                                         height="350px"
                                         readOnly={isRunning}
                                     />

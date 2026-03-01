@@ -72,6 +72,18 @@
                 "description": "Open Source und kostenlos. Kein Account erforderlich."
             }
         },
+        "examples": {
+            "title": "Code-Beispiele",
+            "description": "Entdecke fertige Pascal-Code-Beispiele zum Ausführen",
+            "viewAll": "Alle Beispiele anzeigen",
+            "runExample": "Beispiel ausführen",
+            "categories": {
+                "basic": "Grundlagen",
+                "algorithms": "Algorithmen",
+                "data-structures": "Datenstrukturen",
+                "file-io": "Datei-E/A"
+            }
+        },
         "cta": {
             "title": "Bereit anzufangen?",
             "description": "Beginne deine Reise in die Welt der Programmierung mit Pascal.",

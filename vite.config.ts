@@ -51,6 +51,11 @@ export default defineConfig({
             // injectManifest strategy: workbox options for the build process
             injectManifest: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+                // Exclude large LLVM files - they're handled by runtime caching in sw.ts
+                globIgnores: [
+                    '**/llvm.js/llvm-*.js',
+                    '**/llvm.js/*.js',
+                ],
                 // Increase limit to accommodate Monaco editor TypeScript worker (7+ MB)
                 maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8 MB
             },

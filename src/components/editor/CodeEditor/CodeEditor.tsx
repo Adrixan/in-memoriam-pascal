@@ -25,6 +25,9 @@ export interface CodeEditorProps {
     /** Callback when code changes */
     onChange?: (value: string) => void;
 
+    /** Callback when code should be run (Ctrl+Enter) */
+    onRun?: () => void;
+
     /** Read-only mode */
     readOnly?: boolean;
 
@@ -72,6 +75,7 @@ function EditorLoadingFallback(): ReactElement {
 export function CodeEditor({
     value,
     onChange,
+    onRun,
     readOnly = false,
     height = '400px',
     className,
@@ -118,6 +122,18 @@ export function CodeEditor({
                 setCursorPosition(e.position.lineNumber, e.position.column);
             });
 
+            // Add custom action for Ctrl+Enter to run code
+            if (onRun) {
+                editor.addAction({
+                    id: 'run-code',
+                    label: 'Run Code',
+                    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+                    run: () => {
+                        onRun();
+                    },
+                });
+            }
+
             // Prevent browser's default print dialog (Ctrl+P) when editor is focused
             // Monaco uses Ctrl+P for Quick Open, but we want to prevent browser print
             const editorDom = editor.getDomNode?.();
@@ -135,7 +151,7 @@ export function CodeEditor({
             setReady(true);
             onReady?.();
         },
-        [setCursorPosition, setReady, onReady]
+        [setCursorPosition, setReady, onReady, onRun]
     );
 
     /**

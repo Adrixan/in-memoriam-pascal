@@ -38,6 +38,12 @@ export interface InterpreterError {
     /** Error type */
     type: 'syntax' | 'runtime' | 'compilation';
 
+    /** Error code for categorization */
+    errorCode?: string;
+
+    /** Suggested fix for the error */
+    suggestion?: string;
+
     /** Original error if available */
     originalError?: unknown;
 }

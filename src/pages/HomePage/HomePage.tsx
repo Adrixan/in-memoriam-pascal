@@ -5,13 +5,15 @@
  * - Hero section with Pascal historical context
  * - Animated terminal-style introduction
  * - Feature highlights
+ * - Code examples gallery
  * - Responsive design
  */
 
 import { type ReactElement, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { RetroButton, RetroPanel } from '@/components/common';
+import { codeExamples } from '@/data/examples';
 
 /**
  * TypingEffect Component - Animates text like a terminal
@@ -90,16 +92,26 @@ function FeatureCard({
 function HomePage(): ReactElement {
     const { t } = useTranslation('common');
     const [showSubtitle, setShowSubtitle] = useState(false);
+    const navigate = useNavigate();
 
     const handleTypingComplete = useCallback(() => {
         setTimeout(() => setShowSubtitle(true), 500);
     }, []);
+
+    const handleRunExample = useCallback((code: string) => {
+        // Navigate to tutorial with example code pre-loaded
+        // For now, navigate to first tutorial level
+        navigate('/tutorial/hello-world', { state: { code } });
+    }, [navigate]);
 
     useEffect(() => {
         // Trigger subtitle after main title animation
         const timer = setTimeout(handleTypingComplete, 3000);
         return () => clearTimeout(timer);
     }, [handleTypingComplete]);
+
+    // Show first 4 examples on homepage
+    const featuredExamples = codeExamples.slice(0, 4);
 
     return (
         <main className="min-h-screen" role="main">
@@ -246,6 +258,68 @@ function HomePage(): ReactElement {
                                 'Open source and free to use. No account required.'
                             )}
                         />
+                    </div>
+                </div>
+            </section>
+
+            {/* Code Examples Section */}
+            <section
+                id="examples"
+                className="py-16 md:py-20"
+                aria-labelledby="examples-title"
+            >
+                <div className="container mx-auto px-4">
+                    <div className="max-w-4xl mx-auto">
+                        <h2
+                            id="examples-title"
+                            className="font-pixel text-xl md:text-2xl text-[var(--color-primary)] text-center mb-4 terminal-glow"
+                        >
+                            {t('home.examples.title', 'Code Examples')}
+                        </h2>
+                        <p className="font-terminal text-lg text-[var(--color-text-muted)] text-center mb-10">
+                            {t('home.examples.description', 'Explore ready-to-run Pascal code examples')}
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            {featuredExamples.map((example) => (
+                                <RetroPanel
+                                    key={example.id}
+                                    variant="default"
+                                    hoverGlow
+                                    className="p-4"
+                                >
+                                    <h3 className="font-pixel text-sm text-[var(--color-primary)] mb-2">
+                                        {t(`levels.examples.${example.id}.title`, example.titleKey)}
+                                    </h3>
+                                    <p className="font-terminal text-sm text-[var(--color-text-muted)] mb-4">
+                                        {t(`levels.examples.${example.id}.description`, example.descriptionKey)}
+                                    </p>
+                                    <pre className="font-mono text-xs text-[var(--color-secondary)] bg-[var(--crt-black)] p-3 rounded overflow-x-auto max-h-32">
+                                        <code>{example.code.split('\n').slice(0, 5).join('\n')}{example.code.split('\n').length > 5 ? '\n...' : ''}</code>
+                                    </pre>
+                                    <div className="mt-4">
+                                        <span className="inline-block px-2 py-1 text-xs font-terminal text-[var(--color-text-muted)] border border-[var(--color-primary)] rounded mr-2">
+                                            {t(`home.examples.categories.${example.category}`, example.category)}
+                                        </span>
+                                        <RetroButton
+                                            variant="outline"
+                                            onClick={() => handleRunExample(example.code)}
+                                            className="text-sm py-1 px-3"
+                                        >
+                                            {t('home.examples.runExample', 'Run')}
+                                        </RetroButton>
+                                    </div>
+                                </RetroPanel>
+                            ))}
+                        </div>
+
+                        <div className="text-center">
+                            <Link to="/tutorial/hello-world">
+                                <RetroButton variant="primary">
+                                    {t('home.examples.viewAll', 'View All Examples')}
+                                </RetroButton>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </section>

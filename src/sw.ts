@@ -18,23 +18,26 @@ cleanupOutdatedCaches();
 precacheAndRoute((self as any).__WB_MANIFEST);
 
 // Navigation route for SPA - NetworkFirst for offline support
+// Matches all navigation requests (all SPA routes)
 registerRoute(
     new NavigationRoute(
         new NetworkFirst({
             cacheName: 'navigation-cache',
+            networkTimeoutSeconds: 3,
             plugins: [
                 new CacheableResponsePlugin({
                     statuses: [200],
                 }) as WorkboxPlugin,
                 new ExpirationPlugin({
-                    maxEntries: 10,
+                    maxEntries: 20,
                     maxAgeSeconds: 60 * 60 * 24, // 1 day
                 }) as WorkboxPlugin,
             ],
         }),
         {
-            // Allow all navigation requests
-            allowlist: [/./],
+            // Allow all navigation requests - matches root and all SPA routes
+            // This includes: /, /tutorial, /tutorial/1, /tutorial/any-path, etc.
+            allowlist: [/^\/.*$/],
         }
     )
 );

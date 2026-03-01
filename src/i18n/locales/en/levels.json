@@ -140,5 +140,104 @@
         },
         "example1": "A function to calculate the square of a number",
         "task": "Create a function that squares a number and returns the result."
+    },
+    "level11": {
+        "title": "File I/O",
+        "description": "Learn to read from and write to files using Pascal's file handling commands.",
+        "objective1": "Use Assign to connect a variable to a file",
+        "objective2": "Use Reset, Rewrite, and Close for file operations",
+        "objective3": "Read and write data to text files",
+        "concept1": {
+            "title": "File Operations",
+            "content": "Assign(f, 'filename') connects file variable f to a file. Rewrite creates a new file, Reset opens for reading, and Close closes the file."
+        },
+        "example1": "Writing and reading a text file",
+        "task": "Write 'Hello World!' to a file using Assign, Rewrite, and Close."
+    },
+    "level12": {
+        "title": "Sets",
+        "description": "Work with set data types and perform set operations.",
+        "objective1": "Declare and use set types",
+        "objective2": "Check membership with the 'in' operator",
+        "objective3": "Perform set operations (union, intersection, difference)",
+        "concept1": {
+            "title": "Set Types",
+            "content": "Sets are collections of elements of the same type. Define with 'set of' and use brackets: [1, 2, 3] or [1..10] for ranges."
+        },
+        "example1": "Creating and using sets",
+        "task": "Create a set of prime numbers and check if 5 is in the set."
+    },
+    "level13": {
+        "title": "Pointers",
+        "description": "Learn dynamic memory allocation with pointers and the New/Dispose commands.",
+        "objective1": "Declare pointer variables",
+        "objective2": "Use New to allocate memory and Dispose to free it",
+        "objective3": "Access values through pointer dereferencing (^)",
+        "concept1": {
+            "title": "Pointer Basics",
+            "content": "Pointers store memory addresses. Use New(p) to allocate memory and p^ to access the value at that address."
+        },
+        "example1": "Using pointers to store and access values",
+        "task": "Create a pointer to an integer, allocate memory, assign value 42, and print it."
+    },
+    "level14": {
+        "title": "Advanced Records",
+        "description": "Master variant records and nested record structures.",
+        "objective1": "Create nested record types",
+        "objective2": "Understand variant records (case within records)",
+        "objective3": "Access nested record fields",
+        "concept1": {
+            "title": "Nested Records",
+            "content": "Records can contain other records as fields. Access nested fields with dot notation: record1.field1.subfield"
+        },
+        "example1": "Using nested records for complex data",
+        "task": "Create a TEvent record with a nested TDate record for the event date."
+    },
+    "level15": {
+        "title": "Unit System",
+        "description": "Organize code into units/modules for better code management.",
+        "objective1": "Understand the unit structure (interface/implementation)",
+        "objective2": "Create procedures and functions in modules",
+        "objective3": "Organize code with related procedures",
+        "concept1": {
+            "title": "Units Overview",
+            "content": "Units are separate program modules with interface and implementation sections. They allow code reuse and organization."
+        },
+        "example1": "Creating a utility module with procedures",
+        "task": "Create two procedures (Greet and Farewell) and call them."
+    },
+    "examples": {
+        "helloWorld": {
+            "title": "Hello World",
+            "description": "Your first Pascal program - the classic starting point."
+        },
+        "basicCalculations": {
+            "title": "Basic Calculations",
+            "description": "Perform arithmetic operations with variables."
+        },
+        "arrayManipulation": {
+            "title": "Array Manipulation",
+            "description": "Work with arrays to store and access multiple values."
+        },
+        "recordUsage": {
+            "title": "Record Usage",
+            "description": "Use records to organize related data."
+        },
+        "hailstone": {
+            "title": "Hailstone Sequence",
+            "description": "The famous Collatz conjecture algorithm."
+        },
+        "fibonacci": {
+            "title": "Fibonacci Sequence",
+            "description": "Generate the Fibonacci number sequence."
+        },
+        "bubbleSort": {
+            "title": "Bubble Sort",
+            "description": "Sort an array using the bubble sort algorithm."
+        },
+        "primeCheck": {
+            "title": "Prime Check",
+            "description": "Check if a number is prime."
+        }
     }
 }

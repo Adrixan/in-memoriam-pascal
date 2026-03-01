@@ -37,6 +37,22 @@ export interface ExecutionOutput {
 }
 
 /**
+ * Detailed error information for better debugging
+ */
+export interface ValidationErrorDetail {
+    /** Error category */
+    category: string;
+    /** User-friendly message */
+    message: string;
+    /** Suggested fix */
+    suggestion: string;
+    /** Expected value */
+    expected: string;
+    /** Actual value */
+    actual: string;
+}
+
+/**
  * SolutionValidator class
  * Validates user code against level requirements
  */
@@ -146,33 +162,100 @@ export class SolutionValidator {
     }
 
     /**
+     * Get detailed error information for a validation failure
+     */
+    static getErrorDetail(result: LevelValidationResult): ValidationErrorDetail {
+        const details = result.details;
+        const defaultValues = { suggestion: '', expected: '', actual: '' };
+
+        if (result.success) {
+            return {
+                category: 'success',
+                message: 'Validation passed',
+                ...defaultValues,
+            };
+        }
+
+        const category = details?.failedRule || 'unknown';
+
+        switch (category) {
+            case 'output_match':
+                return {
+                    category: 'output_mismatch',
+                    message: 'Output mismatch',
+                    suggestion: 'Check the exact format of your output - capitalization and spacing matter.',
+                    expected: details?.expected ?? '',
+                    actual: details?.actual ?? '',
+                };
+            case 'output_contains':
+                return {
+                    category: 'output_mismatch',
+                    message: `Output should contain: "${details?.expected ?? ''}"`,
+                    suggestion: 'Make sure your output includes the required text.',
+                    expected: details?.expected ?? '',
+                    actual: details?.actual ?? '',
+                };
+            case 'code_contains':
+                return {
+                    category: 'missing_keyword',
+                    message: `Code should contain: "${details?.expected ?? ''}"`,
+                    suggestion: 'Make sure to include the required keyword in your code.',
+                    expected: details?.expected ?? '',
+                    actual: '',
+                };
+            case 'code_pattern':
+                return {
+                    category: 'syntax_error',
+                    message: `Code should match pattern: ${details?.expected ?? ''}`,
+                    suggestion: 'Check the syntax of your code.',
+                    expected: details?.expected ?? '',
+                    actual: '',
+                };
+            case 'compiles':
+                return {
+                    category: 'compilation_error',
+                    message: 'Code has compilation errors',
+                    suggestion: 'Review your code for syntax errors.',
+                    expected: '',
+                    actual: details?.actual ?? '',
+                };
+            case 'no_runtime_error':
+                return {
+                    category: 'runtime_error',
+                    message: 'Code has runtime errors',
+                    suggestion: 'Check your calculations and variable values.',
+                    expected: '',
+                    actual: details?.actual ?? '',
+                };
+            default:
+                return {
+                    category: 'unknown',
+                    message: details?.expected ?? 'Validation failed',
+                    suggestion: 'Review your code and try again.',
+                    expected: details?.expected ?? '',
+                    actual: '',
+                };
+        }
+    }
+
+    /**
      * Get a user-friendly error message for a validation failure
      */
     static getErrorMessage(result: LevelValidationResult): string {
-        if (result.success) {
-            return '';
+        const errorDetail = this.getErrorDetail(result);
+
+        let message = errorDetail.message;
+
+        if (errorDetail.expected && errorDetail.actual) {
+            message += `\nExpected: "${errorDetail.expected}"`;
+            message += `\nActual: "${errorDetail.actual}"`;
         }
 
-        if (result.details?.failedRule) {
-            switch (result.details.failedRule) {
-                case 'output_match':
-                    return `Expected output: "${result.details.expected}"\nActual output: "${result.details.actual}"`;
-                case 'output_contains':
-                    return `Output should contain: "${result.details.expected}"`;
-                case 'code_contains':
-                    return `Code should contain: "${result.details.expected}"`;
-                case 'code_pattern':
-                    return `Code should match pattern: ${result.details.expected}`;
-                case 'compiles':
-                    return 'Code has compilation errors';
-                case 'no_runtime_error':
-                    return 'Code has runtime errors';
-                default:
-                    return result.details.expected ?? 'Validation failed';
-            }
+        if (errorDetail.suggestion) {
+            message += `\nHint: ${errorDetail.suggestion}`;
         }
 
-        return 'Validation failed';
+        return message;
     }
 }
 

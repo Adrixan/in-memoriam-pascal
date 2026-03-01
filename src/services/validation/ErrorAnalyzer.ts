@@ -37,7 +37,47 @@ export interface AnalyzedError {
 
     /** Whether this error is recoverable */
     isRecoverable: boolean;
+
+    /** Error code from interpreter */
+    errorCode: string;
+
+    /** Suggested fix from interpreter */
+    suggestion: string;
 }
+
+/**
+ * Context-aware suggestions for common errors
+ */
+interface ErrorSuggestion {
+    pattern: RegExp;
+    suggestion: string;
+}
+
+const ERROR_SUGGESTIONS: ErrorSuggestion[] = [
+    // Syntax errors
+    { pattern: /semicolon/i, suggestion: 'Did you forget a semicolon at the end of the statement?' },
+    { pattern: /unexpected token/i, suggestion: 'Check for typos or missing punctuation marks.' },
+    { pattern: /missing end/i, suggestion: 'Every BEGIN needs a matching END.' },
+    { pattern: /invalid identifier/i, suggestion: 'Variable names must start with a letter and contain only letters, numbers, and underscores.' },
+    { pattern: /then/i, suggestion: 'IF statements require THEN after the condition.' },
+    { pattern: /do/i, suggestion: 'Loops (FOR, WHILE) require DO after the condition.' },
+    { pattern: /begin/i, suggestion: 'Multiple statements need to be wrapped in BEGIN...END.' },
+    // Runtime errors
+    { pattern: /division by zero/i, suggestion: 'Check your divisor - it cannot be zero.' },
+    { pattern: /array.*bound/i, suggestion: 'Array indices must be within the declared range.' },
+    { pattern: /type mismatch/i, suggestion: 'Make sure the data types are compatible.' },
+    { pattern: /undefined.*variable/i, suggestion: 'Declare the variable in the VAR section before using it.' },
+    { pattern: /overflow/i, suggestion: 'The value is too large for the variable type.' },
+    // Compilation errors
+    { pattern: /unknown type/i, suggestion: 'Check the type name - use Integer, Real, String, Boolean, or Char.' },
+    { pattern: /duplicate/i, suggestion: 'You cannot declare the same variable twice.' },
+    { pattern: /unknown.*procedure/i, suggestion: 'Make sure the procedure is defined before it is called.' },
+    { pattern: /unknown.*function/i, suggestion: 'Make sure the function is defined before it is called.' },
+    { pattern: /parameter/i, suggestion: 'Check the number of parameters passed to the procedure/function.' },
+    // Output errors
+    { pattern: /output.*mismatch/i, suggestion: 'Check the exact output format - capitalization and spacing matter.' },
+    { pattern: /expected.*got/i, suggestion: 'The output does not match. Compare expected vs actual carefully.' },
+];
 
 /**
  * Error pattern definitions for classification
@@ -52,6 +92,8 @@ const ERROR_PATTERNS: Record<ErrorCategory, RegExp[]> = {
         /unexpected/i,
         /expected/i,
         /parse error/i,
+        /begin/i,
+        /then/i,
     ],
     runtime_error: [
         /division by zero/i,
@@ -60,7 +102,7 @@ const ERROR_PATTERNS: Record<ErrorCategory, RegExp[]> = {
         /undefined variable/i,
         /runtime error/i,
         /overflow/i,
-        /null pointer/i,
+        /nil pointer/i,
     ],
     compilation_error: [
         /unknown type/i,
@@ -68,12 +110,15 @@ const ERROR_PATTERNS: Record<ErrorCategory, RegExp[]> = {
         /missing program/i,
         /compilation failed/i,
         /compile error/i,
+        /unknown procedure/i,
+        /unknown function/i,
     ],
     output_mismatch: [
         /output.*mismatch/i,
         /expected output/i,
         /actual output/i,
         /output does not match/i,
+        /expected.*got/i,
     ],
     missing_keyword: [
         /missing.*keyword/i,
@@ -110,7 +155,7 @@ export class ErrorAnalyzer {
     /**
      * Analyze a validation result to determine error category and suggest hints
      */
-    static analyzeError(result: ValidationResult): AnalyzedError {
+    static analyzeError(result: ValidationResult, interpreterErrorCode?: string, interpreterSuggestion?: string): AnalyzedError {
         if (result.success) {
             return {
                 category: 'unknown',
@@ -118,13 +163,16 @@ export class ErrorAnalyzer {
                 suggestedHintIndices: [],
                 originalMessage: '',
                 isRecoverable: true,
+                errorCode: '',
+                suggestion: '',
             };
         }
 
-        const category = this.classifyError(result);
+        const category = this.classifyError(result, interpreterErrorCode);
         const description = this.generateDescription(result, category);
         const suggestedHintIndices = this.suggestHints(category, result);
         const isRecoverable = this.isRecoverableError(category, result);
+        const suggestion = interpreterSuggestion || this.getSuggestion(result.messageKey, category);
 
         return {
             category,
@@ -132,14 +180,23 @@ export class ErrorAnalyzer {
             suggestedHintIndices,
             originalMessage: result.messageKey,
             isRecoverable,
+            errorCode: interpreterErrorCode ?? '',
+            suggestion: suggestion ?? '',
         };
     }
 
     /**
      * Classify error into a category based on patterns and rule types
      */
-    static classifyError(result: ValidationResult): ErrorCategory {
-        // First, check by failed rule type
+    static classifyError(result: ValidationResult, interpreterErrorCode?: string): ErrorCategory {
+        // First check interpreter error code if available
+        if (interpreterErrorCode) {
+            if (interpreterErrorCode.startsWith('SYNTAX_')) return 'syntax_error';
+            if (interpreterErrorCode.startsWith('RUNTIME_')) return 'runtime_error';
+            if (interpreterErrorCode.startsWith('COMP_')) return 'compilation_error';
+        }
+
+        // Check by failed rule type
         if (result.details?.failedRule) {
             const ruleCategory = RULE_TYPE_TO_CATEGORY[result.details.failedRule];
             if (ruleCategory) {
@@ -170,31 +227,63 @@ export class ErrorAnalyzer {
 
         switch (category) {
             case 'syntax_error':
-                return 'Dein Code enthält einen Syntaxfehler. Überprüfe die Schreibweise und Struktur.';
+                return 'Your code contains a syntax error. Check the spelling and structure.';
 
             case 'runtime_error':
-                return 'Dein Code hat einen Laufzeitfehler verursacht. Überprüfe Berechnungen und Variablen.';
+                return 'Your code caused a runtime error. Check calculations and variables.';
 
             case 'output_mismatch':
                 if (details?.expected && details?.actual) {
-                    return `Die Ausgabe stimmt nicht überein. Erwartet: "${details.expected}", erhalten: "${details.actual}"`;
+                    return `Output mismatch. Expected: "${details.expected}", got: "${details.actual}"`;
                 }
-                return 'Die Ausgabe stimmt nicht mit dem erwarteten Ergebnis überein.';
+                return 'The output does not match the expected result.';
 
             case 'missing_keyword':
                 if (details?.expected) {
-                    return `Dein Code muss "${details.expected}" enthalten.`;
+                    return `Your code must contain "${details.expected}".`;
                 }
-                return 'Deinem Code fehlt ein erforderliches Schlüsselwort.';
+                return 'Your code is missing a required keyword.';
 
             case 'compilation_error':
-                return 'Dein Code konnte nicht kompiliert werden. Überprüfe die Deklarationen.';
+                return 'Your code could not be compiled. Check the declarations.';
 
             case 'logic_error':
-                return 'Das Programm läuft, aber das Ergebnis ist nicht korrekt.';
+                return 'The program runs, but the result is not correct.';
 
             default:
-                return 'Ein Fehler ist aufgetreten. Überprüfe deinen Code.';
+                return 'An error occurred. Check your code.';
+        }
+    }
+
+    /**
+     * Get a context-aware suggestion for the error
+     */
+    static getSuggestion(message: string, category: ErrorCategory): string | undefined {
+        const msgLower = message.toLowerCase();
+
+        // Check against specific patterns first
+        for (const { pattern, suggestion } of ERROR_SUGGESTIONS) {
+            if (pattern.test(msgLower)) {
+                return suggestion;
+            }
+        }
+
+        // Return category-based generic suggestion
+        switch (category) {
+            case 'syntax_error':
+                return 'Review your code for typos and missing punctuation.';
+            case 'runtime_error':
+                return 'Check variable values and calculations.';
+            case 'output_mismatch':
+                return 'Compare your output with the expected format carefully.';
+            case 'missing_keyword':
+                return 'Make sure to include the required keyword in your code.';
+            case 'compilation_error':
+                return 'Check all declarations and make sure they are correct.';
+            case 'logic_error':
+                return 'Review your algorithm and logic.';
+            default:
+                return undefined;
         }
     }
 
@@ -203,28 +292,17 @@ export class ErrorAnalyzer {
      */
     static suggestHints(category: ErrorCategory, _result: ValidationResult): number[] {
         // Suggest hints based on error category
-        // Return indices 0, 1, 2 in order of relevance
         switch (category) {
             case 'syntax_error':
-                // Syntax errors: start with gentle hints about structure
                 return [0, 1, 2];
-
             case 'output_mismatch':
-                // Output mismatch: hints about logic
                 return [0, 1, 2];
-
             case 'missing_keyword':
-                // Missing keyword: specific hints about what's missing
                 return [0, 1, 2];
-
             case 'runtime_error':
-                // Runtime errors: hints about common pitfalls
                 return [0, 1, 2];
-
             case 'compilation_error':
-                // Compilation errors: hints about declarations
                 return [0, 1, 2];
-
             default:
                 return [0, 1, 2];
         }
@@ -234,10 +312,7 @@ export class ErrorAnalyzer {
      * Determine if the error is recoverable with hints
      */
     static isRecoverableError(category: ErrorCategory, result: ValidationResult): boolean {
-        // Most errors are recoverable with proper guidance
-        // Only critical syntax errors might not be
         if (category === 'syntax_error') {
-            // Check for specific unrecoverable patterns
             const message = result.messageKey.toLowerCase();
             if (message.includes('fatal') || message.includes('critical')) {
                 return false;
@@ -250,17 +325,10 @@ export class ErrorAnalyzer {
      * Get a hint relevance score for a specific error category
      */
     static getHintRelevance(hintIndex: number, category: ErrorCategory): number {
-        // Higher score = more relevant
-        // For most errors, the first hint is most relevant
-        // For output mismatches, more specific hints might be better
-
         if (category === 'output_mismatch') {
-            // For output issues, more specific hints are better
-            return hintIndex + 1; // 1, 2, 3
+            return hintIndex + 1;
         }
-
-        // For other errors, gentle hints are preferred
-        return 3 - hintIndex; // 3, 2, 1
+        return 3 - hintIndex;
     }
 
     /**
@@ -268,9 +336,8 @@ export class ErrorAnalyzer {
      */
     static matchesErrorType(hintErrorTypes: string[] | undefined, category: ErrorCategory): boolean {
         if (!hintErrorTypes || hintErrorTypes.length === 0) {
-            return true; // No specific error types = matches all
+            return true;
         }
-
         return hintErrorTypes.includes(category);
     }
 }

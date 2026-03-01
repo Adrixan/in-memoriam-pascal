@@ -38,6 +38,107 @@ const DEFAULT_CONFIG: InterpreterConfig = {
  * PascalInterpreter class
  * Manages the compilation and execution of Pascal code
  */
+
+/**
+ * Error message catalog with suggestions for common Pascal errors
+ */
+const ERROR_CATALOG: Record<string, { message: string; suggestion: string; code: string }> = {
+    // Syntax errors
+    'SYNTAX_UNEXPECTED_TOKEN': {
+        message: 'Unexpected token found',
+        suggestion: 'Check for typos, missing semicolons, or incorrect punctuation',
+        code: 'syntax.unexpectedToken',
+    },
+    'SYNTAX_MISSING_SEMICOLON': {
+        message: 'Semicolon expected',
+        suggestion: 'Most statements in Pascal end with a semicolon (;)',
+        code: 'syntax.missingSemicolon',
+    },
+    'SYNTAX_MISSING_END': {
+        message: 'Missing END keyword',
+        suggestion: 'Every BEGIN must have a matching END',
+        code: 'syntax.missingEnd',
+    },
+    'SYNTAX_INVALID_IDENTIFIER': {
+        message: 'Invalid identifier',
+        suggestion: 'Variable names must start with a letter and contain only letters, numbers, and underscores',
+        code: 'syntax.invalidIdentifier',
+    },
+    'SYNTAX_MISSING_THEN': {
+        message: 'THEN keyword expected',
+        suggestion: 'IF statements require THEN after the condition',
+        code: 'syntax.missingThen',
+    },
+    'SYNTAX_MISSING_DO': {
+        message: 'DO keyword expected',
+        suggestion: 'Loops (FOR, WHILE) require DO after the condition',
+        code: 'syntax.missingDo',
+    },
+    'SYNTAX_UNEXPECTED_END': {
+        message: 'Unexpected END',
+        suggestion: 'Check if there is a matching BEGIN or DO before this END',
+        code: 'syntax.unexpectedEnd',
+    },
+    // Runtime errors
+    'RUNTIME_DIVISION_ZERO': {
+        message: 'Division by zero',
+        suggestion: 'Check your divisor - it cannot be zero',
+        code: 'runtime.divisionByZero',
+    },
+    'RUNTIME_ARRAY_BOUNDS': {
+        message: 'Array index out of bounds',
+        suggestion: 'Array indices must be within the declared range',
+        code: 'runtime.arrayOutOfBounds',
+    },
+    'RUNTIME_TYPE_MISMATCH': {
+        message: 'Type mismatch',
+        suggestion: 'Make sure the data types are compatible',
+        code: 'runtime.typeMismatch',
+    },
+    'RUNTIME_UNDEFINED_VARIABLE': {
+        message: 'Undefined variable',
+        suggestion: 'Declare the variable in the VAR section before using it',
+        code: 'runtime.undefinedVariable',
+    },
+    'RUNTIME_STACK_OVERFLOW': {
+        message: 'Stack overflow',
+        suggestion: 'Your program may have too deep recursion or infinite loop',
+        code: 'runtime.stackOverflow',
+    },
+    // Compilation errors
+    'COMP_UNKNOWN_TYPE': {
+        message: 'Unknown type',
+        suggestion: 'Check the type name - common types are: Integer, Real, String, Boolean, Char',
+        code: 'compilation.unknownType',
+    },
+    'COMP_DUPLICATE_IDENTIFIER': {
+        message: 'Identifier already defined',
+        suggestion: 'You cannot declare the same variable twice',
+        code: 'compilation.duplicateIdentifier',
+    },
+    'COMP_MISSING_PROGRAM': {
+        message: 'Program header missing',
+        suggestion: 'Pascal programs should start with: program Name;',
+        code: 'compilation.missingProgram',
+    },
+    // Generic errors
+    'GENERIC_SYNTAX': {
+        message: 'Syntax error',
+        suggestion: 'Review your code for typos, missing punctuation, or incorrect structure',
+        code: 'syntax.generic',
+    },
+    'GENERIC_RUNTIME': {
+        message: 'Runtime error',
+        suggestion: 'An error occurred while your program was running',
+        code: 'runtime.generic',
+    },
+    'GENERIC_COMPILATION': {
+        message: 'Compilation error',
+        suggestion: 'Your code could not be compiled. Check for typos and syntax issues',
+        code: 'compilation.generic',
+    },
+};
+
 export class PascalInterpreter {
     private config: InterpreterConfig;
     private outputCapture: OutputCapture;
@@ -794,32 +895,81 @@ export class PascalInterpreter {
      * Parse an error into an InterpreterError
      */
     private parseError(error: unknown, type: InterpreterError['type'] = 'compilation'): InterpreterError {
+        let errorMessage = '';
+        let errorCode = 'GENERIC_SYNTAX';
+        let suggestion = '';
+
         if (error instanceof Error) {
-            // Try to extract line number from error message
-            const lineMatch = error.message.match(/line (\d+)/i);
-            const columnMatch = error.message.match(/column (\d+)/i);
+            errorMessage = error.message;
 
-            const result: InterpreterError = {
-                message: error.message,
-                type,
-                originalError: error,
-            };
+            // Match error message against known patterns
+            const msgLower = errorMessage.toLowerCase();
 
-            if (lineMatch && lineMatch[1]) {
-                result.line = parseInt(lineMatch[1], 10);
+            // Check for specific error patterns
+            if (msgLower.includes('semicolon') || msgLower.includes(';')) {
+                errorCode = 'SYNTAX_MISSING_SEMICOLON';
+            } else if (msgLower.includes('end') && (msgLower.includes('expect') || msgLower.includes('missing'))) {
+                errorCode = 'SYNTAX_MISSING_END';
+            } else if (msgLower.includes('unexpected token') || msgLower.includes('unexpected')) {
+                errorCode = 'SYNTAX_UNEXPECTED_TOKEN';
+            } else if (msgLower.includes('identifier') && (msgLower.includes('invalid') || msgLower.includes('unknown'))) {
+                errorCode = 'SYNTAX_INVALID_IDENTIFIER';
+            } else if (msgLower.includes('then')) {
+                errorCode = 'SYNTAX_MISSING_THEN';
+            } else if (msgLower.includes('do')) {
+                errorCode = 'SYNTAX_MISSING_DO';
+            } else if (msgLower.includes('division') && msgLower.includes('zero')) {
+                errorCode = 'RUNTIME_DIVISION_ZERO';
+            } else if (msgLower.includes('array') && (msgLower.includes('bound') || msgLower.includes('range'))) {
+                errorCode = 'RUNTIME_ARRAY_BOUNDS';
+            } else if (msgLower.includes('type') && msgLower.includes('mismatch')) {
+                errorCode = 'RUNTIME_TYPE_MISMATCH';
+            } else if (msgLower.includes('undefined') || (msgLower.includes('unknown') && msgLower.includes('variable'))) {
+                errorCode = 'RUNTIME_UNDEFINED_VARIABLE';
+            } else if (msgLower.includes('stack') && msgLower.includes('overflow')) {
+                errorCode = 'RUNTIME_STACK_OVERFLOW';
+            } else if (msgLower.includes('unknown type')) {
+                errorCode = 'COMP_UNKNOWN_TYPE';
+            } else if (msgLower.includes('duplicate')) {
+                errorCode = 'COMP_DUPLICATE_IDENTIFIER';
+            } else if (msgLower.includes('program') && msgLower.includes('missing')) {
+                errorCode = 'COMP_MISSING_PROGRAM';
+            } else if (type === 'runtime') {
+                errorCode = 'GENERIC_RUNTIME';
+            } else if (type === 'compilation') {
+                errorCode = 'GENERIC_COMPILATION';
             }
 
-            if (columnMatch && columnMatch[1]) {
-                result.column = parseInt(columnMatch[1], 10);
+            const catalogEntry = ERROR_CATALOG[errorCode];
+            if (catalogEntry) {
+                suggestion = catalogEntry.suggestion;
             }
-
-            return result;
+        } else {
+            errorMessage = String(error);
+            errorCode = type === 'runtime' ? 'GENERIC_RUNTIME' : type === 'compilation' ? 'GENERIC_COMPILATION' : 'GENERIC_SYNTAX';
         }
 
-        return {
-            message: String(error),
+        // Try to extract line number from error message
+        const lineMatch = errorMessage.match(/line (\d+)/i);
+        const columnMatch = errorMessage.match(/column (\d+)/i);
+
+        const result: InterpreterError = {
+            message: errorMessage,
             type,
+            originalError: error,
+            errorCode,
+            suggestion,
         };
+
+        if (lineMatch && lineMatch[1]) {
+            result.line = parseInt(lineMatch[1], 10);
+        }
+
+        if (columnMatch && columnMatch[1]) {
+            result.column = parseInt(columnMatch[1], 10);
+        }
+
+        return result;
     }
 }
 

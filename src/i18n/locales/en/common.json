@@ -72,6 +72,18 @@
                 "description": "Open source and free. No account required."
             }
         },
+        "examples": {
+            "title": "Code Examples",
+            "description": "Explore ready-to-run Pascal code examples",
+            "viewAll": "View All Examples",
+            "runExample": "Run Example",
+            "categories": {
+                "basic": "Basic",
+                "algorithms": "Algorithms",
+                "data-structures": "Data Structures",
+                "file-io": "File I/O"
+            }
+        },
         "cta": {
             "title": "Ready to start?",
             "description": "Begin your journey into the world of programming with Pascal.",

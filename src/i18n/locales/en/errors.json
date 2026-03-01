@@ -3,18 +3,31 @@
         "unexpectedToken": "Unexpected token at position {{position}}",
         "missingSemicolon": "Semicolon expected after {{statement}}",
         "missingEnd": "Missing 'end' for 'begin' block",
-        "invalidIdentifier": "Invalid identifier: {{identifier}}"
+        "invalidIdentifier": "Invalid identifier: {{identifier}}",
+        "missingThen": "THEN keyword expected after IF condition",
+        "missingDo": "DO keyword expected for loop statement",
+        "unexpectedEnd": "Unexpected END - check for matching BEGIN",
+        "description": "Your code contains a syntax error. Check the spelling and structure.",
+        "generic": "A syntax error occurred. Review your code for typos."
     },
     "runtime": {
         "divisionByZero": "Division by zero is not allowed",
         "arrayOutOfBounds": "Array index out of bounds",
         "typeMismatch": "Type mismatch: expected {{expected}}, found {{actual}}",
-        "undefinedVariable": "Unknown variable: {{variable}}"
+        "undefinedVariable": "Unknown variable: {{variable}}",
+        "stackOverflow": "Stack overflow - possible infinite recursion",
+        "nilPointer": "Nil pointer access",
+        "description": "Your code caused a runtime error. Check calculations and variables.",
+        "generic": "A runtime error occurred while executing your code."
     },
     "compilation": {
         "unknownType": "Unknown type: {{type}}",
         "duplicateIdentifier": "Identifier already defined: {{identifier}}",
-        "missingProgram": "Program header missing"
+        "missingProgram": "Program header missing",
+        "unknownProcedure": "Unknown procedure or function: {{name}}",
+        "wrongParamCount": "Wrong number of parameters for {{name}}",
+        "description": "Your code could not be compiled. Check the declarations.",
+        "generic": "A compilation error occurred. Review your code."
     },
     "validation": {
         "outputMismatch": "The output does not match the expected result.",
@@ -26,49 +39,77 @@
         "congratulations": "Congratulations! You have successfully completed this level.",
         "failed": "Validation failed",
         "runtimeError": "Your code could not be executed. Error: {{error}}",
-        "level1": {
-            "outputMismatch": "Your output must be exactly 'Hello World!'. Pay attention to capitalization!",
-            "missingWriteLn": "Use WriteLn to output text."
+        "logicError": "The program runs, but the result is not correct.",
+        "genericError": "An error occurred. Check your code."
+    },
+    "suggestions": {
+        "syntax": {
+            "semicolon": "Did you forget a semicolon at the end of the statement?",
+            "identifier": "Variable names must start with a letter and contain only letters, numbers, and underscores.",
+            "begin": "Multiple statements need to be wrapped in BEGIN...END.",
+            "then": "IF statements require THEN after the condition.",
+            "do": "Loops (FOR, WHILE) require DO after the condition."
         },
-        "level2": {
-            "outputMismatch": "The output should be 'Value: 42'.",
-            "missingVar": "Declare your variable in the 'var' section.",
-            "missingAssignment": "Use ':=' to assign a value to the variable."
+        "runtime": {
+            "divisionByZero": "Check your divisor - it cannot be zero.",
+            "arrayBounds": "Array indices must be within the declared range.",
+            "typeMismatch": "Make sure the data types are compatible.",
+            "undefinedVariable": "Declare the variable in the VAR section before using it.",
+            "overflow": "The value is too large for the variable type."
         },
-        "level3": {
-            "outputMismatch": "The output should be '5 + 3 = 8'.",
-            "missingOperator": "Use the + operator for addition."
+        "compilation": {
+            "unknownType": "Check the type name - use Integer, Real, String, Boolean, or Char.",
+            "duplicate": "You cannot declare the same variable twice.",
+            "unknownProcedure": "Make sure the procedure is defined before it is called.",
+            "parameter": "Check the number of parameters passed to the procedure/function."
         },
-        "level4": {
-            "missingGreeting": "The output should contain a greeting.",
-            "missingStringType": "Declare the variable as String type."
-        },
-        "level5": {
-            "missingReadLn": "Use ReadLn to read input.",
-            "missingWrite": "Use Write for the input prompt."
-        },
-        "level6": {
-            "outputMismatch": "The output should be 'Negative' because -5 is less than 0.",
-            "missingIf": "Use an if statement for the condition.",
-            "missingElse": "Add an else branch for the other case."
-        },
-        "level7": {
-            "outputMismatch": "The output should be the numbers 1 to 5, each on a new line.",
-            "missingFor": "Use a for loop.",
-            "missingTo": "Use 'to' for counting up."
-        },
-        "level8": {
-            "outputMismatch": "The output should be 5, 4, 3, 2, 1 and then 'Liftoff!'.",
-            "missingWhile": "Use a while loop."
-        },
-        "level9": {
-            "outputMismatch": "The output should be 'Hello, World!'.",
-            "missingProcedure": "Define a procedure."
-        },
-        "level10": {
-            "outputMismatch": "The output should be '5 squared is 25'.",
-            "missingFunction": "Define a function."
+        "output": {
+            "mismatch": "Check the exact output format - capitalization and spacing matter.",
+            "expected": "The output does not match. Compare expected vs actual carefully."
         }
+    },
+    "level1": {
+        "outputMismatch": "Your output must be exactly 'Hello World!'. Pay attention to capitalization!",
+        "missingWriteLn": "Use WriteLn to output text."
+    },
+    "level2": {
+        "outputMismatch": "The output should be 'Value: 42'.",
+        "missingVar": "Declare your variable in the 'var' section.",
+        "missingAssignment": "Use ':=' to assign a value to the variable."
+    },
+    "level3": {
+        "outputMismatch": "The output should be '5 + 3 = 8'.",
+        "missingOperator": "Use the + operator for addition."
+    },
+    "level4": {
+        "missingGreeting": "The output should contain a greeting.",
+        "missingStringType": "Declare the variable as String type."
+    },
+    "level5": {
+        "missingReadLn": "Use ReadLn to read input.",
+        "missingWrite": "Use Write for the input prompt."
+    },
+    "level6": {
+        "outputMismatch": "The output should be 'Negative' because -5 is less than 0.",
+        "missingIf": "Use an if statement for the condition.",
+        "missingElse": "Add an else branch for the other case."
+    },
+    "level7": {
+        "outputMismatch": "The output should be the numbers 1 to 5, each on a new line.",
+        "missingFor": "Use a for loop.",
+        "missingTo": "Use 'to' for counting up."
+    },
+    "level8": {
+        "outputMismatch": "The output should be 5, 4, 3, 2, 1 and then 'Liftoff!'.",
+        "missingWhile": "Use a while loop."
+    },
+    "level9": {
+        "outputMismatch": "The output should be 'Hello, World!'.",
+        "missingProcedure": "Define a procedure."
+    },
+    "level10": {
+        "outputMismatch": "The output should be '5 squared is 25'.",
+        "missingFunction": "Define a function."
     },
     "hints": {
         "level1": {

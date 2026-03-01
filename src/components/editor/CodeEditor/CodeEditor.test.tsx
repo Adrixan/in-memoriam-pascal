@@ -7,14 +7,20 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { CodeEditor } from './CodeEditor';
 
 // Mock Monaco Editor
-vi.mock('@monaco-editor/react', () => ({
-    default: vi.fn(({ onMount, onChange, value, loading }) => {
+vi.mock('@monaco-editor/react', () => {
+    // Create a promise-based mock for lazy loading
+    const MockEditorComponent = ({ onMount, onChange, value, loading: _loading }: {
+        onMount?: (editor: ReturnType<typeof vi.fn>, monaco: ReturnType<typeof vi.fn>) => void;
+        onChange?: (value: string) => void;
+        value?: string;
+        loading?: boolean;
+    }) => {
         // Simulate editor mount
         if (onMount) {
             const mockEditor = {
                 updateOptions: vi.fn(),
                 onDidChangeCursorPosition: vi.fn(),
-                getValue: () => value,
+                getValue: () => value || '',
                 setValue: vi.fn(),
             };
             const mockMonaco = {
@@ -29,11 +35,12 @@ vi.mock('@monaco-editor/react', () => ({
                     setTheme: vi.fn(),
                 },
             };
-            setTimeout(() => onMount(mockEditor, mockMonaco), 0);
+            // Use setImmediate to ensure async behavior
+            setImmediate(() => onMount(mockEditor as never, mockMonaco as never));
         }
 
-        // Return a simple div to represent the editor
-        return loading || (
+        // Return the editor mock (not loading state)
+        return (
             <div
                 data-testid="monaco-editor"
                 data-value={value}
@@ -42,8 +49,12 @@ vi.mock('@monaco-editor/react', () => ({
                 Monaco Editor Mock
             </div>
         );
-    }),
-}));
+    };
+
+    return {
+        default: MockEditorComponent,
+    };
+});
 
 // Mock stores
 vi.mock('@/stores/editorStore', () => ({
