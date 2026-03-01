@@ -19,8 +19,10 @@
         return;
     }
 
-    // Base path for LLVM.js files
-    var LLVM_BASE_PATH = '/external/pascal.js/llvm.js/';
+    // Base path for LLVM.js files - use relative path for subdirectory deployment
+    // Using ./external/... works because Vite's base: './' ensures all relative paths
+    // correctly resolve to the app's subdirectory (e.g., /in-memoriam-pascal/external/...)
+    var LLVM_BASE_PATH = './external/pascal.js/llvm.js/';
 
     // Internal read function with correct base path
     function readWithBasePath(filename) {
