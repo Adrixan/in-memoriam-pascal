@@ -79,9 +79,13 @@ describe('CodeEditor', () => {
         vi.clearAllMocks();
     });
 
-    it('should render without crashing', () => {
+    it('should render without crashing', async () => {
         render(<CodeEditor />);
-        expect(screen.getByText('Loading Pascal Editor...')).toBeInTheDocument();
+
+        // In test environment with mock, editor renders directly without loading state
+        await waitFor(() => {
+            expect(screen.getByTestId('monaco-editor')).toBeInTheDocument();
+        });
     });
 
     it('should render with initial value', async () => {
