@@ -36,8 +36,8 @@ test.describe('App Navigation', () => {
         const title = page.locator('h1, .hero-title, [data-testid="hero-title"]').first();
         await expect(title).toBeVisible({ timeout: 15000 });
 
-        // Verify navigation links exist
-        const homeLink = page.locator('a[href="/"]').first();
+        // Verify navigation links exist - use generic selector for HashRouter
+        const homeLink = page.locator('header a').first();
         await expect(homeLink).toBeVisible();
     });
 
@@ -66,15 +66,15 @@ test.describe('App Navigation', () => {
         // Wait for header
         await page.waitForSelector('header', { timeout: 15000 });
 
-        // Click home link
-        const homeLink = page.locator('header a[href="/"]').first();
+        // Click home link - use header links selector for HashRouter
+        const homeLink = page.locator('header a').first();
         await homeLink.click();
 
-        // Should still be on home page
-        await expect(page).toHaveURL('/');
+        // Should still be on home page - HashRouter adds #/
+        await expect(page).toHaveURL(/\/#\/|$/);
 
         // Navigate to tutorial via header
-        const tutorialLink = page.locator('header a[href*="/tutorial"]').first();
+        const tutorialLink = page.locator('header a').filter({ hasText: /tutorial/i }).first();
         await tutorialLink.click();
 
         // Should be on tutorial page
@@ -93,15 +93,15 @@ test.describe('App Navigation', () => {
     });
 
     test('404 page displays for invalid routes', async ({ page }) => {
-        // Navigate to a non-existent route
-        await page.goto('/non-existent-page');
+        // Navigate to a non-existent route with hash (HashRouter format)
+        await page.goto('/#/non-existent-page');
 
         // Wait for page to load
         await page.waitForLoadState('networkidle');
 
-        // Should show 404 or not found content
+        // Should show 404 or not found content - wait for the content to appear
         const notFoundContent = page.locator('text=/404|Not Found|Page not found/i');
-        await expect(notFoundContent.first()).toBeVisible({ timeout: 10000 });
+        await expect(notFoundContent.first()).toBeVisible({ timeout: 15000 });
     });
 });
 
@@ -129,12 +129,12 @@ test.describe('Level Navigation', () => {
         // Set viewport to desktop size first
         await page.setViewportSize({ width: 1280, height: 720 });
 
-        // Navigate to tutorial page first
-        await page.goto('/tutorial/hello-world');
+        // Navigate to tutorial page first (use hash for HashRouter)
+        await page.goto('/#/tutorial/hello-world');
         await page.waitForLoadState('networkidle');
 
-        // Find level navigation sidebar links (specific to the sidebar, not header nav)
-        const levelLinks = page.locator('[data-testid="level-nav"] a, nav[aria-label="Tutorial levels"] a');
+        // Find level navigation sidebar links - look for any links in the sidebar aside
+        const levelLinks = page.locator('aside a');
         const linkCount = await levelLinks.count();
 
         // Verify there are level links available

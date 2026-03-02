@@ -15,7 +15,7 @@ test.describe('Monaco Debug', () => {
         });
 
         // Navigate to tutorial page
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
 
         // Wait for page to load
         await page.waitForLoadState('networkidle');

@@ -22,7 +22,7 @@ test.describe('TutorialPage Mobile Responsiveness', () => {
 
             test.beforeEach(async ({ page }) => {
                 await page.setViewportSize({ width: viewport.width, height: viewport.height });
-                await page.goto('/tutorial/hello-world');
+                await page.goto('/#/tutorial/hello-world');
                 // Wait for page to fully load
                 await page.waitForLoadState('networkidle');
             });
@@ -103,7 +103,7 @@ test.describe('TutorialPage Mobile Responsiveness', () => {
     test('Monaco editor is functional on mobile', async ({ page }) => {
         // Test specifically on iPhone SE viewport (smallest)
         await page.setViewportSize({ width: 375, height: 667 });
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
 
         // Wait for editor to load
         const editorContainer = page.locator('.monaco-editor');
