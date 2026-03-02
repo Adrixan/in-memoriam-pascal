@@ -3,7 +3,7 @@
  */
 
 import { Suspense, lazy, Component, type ReactNode, type ErrorInfo } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 // Lazy load pages for code splitting
@@ -85,7 +85,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 function App() {
     return (
         <ErrorBoundary>
-            <HashRouter>
+            <BrowserRouter>
                 <Layout>
                     <Suspense fallback={<LoadingFallback />}>
                         <Routes>
@@ -96,7 +96,7 @@ function App() {
                         </Routes>
                     </Suspense>
                 </Layout>
-            </HashRouter>
+            </BrowserRouter>
         </ErrorBoundary>
     );
 }

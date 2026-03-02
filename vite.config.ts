@@ -88,6 +88,8 @@ export default defineConfig({
             // Allow serving files from project root
             allow: ['..'],
         },
+        // Serve index.html for all routes (SPA mode)
+        historyApiFallback: true,
     },
 
     build: {
