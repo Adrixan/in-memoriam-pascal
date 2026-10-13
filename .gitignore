@@ -51,3 +51,6 @@ dev-dist/
 *.log
 *.tmp
 *.temp
+
+# Generated engine bundle (scripts/build-engine.mjs)
+src/engine/generated/
