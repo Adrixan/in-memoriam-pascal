@@ -96,7 +96,6 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     'monaco-editor': ['monaco-editor'],
-                    'vendor-react': ['react', 'react-dom'],
                     'vendor-router': ['react-router-dom'],
                     'vendor-i18n': ['i18next', 'react-i18next'],
                     'vendor-state': ['zustand'],
@@ -107,6 +106,10 @@ export default defineConfig({
                 assetFileNames: 'assets/[name]-[hash].[ext]',
             },
         },
+        // The browser-local Monaco editor is intentionally bundled as one
+        // chunk and is only loaded on editor/tutorial routes. Its 3.7 MB
+        // minified size is a deliberate offline-capability tradeoff.
+        chunkSizeWarningLimit: 4000,
         sourcemap: false,
         // Minify for smaller bundle size
         minify: 'terser',
