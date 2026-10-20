@@ -1,32 +1,27 @@
-# Session handoff: production-readiness delivered
+# Session handoff: dependency security and sharp responsive UI
 
-## Current intent
-- Continue making the Pascal tutorial PWA production-ready, with its worker-based Pascal.js engine and coherent tutorial/editor execution flow.
-- Implementation is merged to `main` and pushed to `origin/main`.
-- Merge commit: `c439b96`; feature commit: `954c89d`.
-- Build-warning cleanup: removed the empty React chunk, documented the intentional lazy/offline Monaco bundle policy and adjusted Vite's chunk warning limit, and updated Tailwind v4 to 4.3.3 so Node 26 builds use `registerHooks`.
+## Current state
+- Previous production-readiness feature is merged to `main`; this follow-up is under verification before its commit/push.
+- External `external/pascal.js` submodule remains unrelated and dirty. Keep its edits/untracked files isolated.
 
-## Changes and verification
-- Reconnected `TutorialPage` to the worker runner; added a stable run ID, draft autosave/restore, attempt counting on run, test-input vs interactive-input separation, and empty stdin support.
-- Added reference solutions for all 15 levels and a contract test that executes every solution and validates its output. Corrected the nested-record validation rule.
-- Fixed tutorial navigation and test routes for the app's `HashRouter`; E2E tests now verify actual tutorial/editor behavior rather than silently falling back to the home page. Updated local Monaco content inspection.
-- Added localized interpreter diagnostics and waiting/input/progress labels; fixed the unlabeled progressbar, input submission, timestamps, and stray UI debug logging.
-- Free editor code now persists separately. Header tutorial links point to the actual first level. README now describes 15 levels, current localStorage use, and corrected repository details.
-- Disabled Vite PWA dev-service-worker registration, which failed in the Vite test server; production service worker build remains enabled.
-- Verification passed after warning cleanup: `npm run typecheck`, `npm run lint`, `npm test -- --run` (121 tests), `npm run build` with no build/deprecation warnings, and full Playwright suite (57/57 tests) using `/usr/bin/chromium`.
-- Build now completes without Rollup chunk-size or empty React chunk warnings. Monaco remains a 3.7 MB minified / 917 KB gzip asset, intentionally lazy-loaded with editor/tutorial routes to preserve offline use; `chunkSizeWarningLimit` is 4000 kB and documented inline in Vite config.
-- Tailwind CSS and its Vite integration are pinned by the lockfile to 4.3.3; this version selects Node's `module.registerHooks` API on Node 26 and avoids the prior Vite build deprecation message.
+## This follow-up
+- `npm audit` now reports 0 known vulnerabilities after compatible upgrades and overrides: Vite 6.4.4, Vitest 4.1.12, React Router 7.18.4, Monaco Editor 0.57.0, Jison 0.4.18; patched `underscore` and `dompurify` overrides.
+- Removed unused direct dependencies: `framer-motion`, `idb`, `lucide-react`, `@axe-core/react`.
+- Added `.agents/dependency-policy.md`, daily Dependabot npm/GitHub Actions updates including major-version PRs, and CI `npm audit --audit-level=low` gate.
+- Refined CRT glow and anti-aliasing for sharper text. Tutorial content is capped and centered above 1600 px; added E2E viewport assertions at 1366, 1920, and 3840 CSS px.
+- Switched Monaco to its tree-shakeable ESM entrypoint and worker import. Editor bundle fell from 3.66 MB / 917 KB gzip to 2.72 MB / 687 KB gzip while retaining offline editor support.
 
-## Important repository state
-- Current branch is `main`, clean except for the external submodule's pre-existing/unrelated dirty state.
-- `feat/production-readiness` was deleted locally and remotely after merge.
-- The main repo's Pascal compiler sources are under `engine/`; `scripts/build-engine.mjs` builds the app bundle from those sources.
-- `external/pascal.js` remains separately dirty with source edits and untracked files on its own `master` branch. Its upstream is `kanaka/pascal.js`; do not stage or push these submodule edits as part of the app merge without separate authorization/review.
-- Playwright generated reports and TypeScript declaration maps were excluded from commits. Four tracked `test-results/debug-*.png` files that were already deleted before implementation were committed as cleanup.
-- Remote: `origin` is `git@github.com:Adrixan/in-memoriam-pascal.git`; `main` tracks `origin/main`.
-- Local checks: `npm run typecheck`; `npm run lint`; `npm test -- --run`; `npm run build`; `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e` (or install the Playwright browser with `npx playwright install chromium`).
+## Verification
+- `npm audit --audit-level=low`: zero known advisories.
+- `npm run typecheck`, `npm run lint`, `npm test -- --run`: pass (121 tests).
+- `npm run build`: passes without chunk warnings; output has no empty React chunk.
+- Full `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`: 60/60 pass, including desktop responsive viewports, tutorial, mobile, and accessibility checks.
+- This workstation's project-scoped npm `allow-scripts` setting can reject nested `npm audit` invoked through `npm run`; direct `npm audit --audit-level=low` works. CI runs the direct command.
 
-## Next steps
-- Keep the submodule working-tree changes isolated; it contains edits to `ir.js` and `units/system.js` plus untracked files and has upstream `https://github.com/kanaka/pascal.js.git`.
-- Optional follow-up: investigate Monaco bundle slimming further if app-start transfer or execution time becomes a measured issue.
-- Build and E2E checks use the normal Vite production service worker; dev service-worker registration is disabled because its generated dev worker failed in the test server.
+## Dependency freshness notes
+- `npm update` refreshes packages within declared semver ranges. Several majors remain newer than the selected compatible major (for example Vite 8, ESLint 10, TypeScript 7, Vitest 5, PWA plugin 2); Dependabot now opens major update PRs. Migrate these with compatibility fixes and CI, rather than broad unreviewed force upgrades.
+- Zero audit findings means zero advisories known to the configured npm audit database at scan time. It cannot guarantee absence of undiscovered vulnerabilities.
+
+## Next
+- Inspect staged diff; exclude generated Playwright reports/maps and preserve the dirty Pascal.js submodule.
+- Commit and push intended app, dependency, security policy, and responsive UI changes to `main`.

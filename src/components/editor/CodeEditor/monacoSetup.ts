@@ -5,9 +5,9 @@
  * the base editor worker.
  */
 
-import { loader } from '@monaco-editor/react';
-import * as monaco from 'monaco-editor/esm/vs/editor/edcore.main.js';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker.js?worker';
+import { loader, type Monaco } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor/editor';
+import EditorWorker from 'monaco-editor/editor/editor.worker?worker';
 
 import { registerPascalLanguage } from './PascalLanguage';
 import { registerPascalTheme } from './PascalTheme';
@@ -16,6 +16,7 @@ import { registerPascalTheme } from './PascalTheme';
     getWorker: () => new EditorWorker(),
 };
 
-loader.config({ monaco });
-registerPascalLanguage(monaco);
-registerPascalTheme(monaco);
+const monacoApi = monaco as unknown as Monaco;
+loader.config({ monaco: monacoApi });
+registerPascalLanguage(monacoApi);
+registerPascalTheme(monacoApi);

@@ -363,7 +363,7 @@ function TutorialPage(): ReactElement {
                 </aside>
 
                 {/* Main Content */}
-                <div className="flex-grow p-4 lg:p-6">
+                <div className="tutorial-main-content flex-grow p-4 lg:p-6">
                     {/* Mobile menu button */}
                     <button
                         type="button"

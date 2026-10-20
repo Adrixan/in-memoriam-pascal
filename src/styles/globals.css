@@ -151,9 +151,14 @@
    ============================================ */
 html {
     font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+}
+
+@media (min-resolution: 1.5dppx) {
+    html {
+        -webkit-font-smoothing: auto;
+        -moz-osx-font-smoothing: auto;
+    }
 }
 
 body {
@@ -263,20 +268,38 @@ body {
 /* Text Glow Effects */
 .terminal-glow {
     text-shadow:
-        0 0 5px var(--color-primary-glow),
-        0 0 10px var(--color-primary-glow);
+        0 0 1px color-mix(in srgb, var(--color-primary-glow) 45%, transparent),
+        0 0 3px color-mix(in srgb, var(--color-primary-glow) 22%, transparent);
 }
 
 .terminal-glow-amber {
     text-shadow:
-        0 0 5px var(--color-secondary-glow),
-        0 0 10px var(--color-secondary-glow);
+        0 0 1px color-mix(in srgb, var(--color-secondary-glow) 45%, transparent),
+        0 0 3px color-mix(in srgb, var(--color-secondary-glow) 22%, transparent);
 }
 
 .terminal-glow-cyan {
     text-shadow:
-        0 0 5px var(--color-accent-glow),
-        0 0 10px var(--color-accent-glow);
+        0 0 1px color-mix(in srgb, var(--color-accent-glow) 45%, transparent),
+        0 0 3px color-mix(in srgb, var(--color-accent-glow) 22%, transparent);
+}
+
+@media (min-width: 1600px) {
+    .tutorial-main-content {
+        box-sizing: border-box;
+        flex: 1 1 0%;
+        max-width: 1800px;
+        margin-inline: auto;
+        padding-inline: clamp(1.5rem, 2vw, 3rem);
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .terminal-glow,
+    .terminal-glow-amber,
+    .terminal-glow-cyan {
+        text-shadow: none;
+    }
 }
 
 /* ============================================
