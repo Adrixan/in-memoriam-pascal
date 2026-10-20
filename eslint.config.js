@@ -19,8 +19,7 @@ export default tseslint.config(
             'playwright-report/**',
             'test-results/**',
             '**/*.tsbuildinfo',
-            '.cache/**',
-            '.kilocode/**'
+            '.cache/**'
         ]
     },
     // Base TypeScript config
