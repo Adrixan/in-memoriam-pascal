@@ -258,7 +258,9 @@ impl_decls      : impl_decls decl                       {{ $$ = $1.concat($2); }
                 |            decl                       {{ $$ = $1; }}
                 ;
 init_part       : INITIALIZATION stmts                  {{ $$ = $2; }}
+                | INITIALIZATION stmts SEMI             {{ $$ = $2; }}
                 | BEGIN stmts                           {{ $$ = $2; }}
+                | BEGIN stmts SEMI                      {{ $$ = $2; }}
                 |                                       {{ $$ = []; }}
                 ;
 
@@ -423,7 +425,7 @@ stmts           : stmts SEMI stmt                       {{ $$ = $1.concat($3); }
                 | /* none */                            {{ $$ = []; }}
                 ;
 stmt            : open_stmt                             {{ $1.lineno = @1.first_line; $$ = $1; }}
-                | closed_stmt                           {{ $1.lineno = @1.first_line; $$ = $1; }}
+                | closed_stmt %prec "THEN"              {{ $1.lineno = @1.first_line; $$ = $1; }}
                 ;
 closed_stmt     : lvalue ASSIGN expr                    {{ $$ = {node:'stmt_assign',lvalue:$1,expr:$3}; }}
                 | lvalue call_params                    {{ $$ = callStmt($1, $2); }}
@@ -472,6 +474,10 @@ case_stmt       : CASE expr OF cases END                          {{ $$ = {node:
                 | CASE expr OF cases SEMI OTHERWISE stmt END      {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$6};  }}
                 | CASE expr OF cases OTHERWISE stmt SEMI END      {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$6};  }}
                 | CASE expr OF cases SEMI OTHERWISE stmt SEMI END {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$7};  }}
+                | CASE expr OF cases ELSE stmts END               {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$6};  }}
+                | CASE expr OF cases SEMI ELSE stmts END          {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$7};  }}
+                | CASE expr OF cases ELSE stmts SEMI END          {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$6};  }}
+                | CASE expr OF cases SEMI ELSE stmts SEMI END     {{ $$ = {node:'stmt_case',expr:$2,cases:$4,otherwise_stmt:$7};  }}
                 ;
 cases           : cases SEMI case                       {{ $$ = $1.concat($3); }}
                 | case                                  {{ $$ = [$1]; }}

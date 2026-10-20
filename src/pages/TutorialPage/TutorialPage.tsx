@@ -19,7 +19,7 @@ import { OutputWindow } from '@/components/editor/OutputWindow';
 import { RetroPanel, RetroButton } from '@/components/common';
 import { LevelNav, LevelInstructions, HintSystem } from '@/components/tutorial';
 import { useInterpreter } from '@/hooks/useInterpreter';
-import { useEditorStore, useTutorialStore } from '@/stores';
+import { useTutorialStore } from '@/stores';
 import { tutorialLevels, getLevelById } from '@/data/tutorials';
 import { SolutionValidator, type LevelValidationResult } from '@/services/validation';
 import ErrorAnalyzer, { type AnalyzedError } from '@/services/validation/ErrorAnalyzer';
@@ -40,12 +40,15 @@ function TutorialPage(): ReactElement {
     const { levelId } = useParams<{ levelId: string }>();
     const { t } = useTranslation();
 
-    const { code, setCode, isReady: editorReady } = useEditorStore();
+    const [code, setCode] = useState('');
+    const [loadedCodeLevel, setLoadedCodeLevel] = useState<string | null>(null);
     const {
         levels,
         currentLevelId,
         setCurrentLevel,
         setLevels,
+        recordAttempt,
+        saveCode,
         markCompleted,
         updateProgress,
         progress,
@@ -59,10 +62,11 @@ function TutorialPage(): ReactElement {
         output,
         error,
         executionTime,
+        latestRunId,
         isReady: interpreterReady,
         isWaitingForInput,
         provideInput,
-        runCode,
+        runCodeString,
         clearOutput,
     } = useInterpreter();
 
@@ -80,10 +84,11 @@ function TutorialPage(): ReactElement {
     const initializedLevelRef = useRef<string | null>(null);
 
     // Track if we've already processed the current execution to prevent infinite loops
-    const lastProcessedStatusRef = useRef<{ status: string; timestamp: number } | null>(null);
+    const lastProcessedRunRef = useRef<number | null>(null);
 
     // Toast notification state for visual feedback
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+    const executionCounterRef = useRef(0);
 
     const toggleSidebar = useCallback(() => {
         setIsSidebarOpen((prev) => !prev);
@@ -169,7 +174,11 @@ function TutorialPage(): ReactElement {
         if (currentLevelId && currentLevel?.starterCode) {
             // Only set starter code once per level
             if (initializedLevelRef.current !== currentLevelId) {
-                setCode(currentLevel.starterCode);
+                const savedProgress = useTutorialStore.getState().progress[currentLevelId];
+                const hasSavedCode = savedProgress?.hasSavedCode ?? Boolean(savedProgress?.savedCode);
+                const savedCode = hasSavedCode ? savedProgress?.savedCode ?? '' : currentLevel.starterCode;
+                setCode(savedCode);
+                setLoadedCodeLevel(currentLevelId);
                 initializedLevelRef.current = currentLevelId;
             }
         }
@@ -200,23 +209,35 @@ function TutorialPage(): ReactElement {
 
         // Show running indicator
         setToast({ message: 'Running code...', type: 'info' });
-
+        const executionId = ++executionCounterRef.current;
         // Run the code:
         // - If interactiveMode is true: use empty array (user enters input manually)
         // - Otherwise: use testInput from level (for automated testing)
-        const inputQueue = interactiveMode ? [] : currentLevel?.testInput;
-        await runCode(inputQueue);
-    }, [runCode, currentLevel, interactiveMode]);
+        const inputQueue = interactiveMode ? undefined : currentLevel?.testInput;
+        if (currentLevel) {
+            recordAttempt(currentLevel.id, code);
+        }
+        await runCodeString(code, inputQueue);
+        if (executionCounterRef.current === executionId) {
+            setToast(null);
+        }
+    }, [runCodeString, currentLevel, interactiveMode, code, recordAttempt]);
 
     // Save progress handler (Ctrl+S)
     const handleSaveProgress = useCallback(() => {
         if (currentLevelId && code) {
-            updateProgress(currentLevelId, { savedCode: code });
+            saveCode(currentLevelId, code);
             setToast({ message: 'Progress saved!', type: 'success' });
             // Clear toast after 2 seconds
             setTimeout(() => setToast(null), 2000);
         }
-    }, [currentLevelId, code, updateProgress]);
+    }, [currentLevelId, code, saveCode]);
+
+    useEffect(() => {
+        if (currentLevelId && loadedCodeLevel === currentLevelId) {
+            saveCode(currentLevelId, code);
+        }
+    }, [code, currentLevelId, loadedCodeLevel, saveCode]);
 
     // Keyboard shortcut handlers
     useEffect(() => {
@@ -232,22 +253,14 @@ function TutorialPage(): ReactElement {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleSaveProgress]);
 
-    // Validate solution when execution completes
+    // Validate each finished execution once, using the store's monotonic run ID.
     useEffect(() => {
         if (status === 'success' || status === 'error') {
             if (currentLevel) {
-                // Create a unique key for this execution to prevent re-processing
-                const executionKey = `${status}-${executionTime ?? 0}`;
-                const lastProcessed = lastProcessedStatusRef.current;
-
-                // Skip if we've already processed this exact execution
-                if (lastProcessed &&
-                    lastProcessed.status === executionKey) {
+                if (lastProcessedRunRef.current === latestRunId) {
                     return;
                 }
-
-                // Mark this execution as processed
-                lastProcessedStatusRef.current = { status: executionKey, timestamp: Date.now() };
+                lastProcessedRunRef.current = latestRunId;
 
                 const executionOutput = {
                     output: output.map((line) => line.content),
@@ -275,19 +288,18 @@ function TutorialPage(): ReactElement {
                     setErrorAnalysis(analysis);
                 }
 
-                // Update progress - use functional approach to avoid dependency on progress object
-                updateProgress(currentLevel.id, {
-                    savedCode: code,
-                    attempts: 1, // Will be incremented by store's updateProgress
-                });
             }
         }
-    }, [status, currentLevel, code, output, error, executionTime, markCompleted, updateProgress]);
+    }, [status, currentLevel, code, output, error, executionTime, latestRunId, markCompleted]);
 
     const isRunning = status === 'running';
 
     // Get error message for display
-    const errorMessage = error?.message ?? null;
+    const errorMessage = error
+        ? error.messageKey
+            ? t(`errors:${error.messageKey}`, { ...error.params, defaultValue: error.message })
+            : error.message
+        : null;
 
     // Get revealed hints for current level (from new hint system)
     const currentLevelRevealedHints = currentLevel ? (revealedHints[currentLevel.id] ?? []) : [];
@@ -459,7 +471,7 @@ function TutorialPage(): ReactElement {
                                 <RunButton
                                     onRun={handleRunCode}
                                     isRunning={isRunning}
-                                    isReady={interpreterReady && editorReady}
+                                     isReady={interpreterReady}
                                     disabled={!code.trim()}
                                 />
                                 {/* Interactive mode toggle */}
@@ -542,7 +554,9 @@ function TutorialPage(): ReactElement {
                                         ? 'bg-yellow-500 animate-pulse'
                                         : status === 'error'
                                             ? 'bg-red-500'
-                                            : status === 'success'
+                                         : status === 'waiting'
+                                             ? t('common:status.waiting', 'Waiting for input...')
+                                         : status === 'success'
                                                 ? 'bg-green-500'
                                                 : 'bg-gray-500'
                                         }`}

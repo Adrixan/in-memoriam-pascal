@@ -1947,6 +1947,8 @@ LibraryManager.library = {
           return -1;
         }
       } else {
+        // In Memoriam Pascal fork: honour O_APPEND (files opened with mode "a")
+        if (stream.isAppend && stream.object.contents) stream.position = stream.object.contents.length;
         var bytesWritten = _pwrite(fildes, buf, nbyte, stream.position);
         if (bytesWritten != -1) stream.position += bytesWritten;
         return bytesWritten;

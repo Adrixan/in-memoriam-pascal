@@ -13,6 +13,8 @@ export interface RunHooks {
     /** One stdout character code; null signals a flush. */
     stdout(code: number | null): void;
     stderr?(code: number | null): void;
+    /** Seed for Random, so that replays of one session see the same numbers */
+    seed?: number;
 }
 
 /** The API exposed by the engine bundle as the global `PascalEngine`. */
@@ -33,6 +35,8 @@ export interface CompileDiagnostic {
     column?: number;
     /** Offending token for syntax errors */
     unexpected?: string;
+    /** jison's name of the unexpected token (ID, EOF, SEMI, ...) */
+    token?: string;
     /** Token names the parser would have accepted */
     expected?: string[];
 }
@@ -50,9 +54,12 @@ export type RunOutcome =
     | { kind: 'needInput' }
     | { kind: 'runtimeError'; error: RuntimeDiagnostic };
 
-/** Thrown by the stdin hook when the program reads past the supplied input. */
-export class NeedInputSignal {
-    readonly needInput = true;
+/** Options of a single program run. */
+export interface ExecuteOptions {
+    /** Copy the characters the program reads from stdin to the output */
+    echoInput?: boolean;
+    /** Seed for Random; keeps replays of one session consistent */
+    seed?: number;
 }
 
 interface JisonHash {
@@ -103,6 +110,9 @@ export function toCompileDiagnostic(error: unknown, source: string): CompileDiag
                 diagnostic.column = index + 1;
             }
         }
+        if (hash.token) {
+            diagnostic.token = hash.token;
+        }
         if (hash.expected) {
             diagnostic.expected = hash.expected.map((name) => name.replace(/^'|'$/g, ''));
         }
@@ -121,7 +131,7 @@ export function toCompileDiagnostic(error: unknown, source: string): CompileDiag
 
 /** Decode a thrown value into a runtime diagnostic or an exit request. */
 function classifyThrown(thrown: unknown): RunOutcome {
-    if (thrown instanceof NeedInputSignal || (isEngineError(thrown) && (thrown as { needInput?: boolean }).needInput)) {
+    if (isEngineError(thrown) && (thrown as { needInput?: boolean }).needInput) {
         return { kind: 'needInput' };
     }
     if (typeof thrown === 'string') {
@@ -159,6 +169,7 @@ export function executeProgram(
     js: string,
     input: string,
     onOutput: (text: string) => void,
+    options: ExecuteOptions = {},
 ): RunOutcome {
     let position = 0;
     let pending = '';
@@ -173,9 +184,17 @@ export function executeProgram(
     const hooks: RunHooks = {
         stdin(): number | null {
             if (position >= input.length) {
-                throw new NeedInputSignal();
+                return null;
             }
-            return input.charCodeAt(position++);
+            const code = input.charCodeAt(position++);
+            if (options.echoInput) {
+                // show typed input in the transcript, like a terminal does
+                pending += String.fromCharCode(code);
+                if (code === 10) {
+                    flush();
+                }
+            }
+            return code;
         },
         stdout(code: number | null): void {
             if (code === null) {
@@ -190,6 +209,9 @@ export function executeProgram(
     };
     hooks.stderr = hooks.stdout;
 
+    if (options.seed !== undefined) {
+        hooks.seed = options.seed;
+    }
     try {
         engine.run(js, hooks);
         flush();

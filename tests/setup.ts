@@ -4,10 +4,9 @@
  * Browser mocks are only installed in DOM environments; the engine tests run
  * under the node environment and skip them.
  */
+import '@testing-library/jest-dom';
 
 if (typeof window !== 'undefined') {
-    await import('@testing-library/jest-dom');
-
     // Mock matchMedia for tests
     Object.defineProperty(window, 'matchMedia', {
         writable: true,

@@ -1,30 +1,31 @@
 /**
- * Interpreter Store - Manages execution state and output
+ * Interpreter Store - execution status and output of the current program
  */
 
 import { create } from 'zustand';
-import type { InterpreterState, OutputLine, InterpreterError } from '@/types';
+import type { InterpreterError, InterpreterState, OutputLine } from '@/types';
 
 interface InterpreterStore extends InterpreterState {
-    /** Set execution status */
-    setStatus: (status: InterpreterState['status']) => void;
+    /** Start a run: clears output, error and timing */
+    begin: () => void;
 
-    /** Add output line */
-    addOutput: (content: string, type: OutputLine['type']) => void;
+    /** Replace the output lines */
+    setOutput: (output: OutputLine[]) => void;
 
-    /** Clear output */
+    /** Finish a run with a terminal status */
+    finish: (result: {
+        status: 'success' | 'error' | 'idle';
+        error?: InterpreterError | undefined;
+        executionTime?: number | undefined;
+    }) => void;
+
+    /** The program stopped to ask for input */
+    awaitInput: (executionTime?: number) => void;
+
+    /** Clear the output panel without touching the status */
     clearOutput: () => void;
 
-    /** Set error */
-    setError: (error: InterpreterError | undefined) => void;
-
-    /** Set execution time */
-    setExecutionTime: (time: number | undefined) => void;
-
-    /** Set waiting for input state */
-    setIsWaitingForInput: (waiting: boolean) => void;
-
-    /** Reset interpreter state */
+    /** Return to the initial state */
     reset: () => void;
 }
 
@@ -34,51 +35,40 @@ const initialState: InterpreterState = {
     error: undefined,
     executionTime: undefined,
     isWaitingForInput: false,
+    runId: 0,
 };
 
 export const useInterpreterStore = create<InterpreterStore>((set) => ({
     ...initialState,
 
-    setStatus: (status) => {
-        console.log('[InterpreterStore] setStatus:', status);
-        set({ status });
-    },
-
-    addOutput: (content, type) => {
-        console.log('[InterpreterStore] addOutput:', type, content?.substring(0, 50));
+    begin: () => {
         set((state) => ({
-            output: [
-                ...state.output,
-                {
-                    content,
-                    type,
-                    timestamp: Date.now(),
-                },
-            ],
+            status: 'running',
+            output: [],
+            error: undefined,
+            executionTime: undefined,
+            isWaitingForInput: false,
+            runId: state.runId + 1,
         }));
     },
 
+    setOutput: (output) => {
+        set({ output });
+    },
+
+    finish: ({ status, error, executionTime }) => {
+        set({ status, error, executionTime, isWaitingForInput: false });
+    },
+
+    awaitInput: (executionTime) => {
+        set({ status: 'waiting', isWaitingForInput: true, executionTime });
+    },
+
     clearOutput: () => {
-        console.log('[InterpreterStore] clearOutput called - clearing output array');
         set({ output: [] });
     },
 
-    setError: (error) => {
-        console.log('[InterpreterStore] setError:', error?.message);
-        set({ error, status: error ? 'error' : 'idle' } as Partial<InterpreterStore>);
-    },
-
-    setExecutionTime: (executionTime) => {
-        set({ executionTime });
-    },
-
-    setIsWaitingForInput: (isWaitingForInput) => {
-        console.log('[InterpreterStore] setIsWaitingForInput:', isWaitingForInput);
-        set({ isWaitingForInput });
-    },
-
     reset: () => {
-        console.log('[InterpreterStore] reset called');
-        set(initialState);
+        set((state) => ({ ...initialState, runId: state.runId + 1 }));
     },
 }));

@@ -167,6 +167,7 @@ describe('tutorialStore', () => {
             const progress = useTutorialStore.getState().progress['level-1'];
             expect(progress).toBeDefined();
             expect(progress?.savedCode).toBe('test code');
+            expect(progress?.hasSavedCode).toBe(true);
         });
 
         it('should update existing progress', () => {
@@ -211,6 +212,29 @@ describe('tutorialStore', () => {
             // Timestamp should be >= beforeTime
             expect(new Date(progress!.lastAttemptAt).getTime()).toBeGreaterThanOrEqual(new Date(beforeTime).getTime() - 1000);
         });
+    });
+
+    describe('recordAttempt', () => {
+        it('increments attempts once and saves the submitted code', () => {
+            useTutorialStore.getState().recordAttempt('level-1', 'program Attempt;');
+            useTutorialStore.getState().recordAttempt('level-1', 'program Attempt2;');
+            const progress = useTutorialStore.getState().progress['level-1'];
+            expect(progress?.attempts).toBe(2);
+            expect(progress?.savedCode).toBe('program Attempt2;');
+            expect(progress?.status).toBe('in_progress');
+        });
+    });
+
+    it('saves drafts without counting an attempt or changing attempt time', () => {
+        useTutorialStore.getState().setLevels(mockLevels);
+        useTutorialStore.getState().setCurrentLevel('level-1');
+        const before = useTutorialStore.getState().progress['level-1']?.lastAttemptAt;
+        useTutorialStore.getState().saveCode('level-1', 'draft');
+        const progress = useTutorialStore.getState().progress['level-1'];
+        expect(progress?.savedCode).toBe('draft');
+        expect(progress?.hasSavedCode).toBe(true);
+        expect(progress?.attempts).toBe(0);
+        expect(progress?.lastAttemptAt).toBe(before);
     });
 
     describe('markCompleted', () => {

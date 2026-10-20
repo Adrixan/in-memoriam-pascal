@@ -16,7 +16,7 @@ test('debug - check interpreter initialization', async ({ page }) => {
 
     // Navigate to tutorial page
     console.log('Navigating to tutorial page...');
-    await page.goto('/tutorial/1', { timeout: 30000 });
+    await page.goto('/#/tutorial/hello-world', { timeout: 30000 });
 
     // Wait for React to render
     await page.waitForTimeout(3000);

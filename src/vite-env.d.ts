@@ -56,3 +56,9 @@ declare module '*.woff2' {
     const content: string;
     export default content;
 }
+
+// Monaco's editor core with its standard contributions (no extra languages).
+// The package ships no declaration file for this entry point.
+declare module 'monaco-editor/esm/vs/editor/edcore.main.js' {
+    export * from 'monaco-editor';
+}

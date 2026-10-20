@@ -1,30 +1,33 @@
 /**
  * CodeEditor Component
- * Monaco Editor wrapper with Pascal syntax highlighting and retro theme
+ * Monaco editor with Pascal highlighting and the retro theme.
+ *
+ * The component is controlled: the parent owns the code. Keyboard shortcuts
+ * always call the newest callbacks (they are read through refs), so Ctrl+Enter
+ * runs the code that is in the editor right now.
  */
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, type ReactElement } from 'react';
-import * as Monaco from 'monaco-editor';
+import { useCallback, useEffect, useMemo, useRef, type ReactElement } from 'react';
+import Editor, { type OnMount } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
-import Editor from '@monaco-editor/react';
+import { useTranslation } from 'react-i18next';
 
-import { useEditorStore } from '@/stores/editorStore';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { registerPascalLanguage } from './PascalLanguage';
-import { PASCAL_RETRO_THEME, registerPascalTheme } from './PascalTheme';
+import { PASCAL_RETRO_THEME } from './PascalTheme';
+import './monacoSetup';
 
-/**
- * Props for the CodeEditor component
- */
 export interface CodeEditorProps {
-    /** Initial code content */
-    value?: string;
+    /** Code to show */
+    value: string;
 
-    /** Callback when code changes */
-    onChange?: (value: string) => void;
+    /** Called with the new code after every edit */
+    onChange: (value: string) => void;
 
-    /** Callback when code should be run (Ctrl+Enter) */
+    /** Ctrl/Cmd+Enter */
     onRun?: () => void;
+
+    /** Ctrl/Cmd+S */
+    onSave?: () => void;
 
     /** Read-only mode */
     readOnly?: boolean;
@@ -35,357 +38,110 @@ export interface CodeEditorProps {
     /** Additional CSS class names */
     className?: string;
 
-    /** Called when editor is ready */
+    /** Called once the editor is ready */
     onReady?: () => void;
 }
 
-/**
- * Loading fallback component
- */
 function EditorLoadingFallback(): ReactElement {
+    const { t } = useTranslation();
     return (
         <div
-            className="flex items-center justify-center bg-[var(--terminal-bg)] text-[var(--color-primary)] font-mono"
-            style={{ height: '100%', minHeight: '200px' }}
+            className="flex items-center justify-center bg-[var(--terminal-bg)] text-[var(--color-primary)] font-mono h-full min-h-[200px]"
             role="status"
-            aria-label="Loading editor"
         >
-            <div className="flex flex-col items-center gap-2">
-                <div className="animate-pulse text-lg">Loading Pascal Editor...</div>
-                <div className="text-sm text-[var(--color-text-muted)]">
-                    Initializing Monaco...
-                </div>
-            </div>
+            <div className="animate-pulse text-lg">{t('editor.loadingEditor', 'Loading editor...')}</div>
         </div>
     );
 }
 
-/**
- * CodeEditor Component
- *
- * A Monaco Editor wrapper with:
- * - Pascal syntax highlighting (Turbo Pascal dialect)
- * - Retro 80s CRT theme
- * - Integration with editorStore
- * - Accessibility support
- * - Responsive design
- */
 export function CodeEditor({
     value,
     onChange,
     onRun,
+    onSave,
     readOnly = false,
     height = '400px',
     className,
     onReady,
 }: CodeEditorProps): ReactElement {
+    const { t } = useTranslation();
+    const fontSize = useSettingsStore((s) => s.fontSize);
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<typeof Monaco | null>(null);
-    const isInitializedRef = useRef(false);
 
-    // Store access
-    const { code, setCode, setReady, setCursorPosition } = useEditorStore();
-    const { fontSize, theme } = useSettingsStore();
+    // Shortcuts are registered once; refs give them the current callbacks.
+    const onRunRef = useRef(onRun);
+    const onSaveRef = useRef(onSave);
+    const onReadyRef = useRef(onReady);
+    useEffect(() => {
+        onRunRef.current = onRun;
+        onSaveRef.current = onSave;
+        onReadyRef.current = onReady;
+    }, [onRun, onSave, onReady]);
 
-    // Determine the effective code value
-    const effectiveValue = useMemo(() => {
-        return value ?? code ?? '';
-    }, [value, code]);
+    const handleMount = useCallback<OnMount>((instance, monaco) => {
+        editorRef.current = instance;
+        instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onRunRef.current?.());
+        instance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => onSaveRef.current?.());
+        onReadyRef.current?.();
+    }, []);
 
-    /**
-     * Handle editor mount
-     */
-    const handleEditorDidMount = useCallback(
-        (editor: editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
-            editorRef.current = editor;
-            monacoRef.current = monaco;
-
-            // Register Pascal language and theme only once
-            if (!isInitializedRef.current) {
-                registerPascalLanguage(monaco);
-                registerPascalTheme(monaco);
-                isInitializedRef.current = true;
-            }
-
-            // Set the theme
-            monaco.editor.setTheme(PASCAL_RETRO_THEME);
-
-            // Configure editor accessibility
-            editor.updateOptions({
-                accessibilitySupport: 'auto',
-            });
-
-            // Listen for cursor position changes
-            editor.onDidChangeCursorPosition((e) => {
-                setCursorPosition(e.position.lineNumber, e.position.column);
-            });
-
-            // Add custom action for Ctrl+Enter to run code
-            if (onRun) {
-                editor.addAction({
-                    id: 'run-code',
-                    label: 'Run Code',
-                    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-                    run: () => {
-                        onRun();
-                    },
-                });
-            }
-
-            // Prevent browser's default print dialog (Ctrl+P) when editor is focused
-            // Monaco uses Ctrl+P for Quick Open, but we want to prevent browser print
-            const editorDom = editor.getDomNode?.();
-            if (editorDom) {
-                editorDom.addEventListener('keydown', (e: KeyboardEvent) => {
-                    // Prevent Ctrl+P (or Cmd+P on Mac) from triggering browser print
-                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
-                        e.stopPropagation();
-                        // Let Monaco handle it for Quick Open instead
-                    }
-                }, true); // Use capture phase to intercept before Monaco
-            }
-
-            // Mark editor as ready
-            setReady(true);
-            onReady?.();
-        },
-        [setCursorPosition, setReady, onReady, onRun]
-    );
-
-    /**
-     * Handle code changes
-     */
     const handleChange = useCallback(
         (newValue: string | undefined) => {
-            const newCode = newValue ?? '';
-            setCode(newCode);
-            onChange?.(newCode);
+            onChange(newValue ?? '');
         },
-        [setCode, onChange]
+        [onChange],
     );
 
-    /**
-     * Editor options
-     */
+    // The value is not part of the options: changing options re-configures
+    // the editor, which must not happen on every keystroke.
     const options = useMemo<editor.IStandaloneEditorConstructionOptions>(
         () => ({
-            // Language
-            language: 'pascal',
-
-            // Theme is set dynamically
-            theme: PASCAL_RETRO_THEME,
-
-            // Value
-            value: effectiveValue,
-
-            // Read-only
             readOnly,
-
-            // Font settings
-            fontSize: fontSize,
-            fontFamily: "'VT323', 'Share Tech Mono', 'Courier New', monospace",
+            fontSize,
+            fontFamily: "'VT323', 'IBM Plex Mono', 'Courier New', monospace",
             fontLigatures: false,
-            fontWeight: 'normal',
-
-            // Line numbers
             lineNumbers: 'on',
             lineNumbersMinChars: 4,
             renderLineHighlight: 'line',
-
-            // Minimap (disabled for retro feel)
-            minimap: {
-                enabled: false,
-            },
-
-            // Scrollbar
-            scrollbar: {
-                vertical: 'auto',
-                horizontal: 'auto',
-                verticalScrollbarSize: 10,
-                horizontalScrollbarSize: 10,
-                useShadows: false,
-            },
-
-            // Mobile support
+            minimap: { enabled: false },
+            scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10, useShadows: false },
             automaticLayout: true,
-            // Ensure editor handles touch events properly
-            mouseWheelZoom: true,
             fixedOverflowWidgets: true,
-
-            // Tab settings
             tabSize: 2,
             insertSpaces: true,
             detectIndentation: true,
-
-            // Word wrap
             wordWrap: 'off',
-
-            // Cursor
             cursorBlinking: 'smooth',
-            cursorSmoothCaretAnimation: 'on',
-            cursorWidth: 2,
-
-            // Selection
-            selectionHighlight: true,
-            occurrencesHighlight: 'singleFile',
-
-            // Bracket matching
             matchBrackets: 'always',
-            bracketPairColorization: {
-                enabled: false, // Keep simple for retro feel
-            },
-
-            // Auto-closing
             autoClosingBrackets: 'always',
             autoClosingQuotes: 'always',
-            autoClosingDelete: 'always',
-            autoClosingOvertype: 'always',
             autoIndent: 'full',
-
-            // Suggestions
-            quickSuggestions: {
-                other: true,
-                comments: false,
-                strings: false,
-            },
-            suggestOnTriggerCharacters: true,
-            acceptSuggestionOnEnter: 'on',
-            tabCompletion: 'on',
+            quickSuggestions: { other: true, comments: false, strings: false },
             wordBasedSuggestions: 'off',
-
-            // Find
-            find: {
-                addExtraSpaceOnTop: false,
-                autoFindInSelection: 'multiline',
-                seedSearchStringFromSelection: 'selection',
-            },
-
-            // Folding
             folding: true,
             foldingStrategy: 'indentation',
-            showFoldingControls: 'mouseover',
-
-            // Guides
-            guides: {
-                indentation: false,
-                bracketPairs: false,
-            },
-
-            // Padding
-            padding: {
-                top: 8,
-                bottom: 8,
-            },
-
-            // Accessibility
+            padding: { top: 8, bottom: 8 },
             accessibilitySupport: 'auto',
-            ariaLabel: 'Pascal Code Editor',
-            screenReaderAnnounceInlineLabel: true,
-
-            // Performance
-            fastScrollSensitivity: 5,
-            smoothScrolling: true,
-
-            // Context menu
-            contextmenu: true,
-
-            // Copy/paste
-            copyWithSyntaxHighlighting: false,
-
-            // Links
+            ariaLabel: t('editor.ariaLabel', 'Pascal code editor'),
             links: false,
-
-            // Render whitespace
-            renderWhitespace: 'selection',
-
-            // Rulers
-            rulers: [],
-
-            // Stop rendering line when too long (performance)
-            stopRenderingLineAfter: 10000,
-
-            // Large file optimizations
-            largeFileOptimizations: true,
-
-            // Unusual line terminators
-            unusualLineTerminators: 'auto',
-
-            // Drag and drop
-            dragAndDrop: true,
-
-            // Linked editing
-            linkedEditing: true,
-
-            // Sticky scroll
-            stickyScroll: {
-                enabled: false,
-            },
-
-            // Drop into editor
-            dropIntoEditor: {
-                enabled: true,
-            },
-
-            // Multi cursor
-            multiCursorMergeOverlapping: true,
-            multiCursorModifier: 'alt',
-
-            // Inline suggest
-            inlineSuggest: {
-                enabled: false,
-            },
+            stickyScroll: { enabled: false },
+            inlineSuggest: { enabled: false },
         }),
-        [effectiveValue, fontSize, readOnly]
+        [readOnly, fontSize, t],
     );
 
-    /**
-     * Update theme when settings change
-     */
-    useEffect(() => {
-        if (monacoRef.current) {
-            monacoRef.current.editor.setTheme(PASCAL_RETRO_THEME);
-        }
-    }, [theme]);
-
-    /**
-     * Update font size when settings change
-     */
-    useEffect(() => {
-        if (editorRef.current) {
-            editorRef.current.updateOptions({ fontSize });
-        }
-    }, [fontSize]);
-
-    /**
-     * Cleanup on unmount
-     */
-    useEffect(() => {
-        return () => {
-            setReady(false);
-        };
-    }, [setReady]);
-
     return (
-        <div
-            className={`code-editor-wrapper ${className ?? ''}`}
-            style={{ height }}
-            role="region"
-            aria-label="Pascal Code Editor"
-        >
-            <Suspense fallback={<EditorLoadingFallback />}>
-                <Editor
-                    height="100%"
-                    language="pascal"
-                    theme={PASCAL_RETRO_THEME}
-                    value={effectiveValue}
-                    onChange={handleChange}
-                    onMount={handleEditorDidMount}
-                    options={options}
-                    loading={<EditorLoadingFallback />}
-                    // Accessibility
-                    aria-label="Pascal Code Editor"
-                />
-            </Suspense>
+        <div className={`code-editor-wrapper ${className ?? ''}`} style={{ height }}>
+            <Editor
+                height="100%"
+                language="pascal"
+                theme={PASCAL_RETRO_THEME}
+                value={value}
+                onChange={handleChange}
+                onMount={handleMount}
+                options={options}
+                loading={<EditorLoadingFallback />}
+            />
         </div>
     );
 }

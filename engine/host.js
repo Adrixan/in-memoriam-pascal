@@ -99,6 +99,7 @@
    * hooks.stdin()  -> char code, or null at end of input (may throw to abort)
    * hooks.stdout(c) char code, or null when the stream is flushed
    * hooks.stderr(c) same as stdout
+   * hooks.seed     optional seed for Random
    */
   var TRAP_MESSAGES = {
     2: 'File not found',
@@ -120,6 +121,19 @@
     'function __pascal_need_input() { throw Module.__needInput; }'
   ].join('\n');
 
+  // Small deterministic PRNG (mulberry32); the libc rand48 functions of the
+  // generated code are built on Math.random.
+  function seededRandom(seed) {
+    var state = seed >>> 0;
+    return function () {
+      state = (state + 0x6d2b79f5) >>> 0;
+      var t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   function run(js, hooks) {
     var Module = {
       arguments: [],
@@ -138,7 +152,15 @@
         };
       }
     };
-    new Function('Module', RUNTIME_PREFIX + '\n' + js)(Module);
+    var originalRandom = Math.random;
+    if (typeof hooks.seed === 'number') {
+      Math.random = seededRandom(hooks.seed);
+    }
+    try {
+      new Function('Module', RUNTIME_PREFIX + '\n' + js)(Module);
+    } finally {
+      Math.random = originalRandom;
+    }
   }
 
   G.PascalEngine = { compile: compile, toIR: toIR, run: run };

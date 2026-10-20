@@ -10,7 +10,7 @@
  * - Responsive layout
  */
 
-import { type ReactElement, useState, useCallback } from 'react';
+import { type ReactElement, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CodeEditor } from '@/components/editor/CodeEditor';
@@ -18,6 +18,7 @@ import { RunButton } from '@/components/editor/RunButton';
 import { OutputWindow } from '@/components/editor/OutputWindow';
 import { RetroButton, RetroPanel } from '@/components/common';
 import { useInterpreter } from '@/hooks/useInterpreter';
+import { useEditorStore } from '@/stores/editorStore';
 
 // Default starter code for new users
 const DEFAULT_CODE = `program HelloWorld;
@@ -44,7 +45,8 @@ function EditorPage(): ReactElement {
     const { t } = useTranslation();
 
     // Local state for code (separate from tutorial editor store)
-    const [code, setCode] = useState<string>(DEFAULT_CODE);
+    const code = useEditorStore((state) => state.freeCode);
+    const setFreeCode = useEditorStore((state) => state.setFreeCode);
 
     // Interpreter state
     const {
@@ -62,8 +64,8 @@ function EditorPage(): ReactElement {
 
     // Handle code changes
     const handleCodeChange = useCallback((newCode: string) => {
-        setCode(newCode);
-    }, []);
+        setFreeCode(newCode);
+    }, [setFreeCode]);
 
     // Handle run button click
     const handleRun = useCallback(async () => {
@@ -74,8 +76,8 @@ function EditorPage(): ReactElement {
     const handleReset = useCallback(() => {
         reset();
         clearOutput();
-        setCode(DEFAULT_CODE);
-    }, [reset, clearOutput]);
+        setFreeCode(DEFAULT_CODE);
+    }, [reset, clearOutput, setFreeCode]);
 
     // Handle clear output
     const handleClearOutput = useCallback(() => {

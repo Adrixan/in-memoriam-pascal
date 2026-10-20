@@ -83,13 +83,13 @@ test.describe('App Navigation', () => {
 
     test('direct URL navigation to tutorial level works', async ({ page }) => {
         // Navigate directly to a specific level
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
 
         // Verify page loaded
         await expect(page.locator('h1')).toBeVisible({ timeout: 15000 });
 
         // Verify we're on the correct page
-        await expect(page).toHaveURL('/tutorial/hello-world');
+        await expect(page).toHaveURL(/#\/tutorial\/hello-world$/);
     });
 
     test('404 page displays for invalid routes', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('App Navigation', () => {
 test.describe('Level Navigation', () => {
     test.beforeEach(async ({ page }) => {
         // Start at the first tutorial level
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
         await expect(page.locator('h1')).toBeVisible({ timeout: 15000 });
     });
 
@@ -117,7 +117,7 @@ test.describe('Level Navigation', () => {
         await page.setViewportSize({ width: 1280, height: 720 });
 
         // Re-navigate to ensure viewport change is applied
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
         await page.waitForLoadState('networkidle');
 
         // Verify the page loaded correctly by checking for h1
@@ -283,14 +283,14 @@ test.describe('Browser Navigation', () => {
 
     test('page refresh maintains state', async ({ page }) => {
         // Navigate to tutorial
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
         await expect(page.locator('h1')).toBeVisible({ timeout: 15000 });
 
         // Refresh the page
         await page.reload();
 
         // Should still be on the same page
-        await expect(page).toHaveURL('/tutorial/hello-world');
+        await expect(page).toHaveURL(/#\/tutorial\/hello-world$/);
         await expect(page.locator('h1')).toBeVisible();
     });
 });

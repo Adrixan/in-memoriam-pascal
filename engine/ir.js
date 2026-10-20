@@ -176,6 +176,9 @@ function IR(theAST) {
     try {
       rlib = require(unit_path);
     } catch (e) {
+      if (unit_name === 'CRT') {
+        throw new Error("The Crt unit (screen control) is not available in the browser");
+      }
       throw new Error("Unit '" + unit + "' not found");
     }
     return new rlib[unit_name](st);
@@ -858,22 +861,25 @@ function IR(theAST) {
           fparams = ast.fparams,
           block = ast.block;
 
-        st.insert(id, { name: id, level: level, fparams: fparams, lparams: [] });
+        // The program's own name is not an identifier of the program (it
+        // lives under a reserved key so that e.g. "var counter" in program
+        // "Counter" works).
+        st.insert('$MAIN', { name: id, level: level, fparams: fparams, lparams: [] });
 
         // Define some predefined variables/constants
-        allocate_enums(ir, ['FALSE', 'TRUE'], id,
+        allocate_enums(ir, ['FALSE', 'TRUE'], '$MAIN',
           { node: 'type', name: 'BOOLEAN' }, 'i1');
-        allocate_variable(ir, 'const_decl', 'PI', id,
+        allocate_variable(ir, 'const_decl', 'PI', '$MAIN',
           normalize_type({ node: 'type', name: 'REAL' }),
           ieee754.llvm_float_hex(3.1415926536));
-        allocate_variable(ir, 'const_decl', 'MAXINT', id,
+        allocate_variable(ir, 'const_decl', 'MAXINT', '$MAIN',
           normalize_type({ node: 'type', name: 'INTEGER' }), 32767);
 
         // Predeclared types
         st.insert('TEXT', { node: 'type_decl', id: 'TEXT', type: { node: 'type', name: 'TEXT' } });
 
         block.param_list = [];
-        ir.push.apply(ir, toIR(block, level, fnames.concat([id])));
+        ir.push.apply(ir, toIR(block, level, fnames.concat(['$MAIN'])));
         ir.push(extra_decls);
 
         ir.push('');
@@ -939,6 +945,10 @@ function IR(theAST) {
           st.insert(fparam.id, { node: 'var_decl', type: ftype, pname: pname, sname: sname, var: fparam.var, level: level });
         }
 
+        // Exit leaves the current routine by jumping to this label
+        var exit_label = st.new_name('exit');
+        pdecl.exit_label = exit_label;
+
         // Record types get their LLVM names up front so that pointer types
         // declared earlier in the same type section can refer to them.
         for (var i = 0; i < decls.length; i++) {
@@ -1003,6 +1013,8 @@ function IR(theAST) {
         ir.push.apply(ir, vdecl_ir);
         // Postpone variable declarations until inside the body
         ir.push.apply(ir, stmts_ir);
+        ir.push('  br label %' + exit_label);
+        ir.push(exit_label + ':');
         if (pdecl.ireturn) {
           ir.push('  %retreg = load ' + pitype + '* %retval');
           ir.push('  ret ' + pitype + ' %retreg');
@@ -1154,6 +1166,13 @@ function IR(theAST) {
       case 'stmt_call':
       case 'expr_call':
         var id = ast.id, pdecl;
+        if (node === 'stmt_call' && id === 'EXIT' && !st.find('EXIT')) {
+          // leave the current procedure, function or the program
+          var owner = st.lookup(fname);
+          ir.push('  br label %' + owner.exit_label);
+          ir.push(st.new_name('afterexit') + ':');
+          break;
+        }
         if (ast.qualifier && !(ast.qualifier.node === 'variable' && unit_names[ast.qualifier.id])) {
           throw new Error("'" + ast.id + "' is not a procedure or function of a unit");
         }

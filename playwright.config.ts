@@ -38,7 +38,10 @@ export default defineConfig({
         screenshot: 'only-on-failure',
 
         // Video on failure
-        video: 'retain-on-failure',
+        video: process.env['PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH'] ? 'off' : 'retain-on-failure',
+        launchOptions: process.env['PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH']
+            ? { executablePath: process.env['PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH'] }
+            : {},
     },
 
     // Configure projects for major browsers

@@ -1116,14 +1116,14 @@ end.`,
     expectedOutput: 'New Year: 1/1/2025',
     validation: [
         {
-            type: 'contains_keyword',
-            config: { keyword: 'record' },
-            errorKey: 'validation.level14.missingRecord',
+            type: 'output_match',
+            config: { expected: 'New Year: 1/1/2025' },
+            errorKey: 'validation.level14.outputMismatch',
         },
         {
             type: 'contains_keyword',
-            config: { keyword: 'nested' },
-            errorKey: 'validation.level14.missingNested',
+            config: { keyword: 'record' },
+            errorKey: 'validation.level14.missingRecord',
         },
     ] as ValidationRule[],
     hints: [

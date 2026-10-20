@@ -121,3 +121,40 @@ describe('input', () => {
         expect(lines(`program P; var c: Char; begin Read(c); WriteLn(c); end.`, 'x\n')).toEqual(['x']);
     });
 });
+
+describe('exit and case else', () => {
+    it('leaves procedures and the program with Exit', () => {
+        const out = lines(`program P;
+            procedure Check(n: Integer);
+            begin
+              if n < 0 then begin WriteLn('negative'); Exit; end;
+              WriteLn('ok');
+            end;
+            begin
+              Check(-1); Check(1);
+              WriteLn('before');
+              Exit;
+              WriteLn('after');
+            end.`);
+        expect(out).toEqual(['negative', 'ok', 'before']);
+    });
+
+    it('supports else in a case statement', () => {
+        const out = lines(`program P; var n: Integer;
+            begin
+              for n := 1 to 3 do
+                case n of
+                  1: WriteLn('one');
+                  2: WriteLn('two')
+                else WriteLn('many');
+                end;
+            end.`);
+        expect(out).toEqual(['one', 'two', 'many']);
+    });
+
+    it('names the program and a variable alike', () => {
+        const out = lines(`program Counter; var counter: Integer;
+            begin counter := 3; WriteLn(counter); end.`);
+        expect(out).toEqual(['3']);
+    });
+});

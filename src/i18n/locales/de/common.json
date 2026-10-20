@@ -30,6 +30,7 @@
         "success": "Erfolgreich!",
         "error": "Fehler aufgetreten",
         "running": "Wird ausgeführt...",
+        "waiting": "Warten auf Eingabe...",
         "idle": "Bereit"
     },
     "editor": {
@@ -40,7 +41,12 @@
         "output": "Ausgabe",
         "clearOutput": "Löschen",
         "noOutput": "Noch keine Ausgabe. Führe dein Programm aus, um Ergebnisse zu sehen.",
+        "inputLabel": "Eingabe für das Programm",
+        "inputPlaceholder": "Eingabe tippen und Enter drücken...",
         "executionTime": "Ausführungszeit: {{time}}ms"
+    },
+    "tutorial": {
+        "progress": "Tutorial-Fortschritt"
     },
     "home": {
         "startLearning": "Lernen starten",

@@ -39,7 +39,7 @@ test.describe('Accessibility Audit', () => {
     });
 
     test('tutorial page has no critical accessibility issues', async ({ page }) => {
-        await page.goto('/tutorial');
+        await page.goto('/#/tutorial/hello-world');
 
         // Wait for page to fully load
         await page.waitForLoadState('networkidle');
@@ -186,7 +186,7 @@ test.describe('Accessibility Audit', () => {
     });
 
     test('no missing form labels on tutorial page', async ({ page }) => {
-        await page.goto('/tutorial');
+        await page.goto('/#/tutorial/hello-world');
         await page.waitForLoadState('networkidle');
 
         // Run axe accessibility scan focusing on forms

@@ -149,6 +149,7 @@ export class SolutionValidator {
                 'contains_keyword': 'code_contains',
                 'compiles': 'compiles',
                 'custom': 'output_contains', // Default fallback
+                'output_contains': 'output_contains',
             };
 
             const extendedType = typeMap[rule.type] ?? 'output_contains';

@@ -1,6 +1,6 @@
 # In Memoriam Pascal
 
-An interactive Pascal programming tutorial web application with a retro 80s CRT aesthetic. Learn Pascal programming through 10 progressive levels with real-time in-browser code execution.
+An interactive Pascal programming tutorial web application with a retro 80s CRT aesthetic. Learn Pascal programming through 15 progressive levels with real-time in-browser code execution.
 
 ![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
@@ -10,42 +10,20 @@ An interactive Pascal programming tutorial web application with a retro 80s CRT 
 
 ## Features
 
-- **10 Progressive Tutorial Levels** - From "Hello World" to advanced algorithms
+- **15 Progressive Tutorial Levels** - From "Hello World" to records, pointers, and modular programming
 - **Real-time Pascal Execution** - In-browser compilation and execution via Pascal.js
 - **Monaco Code Editor** - Full-featured editor with Pascal syntax highlighting and custom CRT theme
 - **Interactive Hint System** - Progressive disclosure hints to guide learning
 - **Solution Validation** - Automatic checking with context-aware error feedback
-- **Offline Support** - PWA with service worker for offline usage
-- **Progress Persistence** - IndexedDB storage for code and progress
+- **Offline Support** - PWA caches the application for offline use after first load
+- **Progress Persistence** - Local browser storage for code and progress
 - **German/English Localization** - Full i18n support
 - **Retro CRT Aesthetic** - Authentic 80s terminal visual experience
 - **Accessibility** - WCAG 2.1 AA compliant
 
 ## Screenshots
 
-<!-- To add actual screenshots:
-1. Take screenshots of each page (recommended: 1280x800 or 1920x1080)
-2. Save as PNG or WebP format in public/screenshots/
-3. Replace the placeholder paths below with actual screenshot filenames
--->
-
-### Home Page
-
-![In Memoriam Pascal Home Page - Landing screen showing retro CRT aesthetic with "Learn Pascal" call-to-action and level progress overview](/public/screenshots/home-page.png "Home page showing the landing section with retro 80s CRT aesthetic, logo, and navigation")
-
-### Tutorial Page
-
-![In Memoriam Pascal Tutorial Page - Monaco code editor with Pascal syntax highlighting, hint panel, and level navigation](/public/screenshots/tutorial-page.png "Tutorial page displaying the Monaco code editor with Pascal code, hint system panel, and level progress indicator")
-
-### Free-Form Editor
-
-![In Memoriam Pascal Editor Page - Full-screen code editor with CRT theme and output console](/public/screenshots/editor-page.png "Free-form editor page showing Monaco editor with custom Pascal theme, run button, and output window")
-
-> **Note**: Screenshots are placeholder descriptions. To add actual images:
->
-> - Capture screenshots at 1280x800 or 1920x1080 resolution
-> - Save as optimized PNG or WebP in [`public/screenshots/`](/public/screenshots/)
-> - Use descriptive alt text for accessibility
+Screenshots will be added after the current UI and execution flow are finalized.
 
 ## Tech Stack
 
@@ -60,7 +38,7 @@ An interactive Pascal programming tutorial web application with a retro 80s CRT 
 | **Styling** | Tailwind CSS 4 |
 | **Animations** | Framer Motion |
 | **i18n** | i18next + react-i18next |
-| **Storage** | IndexedDB (native) |
+| **Storage** | Debounced localStorage |
 | **PWA** | vite-plugin-pwa + Workbox |
 | **Testing** | Vitest + Testing Library + Playwright |
 | **Icons** | Lucide React |
@@ -74,7 +52,7 @@ An interactive Pascal programming tutorial web application with a retro 80s CRT 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/in-memoriam-pascal.git
+git clone https://github.com/Adrixan/in-memoriam-pascal.git
 cd in-memoriam-pascal
 
 # Install dependencies
@@ -135,7 +113,7 @@ in-memoriam-pascal/
 │   ├── i18n/               # Internationalization configuration and translations
 │   │   └── locales/        # Translation files (de, en)
 │   ├── lib/                # Utility libraries
-│   │   ├── storage/        # IndexedDB wrapper and Zustand adapter
+│   │   ├── storage/        # Persistent browser storage
 │   │   └── utils/          # Utility functions
 │   ├── pages/              # Page components (HomePage, TutorialPage, NotFoundPage)
 │   ├── services/           # Business logic services
@@ -165,14 +143,19 @@ in-memoriam-pascal/
 |-------|-------|----------------|
 | 1 | Hello World | Program structure, `WriteLn` |
 | 2 | Variables | Data types, variable declaration |
-| 3 | Input/Output | `ReadLn`, user interaction |
-| 4 | Arithmetic | Operators, expressions |
-| 5 | Conditions | `If-Then-Else`, boolean logic |
-| 6 | Loops | `For`, `While`, `Repeat` |
-| 7 | Procedures | Procedures, parameters |
-| 8 | Functions | Functions, return values |
-| 9 | Arrays | Array declaration, iteration |
-| 10 | Records | Records, structured data |
+| 3 | Simple Math | Arithmetic operators, expressions |
+| 4 | Strings | String variables and output |
+| 5 | Input/Output | `ReadLn`, user interaction |
+| 6 | Conditions | `If-Then-Else`, boolean logic |
+| 7 | For Loop | Counted iteration |
+| 8 | While Loop | Conditional iteration |
+| 9 | Procedures | Procedures, parameters |
+| 10 | Functions | Functions, return values |
+| 11 | File I/O | Text files and file operations |
+| 12 | Sets | Set values and membership |
+| 13 | Pointers | Dynamic allocation and dereferencing |
+| 14 | Advanced Records | Nested record structures |
+| 15 | Unit System | Modular programming with procedures |
 
 ## PWA Features
 

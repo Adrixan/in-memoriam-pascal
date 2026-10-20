@@ -29,7 +29,9 @@ interface TutorialState {
     /** Actions */
     setLevels: (levels: TutorialLevel[]) => void;
     setCurrentLevel: (levelId: string) => void;
+    recordAttempt: (levelId: string, code: string) => void;
     updateProgress: (levelId: string, progress: Partial<LevelProgress>) => void;
+    saveCode: (levelId: string, code: string) => void;
     markCompleted: (levelId: string) => void;
     resetProgress: () => void;
 
@@ -45,6 +47,7 @@ const initialProgress: LevelProgress = {
     levelId: '',
     status: 'not_started',
     savedCode: '',
+    hasSavedCode: false,
     attempts: 0,
     hintsUsed: [],
     lastAttemptAt: new Date().toISOString(),
@@ -88,6 +91,23 @@ export const useTutorialStore = create<TutorialState>()(
                 }
             },
 
+            recordAttempt: (levelId, code) => {
+                const current = get().progress[levelId] ?? { ...initialProgress, levelId };
+                set((state) => ({
+                    progress: {
+                        ...state.progress,
+                        [levelId]: {
+                            ...current,
+                            savedCode: code,
+                            attempts: current.attempts + 1,
+                            status: current.status === 'completed' ? 'completed' : 'in_progress',
+                            lastAttemptAt: new Date().toISOString(),
+                            hasSavedCode: true,
+                        },
+                    },
+                }));
+            },
+
             updateProgress: (levelId, progressUpdate) => {
                 const { progress } = get();
                 const currentProgress = progress[levelId] || {
@@ -109,9 +129,22 @@ export const useTutorialStore = create<TutorialState>()(
                             ...currentProgress,
                             ...progressUpdate,
                             ...attemptsUpdate,
+                            ...(Object.hasOwn(progressUpdate, 'savedCode') ? { hasSavedCode: true } : {}),
                             lastAttemptAt: new Date().toISOString(),
                         },
                     },
+                });
+            },
+
+            saveCode: (levelId, code) => {
+                set((state) => {
+                    const current = state.progress[levelId] ?? { ...initialProgress, levelId };
+                    return {
+                        progress: {
+                            ...state.progress,
+                            [levelId]: { ...current, savedCode: code, hasSavedCode: true },
+                        },
+                    };
                 });
             },
 

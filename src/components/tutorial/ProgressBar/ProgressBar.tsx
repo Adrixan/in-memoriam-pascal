@@ -8,6 +8,7 @@
  */
 
 import { type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface ProgressBarProps {
     /** Current progress value (0-100) */
@@ -32,6 +33,7 @@ function ProgressBar({
     label,
     className = '',
 }: ProgressBarProps): ReactElement {
+    const { t } = useTranslation('common');
     const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
     return (
@@ -59,6 +61,7 @@ function ProgressBar({
             <div
                 className="retro-progress"
                 role="progressbar"
+                aria-label={label ?? t('tutorial.progress', 'Tutorial progress')}
                 aria-valuenow={Math.round(percentage)}
                 aria-valuemin={0}
                 aria-valuemax={100}
