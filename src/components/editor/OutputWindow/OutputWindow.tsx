@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useState, type ReactElement, type KeyboardEvent } from 'react';
 import type { OutputLine } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Props for the OutputWindow component
@@ -53,15 +54,12 @@ export function OutputWindow({
     isWaitingForInput = false,
     onInputSubmit,
 }: OutputWindowProps): ReactElement {
+    const { t } = useTranslation('common');
     const outputRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [inputValue, setInputValue] = useState('');
 
     // Log output changes for debugging
-    useEffect(() => {
-        console.log('[OutputWindow] output changed, length:', output?.length);
-    }, [output]);
-
     // Auto-scroll to bottom when new output arrives
     useEffect(() => {
         if (outputRef.current) {
@@ -80,7 +78,7 @@ export function OutputWindow({
      * Handle input submission
      */
     const handleInputSubmit = (): void => {
-        if (inputValue.trim() && onInputSubmit) {
+        if (onInputSubmit) {
             onInputSubmit(inputValue);
             setInputValue('');
         }
@@ -127,7 +125,7 @@ export function OutputWindow({
             className={`output-window ${className ?? ''}`}
             style={{ height }}
             role="region"
-            aria-label="Program Output"
+            aria-label={t('editor.output', 'Program Output')}
             aria-live="polite"
             aria-atomic="false"
         >
@@ -144,7 +142,7 @@ export function OutputWindow({
                 </div>
                 {/* Title */}
                 <span className="ml-2 text-sm text-[var(--color-text-muted)] font-mono">
-                    Output
+                    {t('editor.output', 'Output')}
                 </span>
             </div>
 
@@ -159,7 +157,7 @@ export function OutputWindow({
                 {/* Empty state */}
                 {output.length === 0 && !error && (
                     <div className="text-[var(--color-text-muted)] italic">
-                        No output yet. Run your program to see results.
+                        {t('editor.noOutput', 'No output yet. Run your program to see results.')}
                     </div>
                 )}
 
@@ -204,7 +202,7 @@ export function OutputWindow({
                     >
                         <span className="text-[var(--retro-green)] animate-pulse" aria-hidden="true">&gt;</span>
                         <label htmlFor="program-input" className="sr-only">
-                            Enter input for program
+                            {t('editor.inputLabel', 'Enter input for program')}
                         </label>
                         <input
                             id="program-input"
@@ -214,17 +212,17 @@ export function OutputWindow({
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyPress}
                             className="flex-1 bg-transparent border-b border-[var(--retro-green)]/50 outline-none text-[var(--retro-green)] font-mono text-sm placeholder:text-[var(--retro-green)]/30 focus:border-[var(--retro-green)] transition-colors"
-                            placeholder="Type input and press Enter..."
-                            aria-label="Program input"
+                            placeholder={t('editor.inputPlaceholder', 'Type input and press Enter...')}
+                            aria-label={t('editor.inputLabel', 'Program input')}
                             autoFocus
                             autoComplete="off"
                         />
                         <button
                             type="submit"
                             className="px-2 py-1 text-xs bg-[var(--retro-green)] text-[var(--terminal-bg)] font-mono rounded hover:bg-[var(--retro-green)]/80 transition-colors"
-                            aria-label="Submit input"
+                            aria-label={t('actions.submit', 'Submit input')}
                         >
-                            Send
+                            {t('actions.submit', 'Send')}
                         </button>
                     </form>
                 )}

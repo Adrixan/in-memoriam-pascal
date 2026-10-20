@@ -1,23 +1,24 @@
 /**
- * Custom hook for Pascal interpreter
- * Integrates with Pascal.js for browser-based Pascal execution
+ * Hook for running Pascal programs.
+ *
+ * A program runs in a worker. When it asks for input the run ends and the hook
+ * waits for the user; once the user answers, the program runs again from the
+ * start with all answers so far (the engine is deterministic, see
+ * PascalRunner). Output of the previous attempt is replaced, so the user sees
+ * one continuous transcript.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useInterpreterStore } from '@/stores';
-import { useEditorStore } from '@/stores';
-import { getPascalInterpreter, type PascalInterpreter, type RunResult } from '@/services/interpreter';
-import type { InterpreterError } from '@/types';
+import { useInterpreterStore } from '@/stores/interpreterStore';
+import { getPascalRunner, runResultToError, type PascalRunner } from '@/services/interpreter';
+import type { InterpreterError, OutputLine } from '@/types';
 
-/**
- * Hook return type
- */
 export interface UseInterpreterReturn {
     /** Current execution status */
-    status: 'idle' | 'running' | 'success' | 'error';
+    status: 'idle' | 'running' | 'waiting' | 'success' | 'error';
 
     /** Output lines from execution */
-    output: Array<{ content: string; type: 'output' | 'error' | 'info'; timestamp: number }>;
+    output: OutputLine[];
 
     /** Current error if any */
     error: InterpreterError | undefined;
@@ -25,280 +26,230 @@ export interface UseInterpreterReturn {
     /** Execution time in milliseconds */
     executionTime: number | undefined;
 
-    /** Whether the interpreter is ready to run code */
+    /** Whether the execution environment is ready */
     isReady: boolean;
 
-    /** Whether the interpreter is waiting for user input */
+    /** Whether the program is waiting for the user to type input */
     isWaitingForInput: boolean;
 
-    /** Run the current code in the editor */
-    runCode: (inputQueue?: string[]) => Promise<void>;
-
-    /** Run specific code (not from editor) */
+    /**
+     * Run a program.
+     *
+     * @param inputQueue fixed test input. An empty array means no input is
+     *   available and should produce a missing-input error.
+     */
     runCodeString: (code: string, inputQueue?: string[]) => Promise<void>;
+    latestRunId: number;
 
-    /** Provide input to the interpreter */
+    /** Answer the input the program is waiting for */
     provideInput: (input: string) => void;
 
     /** Stop execution */
     stopExecution: () => void;
 
-    /** Reset interpreter state */
+    /** Reset state and output */
     reset: () => void;
 
     /** Clear output */
     clearOutput: () => void;
 }
 
-/**
- * useInterpreter Hook
- *
- * Provides an interface to the Pascal.js interpreter for executing
- * Pascal code in the browser.
- *
- * @example
- * ```tsx
- * const { runCode, status, output, error, isReady } = useInterpreter();
- *
- * // Run code from editor store
- * await runCode();
- *
- * // Check status
- * if (status === 'running') {
- *   // Show loading state
- * }
- * ```
- */
-export function useInterpreter(): UseInterpreterReturn {
-    const {
-        status,
-        output,
-        error,
-        executionTime,
-        setStatus,
-        addOutput,
-        clearOutput,
-        setError,
-        setExecutionTime,
-        reset: resetStore,
-    } = useInterpreterStore();
+interface Session {
+    source: string;
+    /** Lines typed or supplied so far */
+    inputs: string[];
+    /** Test input: running out of it is an error instead of a question */
+    fixed: boolean;
+    seed: number;
+}
 
-    const { code } = useEditorStore();
-    const interpreterRef = useRef<PascalInterpreter | null>(null);
+/** Split program output into display lines (a trailing newline adds none). */
+export function toOutputLines(text: string): OutputLine[] {
+    if (text === '') {
+        return [];
+    }
+    const parts = text.split('\n');
+    if (parts[parts.length - 1] === '') {
+        parts.pop();
+    }
+    const timestamp = Date.now();
+    return parts.map((content) => ({ content, type: 'output' as const, timestamp }));
+}
+
+export function useInterpreter(runner: PascalRunner = getPascalRunner()): UseInterpreterReturn {
+    const status = useInterpreterStore((s) => s.status);
+    const output = useInterpreterStore((s) => s.output);
+    const error = useInterpreterStore((s) => s.error);
+    const executionTime = useInterpreterStore((s) => s.executionTime);
+    const isWaitingForInput = useInterpreterStore((s) => s.isWaitingForInput);
+    const latestRunId = useInterpreterStore((s) => s.runId);
+
     const [isReady, setIsReady] = useState(false);
-    const [isWaitingForInput, setIsWaitingForInput] = useState(false);
-    // Track if prompt was called during execution (for re-run logic)
-    const promptCalledRef = useRef(false);
-    // Store the code being run for potential re-run
-    const pendingCodeRef = useRef<string>('');
+    const sessionRef = useRef<Session | null>(null);
+    // identifies the latest run; results of superseded runs are ignored
+    const runIdRef = useRef(0);
 
-    // Initialize interpreter on mount
     useEffect(() => {
-        const initInterpreter = async (): Promise<void> => {
-            try {
-                interpreterRef.current = getPascalInterpreter({
-                    timeout: 10000, // 10 second timeout
-                    maxOutputLines: 1000,
-                    debug: false,
-                });
-
-                // Set up the input needed callback
-                interpreterRef.current.setOnInputNeeded(() => {
-                    console.log('[useInterpreter] Input needed callback triggered');
-                    setIsWaitingForInput(true);
-                });
-
-                // Pre-load the interpreter scripts
-                await interpreterRef.current.load();
-                setIsReady(true);
-            } catch (err) {
-                console.error('Failed to initialize Pascal interpreter:', err);
-                setError({
-                    message: err instanceof Error ? err.message : 'Failed to initialize interpreter',
-                    type: 'runtime',
-                });
-            }
-        };
-
-        void initInterpreter();
-
-        // Cleanup on unmount
-        return () => {
-            if (interpreterRef.current) {
-                interpreterRef.current.stop();
-            }
-        };
-    }, [setError, setIsWaitingForInput]);
-
-    /**
-     * Handle run result
-     */
-    const handleResult = useCallback(
-        (result: RunResult): void => {
-            // Add output lines
-            for (const line of result.output) {
-                addOutput(line, 'output');
-            }
-
-            // Set execution time
-            if (result.executionTime !== undefined) {
-                setExecutionTime(result.executionTime);
-            }
-
-            // Handle errors - always set a terminal status to prevent stuck 'running' state
-            if (!result.success) {
-                // Even if there are no errors in the array, we should set error status
-                const firstError = result.errors[0];
-                if (firstError) {
-                    const errorObj: InterpreterError = {
-                        message: firstError.message,
-                        type: firstError.type,
-                    };
-                    if (firstError.line !== undefined) {
-                        errorObj.line = firstError.line;
-                    }
-                    if (firstError.column !== undefined) {
-                        errorObj.column = firstError.column;
-                    }
-                    setError(errorObj);
-                } else {
-                    // No error details provided, set a generic error
-                    setError({
-                        message: 'Execution failed with no error details',
-                        type: 'runtime',
+        let cancelled = false;
+        runner
+            .warmUp()
+            .then(() => {
+                if (!cancelled) {
+                    setIsReady(true);
+                }
+            })
+            .catch((reason: unknown) => {
+                if (!cancelled) {
+                    useInterpreterStore.getState().finish({
+                        status: 'error',
+                        error: {
+                            type: 'system',
+                            message: `The execution environment could not be started: ${String(reason)}`,
+                            messageKey: 'interpreter.crashed',
+                            params: { message: String(reason) },
+                        },
                     });
                 }
-                setStatus('error');
-            } else {
-                setStatus('success');
-            }
-        },
-        [addOutput, setExecutionTime, setError, setStatus]
-    );
+            });
+        return () => {
+            cancelled = true;
+            // leaving the page ends a program that is still running
+            runIdRef.current += 1;
+            runner.stop();
+        };
+    }, [runner]);
 
-    /**
-     * Run code string
-     */
-    const runCodeString = useCallback(
-        async (codeToRun: string, inputQueue?: string[]): Promise<void> => {
-            console.log('[useInterpreter] runCodeString called with code length:', codeToRun?.length);
-            console.log('[useInterpreter] code preview (first 100 chars):', codeToRun?.substring(0, 100));
+    const execute = useCallback(
+        async (session: Session): Promise<void> => {
+            const store = useInterpreterStore.getState();
+            const runId = ++runIdRef.current;
+            store.begin();
 
-            if (!codeToRun.trim()) {
-                setError({
-                    message: 'No code to execute',
-                    type: 'compilation',
-                });
-                return;
-            }
-
-            if (!interpreterRef.current || !isReady) {
-                setError({
-                    message: 'Interpreter not ready. Please wait...',
-                    type: 'runtime',
-                });
-                return;
-            }
-
-            // Store code for potential re-run
-            pendingCodeRef.current = codeToRun;
-
-            setStatus('running');
-            clearOutput();
-            setError(undefined);
-            setExecutionTime(undefined);
-            setIsWaitingForInput(false);
-
-            // Reset prompt tracking
-            promptCalledRef.current = false;
-
-            // Override window.prompt to prevent the popup dialog
-            // Instead, it will set a flag and return empty string
-            const originalPrompt = window.prompt;
-            window.prompt = () => {
-                console.log('[useInterpreter] window.prompt called - blocking popup');
-                promptCalledRef.current = true;
-                return ''; // Return empty string, our FS callback will handle the rest
+            let text = '';
+            let flushTimer: ReturnType<typeof setTimeout> | undefined;
+            const flush = (): void => {
+                flushTimer = undefined;
+                if (runId === runIdRef.current) {
+                    useInterpreterStore.getState().setOutput(toOutputLines(text));
+                }
             };
 
-            try {
-                const result = await interpreterRef.current.run(codeToRun, inputQueue);
+            const input = session.inputs.map((line) => `${line}\n`).join('');
+            const result = await runner.run(
+                session.source,
+                input,
+                (chunk) => {
+                    text += chunk;
+                    flushTimer ??= setTimeout(flush, 16);
+                },
+                // Typed input is echoed; test input is not (it is not typed)
+                { echoInput: !session.fixed, seed: session.seed },
+            );
 
-                // Check if we need more input after execution
-                if (promptCalledRef.current) {
-                    console.log('[useInterpreter] Input was needed during execution - showing input UI');
-                    setIsWaitingForInput(true);
-                    // Don't set status to success/error yet - wait for input
-                    return;
-                }
+            if (flushTimer !== undefined) {
+                clearTimeout(flushTimer);
+            }
+            if (runId !== runIdRef.current) {
+                return;
+            }
+            useInterpreterStore.getState().setOutput(toOutputLines(text));
 
-                handleResult(result);
-            } catch (err) {
-                setError({
-                    message: err instanceof Error ? err.message : 'Unknown error during execution',
-                    type: 'runtime',
+            const finishWith = (runError: InterpreterError | undefined, durationMs?: number): void => {
+                useInterpreterStore.getState().finish({
+                    status: runError ? 'error' : 'success',
+                    error: runError,
+                    executionTime: durationMs,
                 });
-                setStatus('error');
-            } finally {
-                // Restore original prompt
-                window.prompt = originalPrompt;
+            };
+
+            switch (result.status) {
+                case 'finished':
+                    finishWith(undefined, result.durationMs);
+                    break;
+                case 'needInput':
+                    if (session.fixed) {
+                        finishWith(
+                            {
+                                type: 'runtime',
+                                message: 'The program reads more input than the test provides.',
+                                messageKey: 'interpreter.needsMoreInput',
+                            },
+                            result.durationMs,
+                        );
+                    } else {
+                        useInterpreterStore.getState().awaitInput(result.durationMs);
+                    }
+                    break;
+                case 'stopped':
+                    useInterpreterStore.getState().finish({ status: 'idle' });
+                    break;
+                case 'runtimeError':
+                    finishWith(runResultToError(result), result.durationMs);
+                    break;
+                default:
+                    finishWith(runResultToError(result));
+                    break;
             }
         },
-        [isReady, setStatus, clearOutput, setError, setExecutionTime, handleResult, setIsWaitingForInput]
+        [runner],
     );
 
-    /**
-     * Run code from editor store
-     */
-    const runCode = useCallback(async (inputQueue?: string[]): Promise<void> => {
-        await runCodeString(code, inputQueue);
-    }, [code, runCodeString]);
-
-    /**
-     * Provide input to the interpreter
-     */
-    const provideInput = useCallback((input: string): void => {
-        if (interpreterRef.current) {
-            console.log('[useInterpreter] provideInput:', input);
-            // Provide the input
-            interpreterRef.current.provideInput(input);
-            setIsWaitingForInput(false);
-
-            // Re-run the code with the provided input
-            const codeToRun = pendingCodeRef.current;
-            if (codeToRun) {
-                console.log('[useInterpreter] Re-running code with input');
-                // Clear output for fresh run
-                clearOutput();
-                // Run with the input
-                interpreterRef.current.run(codeToRun, [input]).then(handleResult);
+    const runCodeString = useCallback(
+        async (code: string, inputQueue?: string[]): Promise<void> => {
+            if (!code.trim()) {
+                useInterpreterStore.getState().begin();
+                useInterpreterStore.getState().finish({
+                    status: 'error',
+                    error: {
+                        type: 'compilation',
+                        message: 'There is no code to run.',
+                        messageKey: 'interpreter.noCode',
+                    },
+                });
+                return;
             }
-        }
-    }, [clearOutput, handleResult]);
+            const fixed = inputQueue !== undefined;
+            const session: Session = {
+                source: code,
+                inputs: fixed ? [...inputQueue] : [],
+                fixed,
+                seed: Math.floor(Math.random() * 0xffffffff),
+            };
+            sessionRef.current = session;
+            await execute(session);
+        },
+        [execute],
+    );
 
-    /**
-     * Stop execution
-     */
+    const provideInput = useCallback(
+        (input: string): void => {
+            const session = sessionRef.current;
+            if (!session || session.fixed || useInterpreterStore.getState().status !== 'waiting') {
+                return;
+            }
+            session.inputs.push(input);
+            void execute(session);
+        },
+        [execute],
+    );
+
     const stopExecution = useCallback((): void => {
-        if (interpreterRef.current) {
-            interpreterRef.current.stop();
-        }
-        setStatus('idle');
-    }, [setStatus]);
+        runIdRef.current += 1;
+        runner.stop();
+        sessionRef.current = null;
+        useInterpreterStore.getState().finish({ status: 'idle' });
+    }, [runner]);
 
-    /**
-     * Reset interpreter state
-     */
     const reset = useCallback((): void => {
-        if (interpreterRef.current) {
-            interpreterRef.current.reset();
-            interpreterRef.current.resetInput();
-        }
-        setIsWaitingForInput(false);
-        pendingCodeRef.current = '';
-        promptCalledRef.current = false;
-        resetStore();
-    }, [resetStore]);
+        runIdRef.current += 1;
+        runner.stop();
+        sessionRef.current = null;
+        useInterpreterStore.getState().reset();
+    }, [runner]);
+
+    const clearOutput = useCallback((): void => {
+        useInterpreterStore.getState().clearOutput();
+    }, []);
 
     return {
         status,
@@ -307,8 +258,8 @@ export function useInterpreter(): UseInterpreterReturn {
         executionTime,
         isReady,
         isWaitingForInput,
-        runCode,
         runCodeString,
+        latestRunId,
         provideInput,
         stopExecution,
         reset,

@@ -1,73 +1,50 @@
 /**
- * Editor Store - Manages code content and editor state
+ * Editor Store - the free editor's program
+ *
+ * The tutorial keeps the code of each level in the tutorial store; this store
+ * only remembers what the user was writing in the free editor.
  */
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { EditorState } from '@/types';
 import { editorStorage } from '@/lib/storage';
 
-interface EditorStore extends EditorState {
-    /** Set code content */
-    setCode: (code: string) => void;
+export const DEFAULT_FREE_CODE = `program HelloWorld;
+{ Welcome to the free editor! }
 
-    /** Set current level */
-    setCurrentLevelId: (levelId: string | null) => void;
+begin
+  WriteLn('Hello, World!');
+end.
+`;
 
-    /** Set editor ready state */
-    setReady: (isReady: boolean) => void;
+interface EditorStore {
+    /** Program in the free editor */
+    freeCode: string;
 
-    /** Update cursor position */
-    setCursorPosition: (line: number, column: number) => void;
+    /** Replace the program */
+    setFreeCode: (code: string) => void;
 
-    /** Reset editor state */
-    reset: () => void;
+    /** Back to the welcome program */
+    resetFreeCode: () => void;
 }
-
-const initialState: EditorState = {
-    code: '',
-    currentLevelId: null,
-    isReady: false,
-    cursorPosition: {
-        line: 1,
-        column: 1,
-    },
-};
 
 export const useEditorStore = create<EditorStore>()(
     persist(
         (set) => ({
-            ...initialState,
+            freeCode: DEFAULT_FREE_CODE,
 
-            setCode: (code) => {
-                console.log('[EditorStore] setCode called with code length:', code?.length);
-                console.log('[EditorStore] code preview (first 100 chars):', code?.substring(0, 100));
-                set({ code });
+            setFreeCode: (freeCode) => {
+                set({ freeCode });
             },
 
-            setCurrentLevelId: (currentLevelId) => {
-                set({ currentLevelId });
-            },
-
-            setReady: (isReady) => {
-                set({ isReady });
-            },
-
-            setCursorPosition: (line, column) => {
-                set({ cursorPosition: { line, column } });
-            },
-
-            reset: () => {
-                set(initialState);
+            resetFreeCode: () => {
+                set({ freeCode: DEFAULT_FREE_CODE });
             },
         }),
         {
             name: 'editor-storage',
             storage: createJSONStorage(() => editorStorage),
-            partialize: (state) => ({
-                code: state.code,
-                currentLevelId: state.currentLevelId,
-            }),
-        }
-    )
+            partialize: (state) => ({ freeCode: state.freeCode }),
+        },
+    ),
 );

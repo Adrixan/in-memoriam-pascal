@@ -105,6 +105,76 @@ begin
   result := Square(5);
   WriteLn('5 squared is ', result);
 end.`,
+
+    'file-io': `program FileIO;
+var
+  f: Text;
+begin
+  Assign(f, 'hello.txt');
+  Rewrite(f);
+  WriteLn(f, 'Hello World!');
+  Close(f);
+  WriteLn('File written: hello.txt');
+end.`,
+
+    'sets': `program Sets;
+type
+  TNumberSet = set of 1..10;
+var
+  primes, numbers: TNumberSet;
+begin
+  primes := [2, 3, 5, 7];
+  numbers := [1..10];
+  if 5 in primes then
+    WriteLn('5 is prime');
+  if primes <= numbers then
+    WriteLn('Primes subset of numbers');
+end.`,
+
+    'pointers': `program Pointers;
+var
+  p: ^Integer;
+begin
+  New(p);
+  p^ := 42;
+  WriteLn('Value: ', p^);
+  Dispose(p);
+end.`,
+
+    'advanced-records': `program AdvancedRecords;
+type
+  TDate = record
+    day: Integer;
+    month: Integer;
+    year: Integer;
+  end;
+  TEvent = record
+    name: String;
+    date: TDate;
+  end;
+var
+  event: TEvent;
+begin
+  event.name := 'New Year';
+  event.date.day := 1;
+  event.date.month := 1;
+  event.date.year := 2025;
+  WriteLn(event.name, ': ', event.date.day, '/', event.date.month, '/', event.date.year);
+end.`,
+
+    'unit-system': `program UnitSystem;
+procedure Greet(name: String);
+begin
+  WriteLn('Hello, ', name, '!');
+end;
+procedure Farewell(name: String);
+begin
+  WriteLn('Goodbye, ', name, '!');
+end;
+begin
+  Greet('World');
+  Farewell('World');
+end.`,
 };
 
 /**

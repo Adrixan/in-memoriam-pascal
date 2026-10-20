@@ -9,6 +9,7 @@ export default tseslint.config(
     {
         ignores: [
             'dist/**',
+            'src/engine/generated/**',
             'dev-dist/**',
             'external/**',
             'node_modules/**',
@@ -28,7 +29,7 @@ export default tseslint.config(
     js.configs.recommended,
     // Test files config with node globals
     {
-        files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', 'tests/setup.ts'],
+        files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', 'tests/**/*.ts'],
         languageOptions: {
             ecmaVersion: 2022,
             globals: {

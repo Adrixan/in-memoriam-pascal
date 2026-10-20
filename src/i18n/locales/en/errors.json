@@ -1,4 +1,42 @@
 {
+    "interpreter": {
+        "noCode": "There is no code to run.",
+        "needsMoreInput": "The program reads more input than the test provides.",
+        "timeout": "The program ran for more than {{seconds}} seconds and was stopped. It may contain an endless loop.",
+        "outputLimit": "The program produced too much output and was stopped.",
+        "crashed": "The execution environment failed: {{message}}",
+        "syntax": {
+            "unexpectedEnd": "The program ends too early. A closing 'end' or final '.' may be missing.",
+            "invalidCharacter": "Unexpected character '{{token}}'.",
+            "missingSemicolon": "Unexpected '{{token}}'. A semicolon may be missing after the previous statement.",
+            "expected": "Unexpected '{{token}}'. Expected {{expected}}.",
+            "unexpected": "Unexpected '{{token}}'."
+        },
+        "semantic": {
+            "unknownIdentifier": "Unknown identifier: {{name}}",
+            "unknownRoutine": "Unknown procedure or function: {{name}}",
+            "unknownType": "Unknown type: {{name}}",
+            "typeMismatch": "Type mismatch: expected {{expected}}, found {{actual}}",
+            "parameterMismatch": "Incorrect parameters when calling {{name}}",
+            "noSuchField": "This record has no field named {{name}}",
+            "unknownUnit": "Unknown unit: {{name}}",
+            "unitNotImplemented": "{{name}} is declared in {{unit}} but has no implementation",
+            "generic": "Compilation failed: {{message}}"
+        },
+        "runtime": {
+            "generic": "Runtime error: {{message}}",
+            "code2": "File not found",
+            "code5": "File could not be opened for writing",
+            "code100": "Read past the end of the file",
+            "code102": "File not assigned",
+            "code103": "File not open",
+            "code106": "Invalid numeric format",
+            "code200": "Division by zero",
+            "code201": "Range check error",
+            "code204": "Invalid pointer operation (nil pointer)",
+            "code207": "Invalid floating-point operation"
+        }
+    },
     "syntax": {
         "unexpectedToken": "Unexpected token at position {{position}}",
         "missingSemicolon": "Semicolon expected after {{statement}}",

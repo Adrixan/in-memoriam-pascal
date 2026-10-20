@@ -11,6 +11,7 @@
 import { type ReactElement, useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { tutorialLevels } from '@/data/tutorials';
 
 function Header(): ReactElement {
     const { t } = useTranslation('common');
@@ -68,7 +69,7 @@ function Header(): ReactElement {
                             {t('navigation.home')}
                         </Link>
                         <Link
-                            to="/tutorial/level-1"
+                            to={`/tutorial/${tutorialLevels[0]?.id ?? 'hello-world'}`}
                             className={`retro-nav-link ${location.pathname.startsWith('/tutorial') ? 'retro-nav-link-active' : ''}`}
                             aria-current={location.pathname.startsWith('/tutorial') ? 'page' : undefined}
                         >
@@ -128,7 +129,7 @@ function Header(): ReactElement {
                             {t('navigation.home')}
                         </Link>
                         <Link
-                            to="/tutorial/level-1"
+                            to={`/tutorial/${tutorialLevels[0]?.id ?? 'hello-world'}`}
                             className={`retro-nav-link ${location.pathname.startsWith('/tutorial') ? 'retro-nav-link-active' : ''}`}
                             onClick={closeMobileMenu}
                             aria-current={location.pathname.startsWith('/tutorial') ? 'page' : undefined}

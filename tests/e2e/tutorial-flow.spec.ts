@@ -51,25 +51,13 @@ async function typeInMonaco(page: Page, code: string): Promise<boolean> {
  * Helper to get Monaco editor content
  */
 async function getMonacoContent(page: Page): Promise<string> {
-    return await page.evaluate(() => {
-        // Access Monaco editor instance and get value
-        const win = window as unknown as { monaco?: { editor?: { getModels?: () => Array<{ getValue: () => string }> } } };
-        const monaco = win.monaco;
-        if (monaco?.editor?.getModels) {
-            const models = monaco.editor.getModels();
-            const firstModel = models[0];
-            if (firstModel) {
-                return firstModel.getValue();
-            }
-        }
-        return '';
-    });
+    return (await page.locator('.monaco-editor .view-lines').innerText()).replace(/\u00a0/g, ' ');
 }
 
 test.describe('Tutorial Flow', () => {
     test.beforeEach(async ({ page }) => {
         // Navigate to the first tutorial level
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
 
         // Wait for the page to be fully loaded
         await expect(page.locator('h1')).toBeVisible({ timeout: 15000 });
@@ -183,6 +171,19 @@ end.`;
             // If Monaco doesn't load, verify page structure exists
             await expect(page.locator('h1')).toBeVisible();
         }
+    });
+
+    test('restores level code after leaving and returning', async ({ page }) => {
+        const monacoReady = await waitForMonaco(page);
+        expect(monacoReady).toBe(true);
+
+        const saved = "program Saved;\nbegin\n  WriteLn('Saved draft');\nend.";
+        expect(await typeInMonaco(page, saved)).toBe(true);
+        await page.locator('a[href*="/tutorial/variables"]').first().click();
+        await expect(page.locator('h1')).toBeVisible();
+        await page.locator('a[href*="/tutorial/hello-world"]').first().click();
+        expect(await waitForMonaco(page)).toBe(true);
+        await expect.poll(() => getMonacoContent(page)).toContain('Saved draft');
     });
 
     test('user sees validation error for incorrect output', async ({ page }) => {
@@ -321,7 +322,7 @@ end.`);
 test.describe('Tutorial Level Progression', () => {
     test('user can navigate to different levels', async ({ page }) => {
         // Start at level 1
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
         await expect(page.locator('h1')).toBeVisible({ timeout: 15000 });
 
         // Check if there are level links in navigation
@@ -332,7 +333,7 @@ test.describe('Tutorial Level Progression', () => {
     });
 
     test('level shows correct title and description', async ({ page }) => {
-        await page.goto('/tutorial/hello-world');
+        await page.goto('/#/tutorial/hello-world');
 
         // Wait for page load
         await page.waitForSelector('h1', { timeout: 15000 });

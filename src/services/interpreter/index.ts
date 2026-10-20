@@ -1,20 +1,23 @@
 /**
- * Pascal Interpreter Service
+ * Pascal execution service.
  *
- * Provides a clean API for compiling and executing Pascal code in the browser
- * using the Pascal.js compiler.
+ * Programs run in a worker (see src/engine); the runner is shared by all
+ * pages so the worker and its compile cache survive navigation.
  */
 
-export { PascalInterpreter, getPascalInterpreter } from './PascalInterpreter';
-export { OutputCapture, getOutputCapture } from './OutputCapture';
-export type {
-    RunResult,
-    InterpreterError,
-    InterpreterConfig,
-    CompilationResult,
-    OutputHandler,
-    PascalParser,
-    IRModule,
-    LLVMModule,
-    PascalJsGlobals,
-} from './types';
+import { PascalRunner } from './PascalRunner';
+
+export { PascalRunner, type RunResult, type RunnerOptions, type WorkerLike } from './PascalRunner';
+export {
+    compileDiagnosticToError,
+    runResultToError,
+    runtimeDiagnosticToError,
+} from './diagnostics';
+
+let shared: PascalRunner | null = null;
+
+/** The runner used by the application. */
+export function getPascalRunner(): PascalRunner {
+    shared ??= new PascalRunner();
+    return shared;
+}

@@ -4,6 +4,7 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 // Import English translation files
 import commonEn from './locales/en/common.json';
@@ -36,7 +37,7 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        lng: 'de',
+        lng: useSettingsStore.getState().language,
         defaultNS: 'common',
         fallbackLng: 'en',
         supportedLngs: ['en', 'de'],
@@ -49,5 +50,11 @@ i18n
             useSuspense: false,
         },
     });
+
+useSettingsStore.subscribe((state, previous) => {
+    if (state.language !== previous.language) {
+        void i18n.changeLanguage(state.language);
+    }
+});
 
 export default i18n;

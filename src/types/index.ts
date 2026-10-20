@@ -154,6 +154,9 @@ export interface LevelProgress {
     /** User's saved code */
     savedCode: string;
 
+    /** Distinguishes an intentionally empty draft from no saved draft */
+    hasSavedCode?: boolean;
+
     /** Number of attempts */
     attempts: number;
 
@@ -201,7 +204,7 @@ export interface UserSettings {
     reducedMotion: boolean;
 
     /** Language preference */
-    language: 'de';
+    language: 'de' | 'en';
 }
 
 // ============================================
@@ -209,8 +212,11 @@ export interface UserSettings {
 // ============================================
 
 export interface InterpreterState {
-    /** Current execution status */
-    status: 'idle' | 'running' | 'success' | 'error';
+    /**
+     * Current execution status. 'waiting' means the program has asked for
+     * input that the user has not typed yet.
+     */
+    status: 'idle' | 'running' | 'waiting' | 'success' | 'error';
 
     /** Output lines */
     output: OutputLine[];
@@ -220,6 +226,9 @@ export interface InterpreterState {
 
     /** Execution time in milliseconds */
     executionTime: number | undefined;
+
+    /** Monotonically increasing ID for the latest execution */
+    runId: number;
 
     /** Whether the interpreter is waiting for user input */
     isWaitingForInput: boolean;
@@ -237,8 +246,14 @@ export interface OutputLine {
 }
 
 export interface InterpreterError {
-    /** Error message */
+    /** Error message in English (used when no translation is available) */
     message: string;
+
+    /** Key in the "errors" i18n namespace of the translated message */
+    messageKey?: string;
+
+    /** Values for the translated message */
+    params?: Record<string, string | number>;
 
     /** Line number (1-based) */
     line?: number;
@@ -246,8 +261,12 @@ export interface InterpreterError {
     /** Column number (1-based) */
     column?: number;
 
-    /** Error type */
-    type: 'syntax' | 'runtime' | 'compilation';
+    /**
+     * Error type: syntax errors come from the parser, "compilation" errors
+     * from type checking, "runtime" errors from the running program and
+     * "system" errors from the environment (time limit, crashed worker).
+     */
+    type: 'syntax' | 'runtime' | 'compilation' | 'system';
 }
 
 // ============================================

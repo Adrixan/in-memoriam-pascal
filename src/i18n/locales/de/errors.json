@@ -1,4 +1,42 @@
 {
+    "interpreter": {
+        "noCode": "Es gibt keinen Code zum Ausführen.",
+        "needsMoreInput": "Das Programm liest mehr Eingaben, als der Test bereitstellt.",
+        "timeout": "Das Programm lief länger als {{seconds}} Sekunden und wurde angehalten. Möglicherweise enthält es eine Endlosschleife.",
+        "outputLimit": "Das Programm erzeugte zu viel Ausgabe und wurde angehalten.",
+        "crashed": "Die Ausführungsumgebung ist fehlgeschlagen: {{message}}",
+        "syntax": {
+            "unexpectedEnd": "Das Programm endet zu früh. Möglicherweise fehlt ein 'end' oder der abschließende Punkt.",
+            "invalidCharacter": "Unerwartetes Zeichen '{{token}}'.",
+            "missingSemicolon": "Unerwartetes '{{token}}'. Möglicherweise fehlt nach der vorherigen Anweisung ein Semikolon.",
+            "expected": "Unerwartetes '{{token}}'. Erwartet wurde {{expected}}.",
+            "unexpected": "Unerwartetes '{{token}}'."
+        },
+        "semantic": {
+            "unknownIdentifier": "Unbekannter Bezeichner: {{name}}",
+            "unknownRoutine": "Unbekannte Prozedur oder Funktion: {{name}}",
+            "unknownType": "Unbekannter Typ: {{name}}",
+            "typeMismatch": "Typinkompatibilität: {{expected}} erwartet, {{actual}} gefunden",
+            "parameterMismatch": "Falsche Parameter beim Aufruf von {{name}}",
+            "noSuchField": "Dieser Record besitzt kein Feld namens {{name}}",
+            "unknownUnit": "Unbekannte Unit: {{name}}",
+            "unitNotImplemented": "{{name}} ist in {{unit}} deklariert, aber nicht implementiert",
+            "generic": "Kompilierung fehlgeschlagen: {{message}}"
+        },
+        "runtime": {
+            "generic": "Laufzeitfehler: {{message}}",
+            "code2": "Datei nicht gefunden",
+            "code5": "Datei konnte nicht zum Schreiben geöffnet werden",
+            "code100": "Dateiende beim Lesen überschritten",
+            "code102": "Datei nicht zugewiesen",
+            "code103": "Datei nicht geöffnet",
+            "code106": "Ungültiges Zahlenformat",
+            "code200": "Division durch Null",
+            "code201": "Bereichsprüfungsfehler",
+            "code204": "Ungültige Zeigeroperation (Nil-Zeiger)",
+            "code207": "Ungültige Gleitkommaoperation"
+        }
+    },
     "syntax": {
         "unexpectedToken": "Unerwartetes Token an Position {{position}}",
         "missingSemicolon": "Semikolon erwartet nach {{statement}}",
