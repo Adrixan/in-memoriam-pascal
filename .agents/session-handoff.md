@@ -1,5 +1,10 @@
 # Session handoff: dependency security and sharp responsive UI
 
+## CI follow-up (2026-10-21)
+- Added `build:engine` and npm `predev`/`prebuild` hooks so clean checkouts generate the ignored Pascal engine bundle before Vite needs it.
+- Aligned i18next 26.5.4 with react-i18next 17.1.0, upgraded jsdom to 30.1.3, grouped the coupled i18next updates in Dependabot, and set Node 22.22.2 as the supported minimum (including CI and README).
+- Verified lint, typecheck, 121 unit tests, production build, and audit (0 findings). Focused interpreter E2E passed using system Chromium. The full 60-test E2E attempt exceeded the local five-minute limit. Preserve the pre-existing `external/pascal.js` modification; restore generated `playwright-report/index.html` before committing.
+
 ## Current state
 - Previous production-readiness feature is merged to `main`; this follow-up is under verification before its commit/push.
 - External `external/pascal.js` submodule remains unrelated and dirty. Keep its edits/untracked files isolated.

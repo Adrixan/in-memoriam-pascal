@@ -45,7 +45,7 @@ Screenshots will be added after the current UI and execution flow are finalized.
 
 ## Prerequisites
 
-- **Node.js** 20.x or higher
+- **Node.js** 22.22.2 or higher
 - **npm** 10.x or higher
 
 ## Installation
