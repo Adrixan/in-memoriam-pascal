@@ -1,0 +1,27 @@
+name: Notify Lernspiele site
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request a full site release
+        env:
+          GH_TOKEN: ${{ secrets.LERNSPIELE_DISPATCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "LERNSPIELE_DISPATCH_TOKEN is not configured; skipping automatic site release." >&2
+            exit 0
+          fi
+          gh api repos/Adrixan/lernspiele.aufner.org/dispatches \
+            --method POST \
+            --field event_type=game-release \
+            --field client_payload[source]=in-memoriam-pascal \
+            --field client_payload[commit]="$GITHUB_SHA"
