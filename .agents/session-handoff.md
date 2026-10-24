@@ -1,5 +1,8 @@
 # Session handoff: dependency security and sharp responsive UI
 
+## 2026-10-24 release audit remediation
+- Patched transitive serialize-javascript to 7.1.4. Clean install, zero-finding audit, lint, typecheck, 121 tests and production build passed. Main `3daac4b` merged/pushed. Verification used the site `.scratch/remediation/in-memoriam-pascal` worktree; pre-existing local Pascal.js submodule changes remain untouched.
+
 ## CI follow-up (2026-10-21)
 - Added `build:engine` and npm `predev`/`prebuild` hooks so clean checkouts generate the ignored Pascal engine bundle before Vite needs it.
 - Aligned i18next 26.5.4 with react-i18next 17.1.0, upgraded jsdom to 30.1.3, grouped the coupled i18next updates in Dependabot, and set Node 22.22.2 as the supported minimum (including CI and README).
