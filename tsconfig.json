@@ -16,6 +16,10 @@
         "moduleDetection": "force",
         "noEmit": true,
         "jsx": "react-jsx",
+        /* TypeScript 6 no longer loads every @types package by default */
+        "types": [
+            "node"
+        ],
         /* Strict Type-Checking */
         "strict": true,
         "noUncheckedIndexedAccess": true,
@@ -37,7 +41,6 @@
         "noPropertyAccessFromIndexSignature": true,
         "forceConsistentCasingInFileNames": true,
         /* Path Aliases */
-        "baseUrl": ".",
         "paths": {
             "@/*": [
                 "./src/*"
