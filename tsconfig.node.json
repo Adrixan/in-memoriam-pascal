@@ -6,6 +6,10 @@
         ],
         "module": "ESNext",
         "skipLibCheck": true,
+        /* TypeScript 6 no longer loads every @types package by default */
+        "types": [
+            "node"
+        ],
         "composite": true,
         /* Bundler mode */
         "moduleResolution": "bundler",

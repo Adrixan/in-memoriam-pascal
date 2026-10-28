@@ -1,0 +1,10 @@
+[
+  {
+    "advisory": "GHSA-gcqx-w48m-w2h4",
+    "package": "deepmerge",
+    "reason": "Prototype poisoning in deepmerge; no fixed release exists. Reached only at build time through vite-plugin-pwa > workbox-build > @rollup/plugin-node-resolve on the project's own config.",
+    "accepted": "2026-10-28",
+    "accepted_by": "Peter",
+    "review": "Remove once a fixed deepmerge release exists or workbox-build drops it."
+  }
+]

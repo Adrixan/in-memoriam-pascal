@@ -9,7 +9,7 @@
  * Integrates CodeEditor, RunButton, OutputWindow, LevelNav, LevelInstructions, and HintSystem
  */
 
-import { type ReactElement, useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { type ReactElement, useEffect, useEffectEvent, useMemo, useState, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -20,6 +20,7 @@ import { RetroPanel, RetroButton } from '@/components/common';
 import { LevelNav, LevelInstructions, HintSystem } from '@/components/tutorial';
 import { useInterpreter } from '@/hooks/useInterpreter';
 import { useTutorialStore } from '@/stores';
+import { useInterpreterStore } from '@/stores/interpreterStore';
 import { tutorialLevels, getLevelById } from '@/data/tutorials';
 import { SolutionValidator, type LevelValidationResult } from '@/services/validation';
 import ErrorAnalyzer, { type AnalyzedError } from '@/services/validation/ErrorAnalyzer';
@@ -62,7 +63,6 @@ function TutorialPage(): ReactElement {
         output,
         error,
         executionTime,
-        latestRunId,
         isReady: interpreterReady,
         isWaitingForInput,
         provideInput,
@@ -74,6 +74,15 @@ function TutorialPage(): ReactElement {
     const [validationResult, setValidationResult] = useState<LevelValidationResult | null>(null);
     const [showSuccess, setShowSuccess] = useState(false);
 
+    // Validation state belongs to one level: reset it while rendering a new level
+    // (React's pattern for adjusting state to a changed prop, no effect needed).
+    const [validationLevelId, setValidationLevelId] = useState(levelId);
+    if (validationLevelId !== levelId) {
+        setValidationLevelId(levelId);
+        setValidationResult(null);
+        setShowSuccess(false);
+    }
+
     // Error analysis state for context-aware hints
     const [errorAnalysis, setErrorAnalysis] = useState<AnalyzedError | null>(null);
 
@@ -82,9 +91,6 @@ function TutorialPage(): ReactElement {
 
     // Track which level's starter code has been initialized to prevent infinite loops
     const initializedLevelRef = useRef<string | null>(null);
-
-    // Track if we've already processed the current execution to prevent infinite loops
-    const lastProcessedRunRef = useRef<number | null>(null);
 
     // Toast notification state for visual feedback
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
@@ -150,11 +156,8 @@ function TutorialPage(): ReactElement {
             setCurrentLevel(levelId);
             // Clear output when changing levels
             clearOutput();
-            // Reset validation state when changing levels
-            setValidationResult(null);
-            setShowSuccess(false);
         }
-    }, [levelId, setCurrentLevel, setValidationResult, setShowSuccess, clearOutput]);
+    }, [levelId, setCurrentLevel, clearOutput]);
 
     // Separate effect to handle level setting when levels become available
     // This ensures we re-run when levels are loaded
@@ -164,9 +167,7 @@ function TutorialPage(): ReactElement {
 
         setCurrentLevel(levelId);
         clearOutput();
-        setValidationResult(null);
-        setShowSuccess(false);
-    }, [levels.length, levelId, currentLevelId, setCurrentLevel, clearOutput, setValidationResult, setShowSuccess]);
+    }, [levels.length, levelId, currentLevelId, setCurrentLevel, clearOutput]);
 
     // Set starter code when level is loaded
     // Use currentLevelId as dependency to avoid infinite loops from object reference changes
@@ -253,44 +254,55 @@ function TutorialPage(): ReactElement {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleSaveProgress]);
 
-    // Validate each finished execution once, using the store's monotonic run ID.
-    useEffect(() => {
-        if (status === 'success' || status === 'error') {
-            if (currentLevel) {
-                if (lastProcessedRunRef.current === latestRunId) {
-                    return;
-                }
-                lastProcessedRunRef.current = latestRunId;
+    // Validate a finished execution against the level and code shown when it finishes.
+    const validateFinishedRun = useEffectEvent((run: {
+        status: 'success' | 'error';
+        output: readonly { content: string }[];
+        error: { message: string } | undefined;
+        executionTime: number | undefined;
+    }) => {
+        if (!currentLevel) return;
 
-                const executionOutput = {
-                    output: output.map((line) => line.content),
-                    errors: error ? [error.message] : [],
-                    success: status === 'success',
-                    executionTime: executionTime ?? 0,
-                };
+        const executionOutput = {
+            output: run.output.map((line) => line.content),
+            errors: run.error ? [run.error.message] : [],
+            success: run.status === 'success',
+            executionTime: run.executionTime ?? 0,
+        };
 
-                const result = SolutionValidator.validateLevel(
-                    currentLevel,
-                    code,
-                    executionOutput
-                );
+        const result = SolutionValidator.validateLevel(
+            currentLevel,
+            code,
+            executionOutput
+        );
 
-                setValidationResult(result);
+        setValidationResult(result);
 
-                if (result.levelCompleted) {
-                    setShowSuccess(true);
-                    markCompleted(currentLevel.id);
-                    // Reset error analysis on success
-                    setErrorAnalysis(null);
-                } else {
-                    // Analyze error for context-aware hints
-                    const analysis = ErrorAnalyzer.analyzeError(result);
-                    setErrorAnalysis(analysis);
-                }
-
-            }
+        if (result.levelCompleted) {
+            setShowSuccess(true);
+            markCompleted(currentLevel.id);
+            // Reset error analysis on success
+            setErrorAnalysis(null);
+        } else {
+            // Analyze error for context-aware hints
+            const analysis = ErrorAnalyzer.analyzeError(result);
+            setErrorAnalysis(analysis);
         }
-    }, [status, currentLevel, code, output, error, executionTime, latestRunId, markCompleted]);
+    });
+
+    // Each run ends exactly once in 'success' or 'error'; validate on that transition.
+    useEffect(() => {
+        return useInterpreterStore.subscribe((state, previous) => {
+            if ((state.status === 'success' || state.status === 'error') && state.status !== previous.status) {
+                validateFinishedRun({
+                    status: state.status,
+                    output: state.output,
+                    error: state.error,
+                    executionTime: state.executionTime,
+                });
+            }
+        });
+    }, []);
 
     const isRunning = status === 'running';
 

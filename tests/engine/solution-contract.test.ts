@@ -17,7 +17,7 @@ describe('tutorial solution contracts', () => {
             try {
                 compiled = engine.compile(code!);
             } catch (error) {
-                throw new Error(`${level.id} reference solution does not compile: ${toCompileDiagnostic(error, code!).message}`);
+                throw new Error(`${level.id} reference solution does not compile: ${toCompileDiagnostic(error, code!).message}`, { cause: error });
             }
 
             let output = '';

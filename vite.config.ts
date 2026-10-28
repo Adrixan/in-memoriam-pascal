@@ -69,7 +69,7 @@ export default defineConfig({
 
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, './src'),
+            '@': path.resolve(import.meta.dirname, './src'),
         },
     },
 
@@ -92,13 +92,16 @@ export default defineConfig({
 
     build: {
         target: 'esnext',
-        rollupOptions: {
+        rolldownOptions: {
             output: {
-                manualChunks: {
-                    'monaco-editor': ['monaco-editor'],
-                    'vendor-router': ['react-router-dom'],
-                    'vendor-i18n': ['i18next', 'react-i18next'],
-                    'vendor-state': ['zustand'],
+                // Rolldown replaces Rollup's object-form manualChunks with codeSplitting groups.
+                codeSplitting: {
+                    groups: [
+                        { name: 'monaco-editor', test: /[\\/]node_modules[\\/]monaco-editor[\\/]/ },
+                        { name: 'vendor-router', test: /[\\/]node_modules[\\/]react-router(-dom)?[\\/]/ },
+                        { name: 'vendor-i18n', test: /[\\/]node_modules[\\/](react-)?i18next[\\/]/ },
+                        { name: 'vendor-state', test: /[\\/]node_modules[\\/]zustand[\\/]/ },
+                    ],
                 },
                 // Ensure CSS is code-split alongside JS chunks
                 chunkFileNames: 'assets/[name]-[hash].js',

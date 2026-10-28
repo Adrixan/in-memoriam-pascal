@@ -15,38 +15,33 @@ import { Link, useNavigate } from 'react-router-dom';
 import { RetroButton, RetroPanel } from '@/components/common';
 import { codeExamples } from '@/data/examples';
 
-/**
- * TypingEffect Component - Animates text like a terminal
- */
-function TypingEffect({
-    text,
-    speed = 50,
-    className = ''
-}: {
+interface TypingEffectProps {
     text: string;
     speed?: number;
     className?: string;
-}): ReactElement {
-    const [displayedText, setDisplayedText] = useState('');
-    const [isComplete, setIsComplete] = useState(false);
+}
+
+/**
+ * TypingEffect Component - Animates text like a terminal
+ *
+ * A new text or speed restarts the animation: the key gives the animation a
+ * fresh state instead of resetting it from an effect.
+ */
+function TypingEffect({ text, speed = 50, className = '' }: TypingEffectProps): ReactElement {
+    return <TypingAnimation key={`${speed}:${text}`} text={text} speed={speed} className={className} />;
+}
+
+function TypingAnimation({ text, speed, className }: Required<TypingEffectProps>): ReactElement {
+    // One step per tick: steps 1..length reveal characters, the step after that ends the animation
+    const [step, setStep] = useState(0);
+    const isComplete = step > text.length;
+    const displayedText = text.slice(0, step);
 
     useEffect(() => {
-        let index = 0;
-        setDisplayedText('');
-        setIsComplete(false);
-
-        const timer = setInterval(() => {
-            if (index < text.length) {
-                setDisplayedText(text.slice(0, index + 1));
-                index++;
-            } else {
-                setIsComplete(true);
-                clearInterval(timer);
-            }
-        }, speed);
-
+        if (isComplete) return;
+        const timer = setInterval(() => setStep((current) => current + 1), speed);
         return () => clearInterval(timer);
-    }, [text, speed]);
+    }, [isComplete, speed]);
 
     return (
         <span className={className}>
