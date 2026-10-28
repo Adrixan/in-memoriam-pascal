@@ -1,5 +1,12 @@
 # Session handoff: dependency security and sharp responsive UI
 
+## 2026-10-28 unpinned dependencies
+- New policy (global rules): no exact pins; manifests name the latest release as the minimum. `@fontsource/ibm-plex-mono`, `@fontsource/press-start-2p` and `@fontsource/vt323` went from exact `5.3.0` to `^5.3.0` (5.3.0 is latest). `typescript` went from `~5.7.3` to `^5.9.3` (installed 5.9.3).
+- Kept cap: TypeScript stays on major 5 (`^5.9.3`). TypeScript 7.0.2 was tried and breaks the project: typescript-eslint 8.72.1 throws "does not support TS 7.0" (peer `typescript >=4.8.4 <6.1.0`) and `tsc` rejects the removed `baseUrl` option in `tsconfig.json`. TypeScript 6.0.3 is inside the typescript-eslint peer range but was not tried (major upgrade, needs approval).
+- Lockfile refreshed with `npm update` (in-range updates such as i18next 26.5.11, react-i18next 17.1.9, react-router-dom 7.18.5, vite 6.4.5, zustand 5.0.16, typescript-eslint 8.72.1).
+- Verified: typecheck, lint, 121 unit tests, production build, `npm ci`. E2E with system Chromium: 58/60 in the full run (two Monaco typing tests in `tutorial-flow.spec.ts` timed out under load), then `tutorial-flow.spec.ts` alone 12/12.
+- Branch `chore/unpin-deps` pushed but not merged to `main` because the audit gate fails. Open audit finding (not fixable): GHSA-gcqx-w48m-w2h4 (CVE-2026-93753, low) in `deepmerge` 4.3.1 via vite-plugin-pwa > workbox-build > @rollup/plugin-node-resolve; every deepmerge release is affected and upstream has no fix; GitHub reviewed it on 2026-10-27, so the CI `npm audit --audit-level=low` gate fails on `main` too. Build-time only path on trusted config. Needs Peter's decision (accept with an audit exception, or wait for upstream).
+
 ## 2026-10-24 release audit remediation
 - Patched transitive serialize-javascript to 7.1.4. Clean install, zero-finding audit, lint, typecheck, 121 tests and production build passed. Main `3daac4b` merged/pushed. Verification used the site `.scratch/remediation/in-memoriam-pascal` worktree; pre-existing local Pascal.js submodule changes remain untouched.
 
