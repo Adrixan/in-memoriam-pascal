@@ -92,7 +92,12 @@ npm run test:e2e
 
 # Run E2E tests with UI
 npm run test:e2e:ui
+
+# Dependency audit gate (CI): fails on any advisory not accepted in audit-exceptions.json
+npm run audit
 ```
+
+Accepted audit exception: GHSA-gcqx-w48m-w2h4 (deepmerge prototype poisoning, no fixed release, build time only via vite-plugin-pwa > workbox-build), see `audit-exceptions.json`.
 
 ## Project Structure
 

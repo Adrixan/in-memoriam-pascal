@@ -4,6 +4,8 @@ updates:
     directory: /
     schedule:
       interval: daily
+    cooldown:
+      default-days: 1
     versioning-strategy: increase
     open-pull-requests-limit: 20
     groups:
@@ -21,4 +23,6 @@ updates:
     directory: /
     schedule:
       interval: daily
+    cooldown:
+      default-days: 1
     open-pull-requests-limit: 10

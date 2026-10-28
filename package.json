@@ -10,6 +10,7 @@
         "build": "tsc -b && vite build",
         "build:engine": "node scripts/build-engine.mjs",
         "lint": "eslint src tests",
+        "audit": "node scripts/audit.mjs",
         "preview": "vite preview",
         "test": "vitest",
         "test:coverage": "vitest run --coverage",
