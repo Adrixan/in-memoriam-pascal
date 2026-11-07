@@ -1,0 +1,10 @@
+Fonts shipped with In Memoriam Pascal (bundled from the @fontsource packages)
+
+All fonts are licensed under the SIL Open Font License, Version 1.1 (OFL-1.1).
+The licence texts with their copyright lines are in this folder:
+
+- IBM Plex Mono: OFL-IBMPlexMono.txt (Copyright 2017 IBM Corp.)
+- Press Start 2P: OFL-PressStart2P.txt (Copyright 2012 The Press Start 2P Project Authors)
+- VT323: OFL-VT323.txt (Copyright 2011, The VT323 Project Authors)
+
+The fonts are not covered by the PolyForm Noncommercial licence of the game code.
