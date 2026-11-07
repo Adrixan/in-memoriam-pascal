@@ -48,3 +48,9 @@
 ## Next
 - Inspect staged diff; exclude generated Playwright reports/maps and preserve the dirty Pascal.js submodule.
 - Commit and push intended app, dependency, security policy, and responsive UI changes to `main`.
+
+## 2026-11-07: relicensed to PolyForm Noncommercial 1.0.0
+- Peter's order: only he may make money from the games. `LICENSE` is the verbatim PolyForm Noncommercial 1.0.0 text with two Required Notice lines (copyright; selling or paid distribution needs a written licence from Peter); `package.json` license `PolyForm-Noncommercial-1.0.0`; README badge and licence section rewritten (content CC BY-NC-SA 4.0, contributions only with a written agreement). Versions before 2026-11-07 stay AGPL-3.0 for those who received them.
+- Third-party parts stay under their own licences: submodule `external/pascal.js` and `public/external/pascal.js` (MPL-2.0), the forked compiler in `engine/` (MPL-2.0; long.js Apache-2.0, ieee754.js BSD-style). The README acknowledgement now links the real Pascal.js source (kanaka/pascal.js, as in `.gitmodules`).
+- Added the missing OFL texts for the bundled @fontsource fonts in `public/fonts/` (shipped to `dist/fonts/`).
+- Gates: `npm run audit` (accepted deepmerge exception only), lint, typecheck, 121 tests, build green; E2E left to CI (local full run is slow and flaky). The dirty `external/pascal.js` submodule stays untouched and uncommitted.
