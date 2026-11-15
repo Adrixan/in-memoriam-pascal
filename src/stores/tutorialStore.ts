@@ -10,6 +10,9 @@ import { tutorialStorage } from '@/lib/storage';
 /** Default hint points for new users */
 const DEFAULT_HINT_POINTS = 3;
 
+/** Hint points awarded the first time a level is completed */
+export const HINT_POINTS_PER_LEVEL = 10;
+
 interface TutorialState {
     /** All available levels */
     levels: TutorialLevel[];
@@ -154,7 +157,9 @@ export const useTutorialStore = create<TutorialState>()(
 
                 if (!currentProgress) return;
 
-                set({
+                const firstCompletion = currentProgress.status !== 'completed';
+                set((state) => ({
+                    hintPoints: firstCompletion ? state.hintPoints + HINT_POINTS_PER_LEVEL : state.hintPoints,
                     progress: {
                         ...progress,
                         [levelId]: {
@@ -164,7 +169,7 @@ export const useTutorialStore = create<TutorialState>()(
                             lastAttemptAt: new Date().toISOString(),
                         },
                     },
-                });
+                }));
             },
 
             resetProgress: () => {

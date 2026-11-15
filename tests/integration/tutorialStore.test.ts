@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { act } from '@testing-library/react';
-import { useTutorialStore } from '@/stores/tutorialStore';
+import { HINT_POINTS_PER_LEVEL, useTutorialStore } from '@/stores/tutorialStore';
 import type { TutorialLevel } from '@/types';
 
 // Mock the storage adapter
@@ -258,6 +258,34 @@ describe('tutorialStore', () => {
             });
 
             expect(useTutorialStore.getState().progress['non-existent']).toBeUndefined();
+            expect(useTutorialStore.getState().hintPoints).toBe(3);
+        });
+
+        it('awards hint points on the first completion only', () => {
+            act(() => {
+                useTutorialStore.getState().updateProgress('level-1', { status: 'in_progress' });
+            });
+
+            act(() => {
+                useTutorialStore.getState().markCompleted('level-1');
+            });
+            expect(useTutorialStore.getState().hintPoints).toBe(3 + HINT_POINTS_PER_LEVEL);
+
+            act(() => {
+                useTutorialStore.getState().markCompleted('level-1');
+            });
+            expect(useTutorialStore.getState().hintPoints).toBe(3 + HINT_POINTS_PER_LEVEL);
+        });
+
+        it('earns enough points for the costliest hint after two levels', () => {
+            act(() => {
+                useTutorialStore.getState().updateProgress('level-1', { status: 'in_progress' });
+                useTutorialStore.getState().updateProgress('level-2', { status: 'in_progress' });
+                useTutorialStore.getState().markCompleted('level-1');
+                useTutorialStore.getState().markCompleted('level-2');
+            });
+
+            expect(useTutorialStore.getState().hasHintPoints(15)).toBe(true);
         });
     });
 
