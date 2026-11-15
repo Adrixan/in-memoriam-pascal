@@ -85,15 +85,15 @@ function HintSystem({
         <RetroPanel
             variant="default"
             className={`hint-system p-4 ${className}`}
-            aria-label={t('hints.section', 'Hinweise')}
+            aria-label={t('hints.section')}
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
                 <h3 className="font-pixel text-sm text-[var(--color-secondary)]">
-                    {t('hints.title', 'Hinweise')}
+                    {t('hints.title')}
                 </h3>
                 <div className="font-terminal text-xs text-[var(--color-text-muted)]">
-                    {t('hints.pointsRemaining', '{{count}} Punkte', { count: hintPoints })}
+                    {t('hints.pointsRemaining', { count: hintPoints })}
                 </div>
             </div>
 
@@ -140,7 +140,7 @@ function HintSystem({
             {allRevealed && (
                 <div className="mt-2 p-2 bg-[var(--crt-dark)] rounded border border-[var(--color-border)]">
                     <p className="font-terminal text-xs text-[var(--color-text-muted)]">
-                        {t('hints.allRevealed', 'Alle Hinweise wurden angezeigt.')}
+                        {t('hints.allRevealed')}
                     </p>
                 </div>
             )}
@@ -150,6 +150,7 @@ function HintSystem({
                 {sortedHints.map((hint, index) => (
                     <div
                         key={hint.level}
+                        role="img"
                         className={`
                             w-3 h-3 rounded-full border
                             ${revealedHintIndices.includes(index)
@@ -159,8 +160,8 @@ function HintSystem({
                         `}
                         aria-label={
                             revealedHintIndices.includes(index)
-                                ? t('hints.revealed', 'Hinweis {{level}} angezeigt', { level: hint.level })
-                                : t('hints.notRevealed', 'Hinweis {{level}} verfügbar', { level: hint.level })
+                                ? t('hints.revealed', { level: hint.level })
+                                : t('hints.notRevealed', { level: hint.level })
                         }
                     />
                 ))}

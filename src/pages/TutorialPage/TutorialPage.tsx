@@ -429,7 +429,7 @@ function TutorialPage(): ReactElement {
                     {showSuccess && (
                         <RetroPanel variant="header" className="p-4 mb-6 border-2 border-[var(--color-primary)]">
                             <div className="flex items-center gap-3">
-                                <span className="text-2xl" role="img" aria-label="Success">✓</span>
+                                <span className="text-2xl" role="img" aria-label={t('validation.success')}>✓</span>
                                 <div>
                                     <h3 className="font-pixel text-lg text-[var(--color-primary)]">
                                         {t('validation.levelComplete', 'Level Complete!')}
@@ -473,7 +473,7 @@ function TutorialPage(): ReactElement {
                         {/* Left column: Editor */}
                         <section
                             className="flex flex-col gap-4 order-2 xl:order-1"
-                            aria-label="Code editor section"
+                            aria-label={t('editor.section')}
                         >
                             {/* Editor toolbar */}
                             <div className="flex items-center justify-between flex-wrap gap-2">

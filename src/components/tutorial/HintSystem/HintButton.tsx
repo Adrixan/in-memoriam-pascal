@@ -77,20 +77,19 @@ function HintButton({
                     onClick={handleClick}
                     disabled={isDisabled}
                     icon={<span aria-hidden="true">💡</span>}
-                    aria-label={t('hints.revealHint', { level: hintLevel })}
                 >
                     <span className="flex items-center gap-2">
                         <span>
-                            {t('hints.showHint', 'Hinweis anzeigen')} {hintLevel}
+                            {t('hints.showHint', { level: hintLevel })}
                         </span>
                         {!isFree && (
                             <span className="text-xs text-[var(--color-text-muted)]">
-                                ({cost} {t('hints.points', 'Punkte')})
+                                ({t('hints.cost', { count: cost })})
                             </span>
                         )}
                         {isFree && (
                             <span className="text-xs text-[var(--color-primary)]">
-                                ({t('hints.free', 'Kostenlos')})
+                                ({t('hints.free')})
                             </span>
                         )}
                     </span>
@@ -98,22 +97,20 @@ function HintButton({
             ) : (
                 <div className="flex flex-col gap-2 p-3 bg-[var(--crt-dark)] rounded border border-[var(--color-border)]">
                     <p className="font-terminal text-sm text-[var(--color-text)]">
-                        {t('hints.confirmMessage', 'Bist du sicher? Dieser Hinweis kostet {{cost}} Punkte.', { cost })}
+                        {t('hints.confirmMessage', { count: cost })}
                     </p>
                     <div className="flex gap-2">
                         <RetroButton
                             variant="primary"
                             onClick={handleConfirm}
-                            aria-label={t('hints.confirm', 'Ja, anzeigen')}
                         >
-                            {t('hints.confirm', 'Ja, anzeigen')}
+                            {t('hints.confirm')}
                         </RetroButton>
                         <RetroButton
                             variant="ghost"
                             onClick={handleCancel}
-                            aria-label={t('hints.cancel', 'Abbrechen')}
                         >
-                            {t('hints.cancel', 'Abbrechen')}
+                            {t('hints.cancel')}
                         </RetroButton>
                     </div>
                 </div>
@@ -122,7 +119,7 @@ function HintButton({
             {/* Remaining points indicator */}
             {!showConfirmation && (
                 <div className="mt-2 font-terminal text-xs text-[var(--color-text-muted)]">
-                    {t('hints.remainingPoints', 'Verbleibende Hinweise: {{count}}', { count: remainingPoints })}
+                    {t('hints.remainingPoints', { count: remainingPoints })}
                 </div>
             )}
         </div>

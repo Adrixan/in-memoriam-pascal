@@ -43,10 +43,20 @@
         "noOutput": "Noch keine Ausgabe. Führe dein Programm aus, um Ergebnisse zu sehen.",
         "inputLabel": "Eingabe für das Programm",
         "inputPlaceholder": "Eingabe tippen und Enter drücken...",
-        "executionTime": "Ausführungszeit: {{time}}ms"
+        "executionTime": "Ausführungszeit: {{time}}ms",
+        "section": "Code-Editor",
+        "ariaLabel": "Pascal-Code-Editor",
+        "loadingEditor": "Editor wird geladen...",
+        "interactive": "Interaktiv",
+        "interactiveMode": "Eigene Eingabe statt der Testdaten verwenden"
     },
     "tutorial": {
-        "progress": "Tutorial-Fortschritt"
+        "levels": "Lektionen",
+        "progress": "Fortschritt",
+        "completed": "abgeschlossen",
+        "objectives": "Lernziele",
+        "hints": "Hinweise",
+        "hintsAvailable": "{{count}} Hinweise verfügbar"
     },
     "home": {
         "startLearning": "Lernen starten",
@@ -95,15 +105,12 @@
             "title": "Bereit anzufangen?",
             "description": "Beginne deine Reise in die Welt der Programmierung mit Pascal.",
             "button": "Tutorial starten"
+        },
+        "about": {
+            "pascal": "ist eine Programmiersprache, die 1970 von Niklaus Wirth entwickelt wurde.",
+            "turboPascal": ", 1983 von Borland veröffentlicht, machte Pascal zur führenden Sprache für die PC-Entwicklung der 1980er Jahre.",
+            "tribute": "Viele heutige Entwicklerinnen und Entwickler haben ihre ersten Schritte in Pascal gemacht. Diese Anwendung ist eine Hommage an diese Ära."
         }
-    },
-    "tutorial": {
-        "levels": "Lektionen",
-        "progress": "Fortschritt",
-        "completed": "abgeschlossen",
-        "objectives": "Lernziele",
-        "hints": "Hinweise",
-        "hintsAvailable": "{{count}} Hinweise verfügbar"
     },
     "accessibility": {
         "skipToContent": "Zum Hauptinhalt springen",
@@ -112,5 +119,29 @@
     },
     "footer": {
         "tagline": "Turbo Pascal • 1983 • Für immer in unseren Herzen"
+    },
+    "hints": {
+        "section": "Hinweise",
+        "title": "Hinweise",
+        "pointsRemaining_one": "{{count}} Punkt",
+        "pointsRemaining_other": "{{count}} Punkte",
+        "showHint": "Hinweis {{level}} anzeigen",
+        "cost_one": "{{count}} Punkt",
+        "cost_other": "{{count}} Punkte",
+        "free": "kostenlos",
+        "confirmMessage_one": "Bist du sicher? Dieser Hinweis kostet {{count}} Punkt.",
+        "confirmMessage_other": "Bist du sicher? Dieser Hinweis kostet {{count}} Punkte.",
+        "confirm": "Ja, anzeigen",
+        "cancel": "Abbrechen",
+        "remainingPoints": "Verbleibende Hinweispunkte: {{count}}",
+        "allRevealed": "Alle Hinweise wurden angezeigt.",
+        "revealed": "Hinweis {{level}} angezeigt",
+        "notRevealed": "Hinweis {{level}} verfügbar"
+    },
+    "validation": {
+        "success": "Geschafft",
+        "levelComplete": "Lektion abgeschlossen!",
+        "congratulations": "Gratuliere! Du hast diese Lektion abgeschlossen.",
+        "failed": "Überprüfung fehlgeschlagen"
     }
 }
