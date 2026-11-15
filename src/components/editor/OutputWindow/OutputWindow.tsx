@@ -3,7 +3,7 @@
  * Terminal-style output display for Pascal interpreter results
  */
 
-import { useEffect, useRef, useState, type ReactElement, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import type { OutputLine } from '@/types';
 import { useTranslation } from 'react-i18next';
 
@@ -81,15 +81,6 @@ export function OutputWindow({
         if (onInputSubmit) {
             onInputSubmit(inputValue);
             setInputValue('');
-        }
-    };
-
-    /**
-     * Handle key press in input field
-     */
-    const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
-        if (e.key === 'Enter') {
-            handleInputSubmit();
         }
     };
 
@@ -210,7 +201,6 @@ export function OutputWindow({
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={handleKeyPress}
                             className="flex-1 bg-transparent border-b border-[var(--retro-green)]/50 outline-none text-[var(--retro-green)] font-mono text-sm placeholder:text-[var(--retro-green)]/30 focus:border-[var(--retro-green)] transition-colors"
                             placeholder={t('editor.inputPlaceholder', 'Type input and press Enter...')}
                             aria-label={t('editor.inputLabel', 'Program input')}
