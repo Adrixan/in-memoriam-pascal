@@ -449,7 +449,12 @@ function TutorialPage(): ReactElement {
                                 {t('validation.failed', 'Validation Failed')}
                             </h3>
                             <p className="font-terminal text-sm text-[var(--color-text-muted)]">
-                                {t(`errors:${validationResult.messageKey}`, SolutionValidator.getErrorMessage(validationResult))}
+                                {t(`errors:${validationResult.messageKey}`, {
+                                    defaultValue: SolutionValidator.getErrorMessage(validationResult),
+                                    // runtimeError and missingKeyword interpolate these
+                                    error: validationResult.details?.actual ?? '',
+                                    keyword: validationResult.details?.expected ?? '',
+                                })}
                             </p>
                         </RetroPanel>
                     )}
