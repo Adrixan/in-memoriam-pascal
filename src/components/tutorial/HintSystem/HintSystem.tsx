@@ -98,10 +98,10 @@ function HintSystem({
             </div>
 
             {/* Error context (if available) */}
-            {errorAnalysis && showError && (
+            {errorAnalysis?.description && showError && (
                 <div className="mb-3 p-2 bg-red-900/20 border border-red-500/30 rounded">
                     <p className="font-terminal text-sm text-red-300">
-                        {errorAnalysis.description}
+                        {t(`errors:analysis.${errorAnalysis.description.key}`, errorAnalysis.description.values)}
                     </p>
                 </div>
             )}

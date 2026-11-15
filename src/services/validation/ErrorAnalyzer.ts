@@ -19,6 +19,27 @@ export type ErrorCategory =
     | 'logic_error'
     | 'unknown';
 
+/** Keys of the `analysis` section in the errors namespace (both locales). */
+export const ERROR_DESCRIPTION_KEYS = [
+    'syntax',
+    'runtime',
+    'outputMismatch',
+    'outputMismatchDetail',
+    'missingKeyword',
+    'missingKeywordDetail',
+    'compilation',
+    'logic',
+    'unknown',
+] as const;
+
+export type ErrorDescriptionKey = (typeof ERROR_DESCRIPTION_KEYS)[number];
+
+/** Translatable error description: `errors:analysis.<key>` with interpolation values */
+export interface ErrorDescription {
+    key: ErrorDescriptionKey;
+    values: Record<string, string>;
+}
+
 /**
  * Analyzed error result with hint suggestions
  */
@@ -26,8 +47,8 @@ export interface AnalyzedError {
     /** Classified error category */
     category: ErrorCategory;
 
-    /** User-friendly error description */
-    description: string;
+    /** User-friendly error description, translated by the UI */
+    description: ErrorDescription | null;
 
     /** Suggested hint indices (0-based) */
     suggestedHintIndices: number[];
@@ -159,7 +180,7 @@ export class ErrorAnalyzer {
         if (result.success) {
             return {
                 category: 'unknown',
-                description: '',
+                description: null,
                 suggestedHintIndices: [],
                 originalMessage: '',
                 isRecoverable: true,
@@ -169,7 +190,7 @@ export class ErrorAnalyzer {
         }
 
         const category = this.classifyError(result, interpreterErrorCode);
-        const description = this.generateDescription(result, category);
+        const description = this.describeError(result, category);
         const suggestedHintIndices = this.suggestHints(category, result);
         const isRecoverable = this.isRecoverableError(category, result);
         const suggestion = interpreterSuggestion || this.getSuggestion(result.messageKey, category);
@@ -220,38 +241,33 @@ export class ErrorAnalyzer {
     }
 
     /**
-     * Generate a user-friendly description of the error
+     * Describe the error as a key in the `analysis` section of the errors namespace,
+     * with interpolation values; the UI translates it.
      */
-    static generateDescription(result: ValidationResult, category: ErrorCategory): string {
+    static describeError(result: ValidationResult, category: ErrorCategory): ErrorDescription {
         const details = result.details;
 
         switch (category) {
             case 'syntax_error':
-                return 'Your code contains a syntax error. Check the spelling and structure.';
-
+                return { key: 'syntax', values: {} };
             case 'runtime_error':
-                return 'Your code caused a runtime error. Check calculations and variables.';
-
+                return { key: 'runtime', values: {} };
             case 'output_mismatch':
                 if (details?.expected && details?.actual) {
-                    return `Output mismatch. Expected: "${details.expected}", got: "${details.actual}"`;
+                    return { key: 'outputMismatchDetail', values: { expected: details.expected, actual: details.actual } };
                 }
-                return 'The output does not match the expected result.';
-
+                return { key: 'outputMismatch', values: {} };
             case 'missing_keyword':
                 if (details?.expected) {
-                    return `Your code must contain "${details.expected}".`;
+                    return { key: 'missingKeywordDetail', values: { expected: details.expected } };
                 }
-                return 'Your code is missing a required keyword.';
-
+                return { key: 'missingKeyword', values: {} };
             case 'compilation_error':
-                return 'Your code could not be compiled. Check the declarations.';
-
+                return { key: 'compilation', values: {} };
             case 'logic_error':
-                return 'The program runs, but the result is not correct.';
-
+                return { key: 'logic', values: {} };
             default:
-                return 'An error occurred. Check your code.';
+                return { key: 'unknown', values: {} };
         }
     }
 

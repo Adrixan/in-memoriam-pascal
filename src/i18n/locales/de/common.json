@@ -136,7 +136,14 @@
         "remainingPoints": "Verbleibende Hinweispunkte: {{count}}",
         "allRevealed": "Alle Hinweise wurden angezeigt.",
         "revealed": "Hinweis {{level}} angezeigt",
-        "notRevealed": "Hinweis {{level}} verfügbar"
+        "notRevealed": "Hinweis {{level}} verfügbar",
+        "levelLabel": "Stufe {{level}}",
+        "levelAria": "Hinweis der Stufe {{level}}",
+        "kind": {
+            "gentle": "Kleiner Anstoß",
+            "specific": "Gezielte Hilfe",
+            "detailed": "Ausführliche Hilfe"
+        }
     },
     "validation": {
         "success": "Geschafft",

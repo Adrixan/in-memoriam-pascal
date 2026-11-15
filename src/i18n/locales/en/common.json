@@ -136,7 +136,14 @@
         "remainingPoints": "Hint points left: {{count}}",
         "allRevealed": "All hints have been shown.",
         "revealed": "Hint {{level}} shown",
-        "notRevealed": "Hint {{level}} available"
+        "notRevealed": "Hint {{level}} available",
+        "levelLabel": "Level {{level}}",
+        "levelAria": "Hint level {{level}}",
+        "kind": {
+            "gentle": "Gentle nudge",
+            "specific": "Specific guidance",
+            "detailed": "Detailed help"
+        }
     },
     "validation": {
         "success": "Success",

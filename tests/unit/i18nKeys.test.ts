@@ -7,6 +7,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { ERROR_DESCRIPTION_KEYS } from '../../src/services/validation/ErrorAnalyzer';
 
 const root = path.resolve(import.meta.dirname, '../..');
 const srcDir = path.join(root, 'src');
@@ -83,6 +84,11 @@ describe('i18n keys', () => {
                 }
             }
         }
+        expect(missing).toEqual([]);
+    });
+
+    it.each(languages)('%s defines every error description key', (language) => {
+        const missing = ERROR_DESCRIPTION_KEYS.filter((key) => !hasKey(locales[language].errors, `analysis.${key}`));
         expect(missing).toEqual([]);
     });
 

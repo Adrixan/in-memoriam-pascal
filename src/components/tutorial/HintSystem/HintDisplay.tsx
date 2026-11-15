@@ -18,46 +18,18 @@ export interface HintDisplayProps {
     className?: string;
 }
 
-/**
- * Get styling based on hint type/level
- */
-function getHintStyle(type: Hint['type'], level: Hint['level']): {
-    borderColor: string;
-    bgColor: string;
-    icon: string;
-    label: string;
-} {
-    switch (type ?? (level === 1 ? 'gentle' : level === 2 ? 'specific' : 'detailed')) {
-        case 'gentle':
-            return {
-                borderColor: 'border-[var(--color-primary)]',
-                bgColor: 'bg-[var(--crt-dark)]',
-                icon: '💡',
-                label: 'Gentle Nudge',
-            };
-        case 'specific':
-            return {
-                borderColor: 'border-[var(--color-secondary)]',
-                bgColor: 'bg-[var(--crt-dark)]',
-                icon: '🔍',
-                label: 'Specific Guidance',
-            };
-        case 'detailed':
-            return {
-                borderColor: 'border-yellow-500',
-                bgColor: 'bg-[var(--crt-dark)]',
-                icon: '📖',
-                label: 'Detailed Help',
-            };
-        default:
-            return {
-                borderColor: 'border-[var(--color-border)]',
-                bgColor: 'bg-[var(--crt-dark)]',
-                icon: '💡',
-                label: 'Hint',
-            };
-    }
+type HintKind = NonNullable<Hint['type']>;
+
+/** Hints without an explicit type take it from their level. */
+function hintKind(hint: Hint): HintKind {
+    return hint.type ?? (hint.level === 1 ? 'gentle' : hint.level === 2 ? 'specific' : 'detailed');
 }
+
+const HINT_STYLES: Record<HintKind, { borderColor: string; bgColor: string; icon: string }> = {
+    gentle: { borderColor: 'border-[var(--color-primary)]', bgColor: 'bg-[var(--crt-dark)]', icon: '💡' },
+    specific: { borderColor: 'border-[var(--color-secondary)]', bgColor: 'bg-[var(--crt-dark)]', icon: '🔍' },
+    detailed: { borderColor: 'border-yellow-500', bgColor: 'bg-[var(--crt-dark)]', icon: '📖' },
+};
 
 /**
  * HintDisplay component
@@ -65,7 +37,13 @@ function getHintStyle(type: Hint['type'], level: Hint['level']): {
  */
 function HintDisplay({ hint, animate = true, className = '' }: HintDisplayProps): ReactElement {
     const { t } = useTranslation();
-    const style = getHintStyle(hint.type, hint.level);
+    const kind = hintKind(hint);
+    const style = HINT_STYLES[kind];
+    const kindLabel = {
+        gentle: t('hints.kind.gentle'),
+        specific: t('hints.kind.specific'),
+        detailed: t('hints.kind.detailed'),
+    }[kind];
 
     return (
         <div
@@ -80,7 +58,7 @@ function HintDisplay({ hint, animate = true, className = '' }: HintDisplayProps)
                 ${className}
             `}
             role="article"
-            aria-label={`Hint level ${hint.level}`}
+            aria-label={t('hints.levelAria', { level: hint.level })}
         >
             {/* Hint header */}
             <div className="flex items-center gap-2 mb-2">
@@ -88,7 +66,7 @@ function HintDisplay({ hint, animate = true, className = '' }: HintDisplayProps)
                     {style.icon}
                 </span>
                 <span className="font-pixel text-xs text-[var(--color-text-muted)]">
-                    {t(`hints.level.${hint.level}`, `Level ${hint.level}`)}: {t(`hints.type.${hint.type ?? 'gentle'}`, style.label)}
+                    {t('hints.levelLabel', { level: hint.level })}: {kindLabel}
                 </span>
             </div>
 
