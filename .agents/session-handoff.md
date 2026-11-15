@@ -54,3 +54,9 @@
 - Third-party parts stay under their own licences: submodule `external/pascal.js` and `public/external/pascal.js` (MPL-2.0), the forked compiler in `engine/` (MPL-2.0; long.js Apache-2.0, ieee754.js BSD-style). The README acknowledgement now links the real Pascal.js source (kanaka/pascal.js, as in `.gitmodules`).
 - Added the missing OFL texts for the bundled @fontsource fonts in `public/fonts/` (shipped to `dist/fonts/`).
 - Gates: `npm run audit` (accepted deepmerge exception only), lint, typecheck, 121 tests, build green; E2E left to CI (local full run is slow and flaky). The dirty `external/pascal.js` submodule stays untouched and uncommitted.
+
+## 2026-11-15: Modern Web Guidance run (web-modernize timer)
+- `legacy-scan` on `src/` and `index.html` (generated engine bundle, `engine/`, `public/external/`, submodule excluded): one finding, `ime-safe-enter-submit` in `OutputWindow.tsx`. Fixed by removing the custom keydown Enter handler on `#program-input`; the surrounding `<form>` with its submit button does the IME-safe native implicit submission (and the handler had called `onInputSubmit` twice per Enter).
+- Commit `42ad112`, merge `149ad67` on `main`, pushed; "Notify Lernspiele site" dispatched the site release (success). Verified typecheck, lint, 121 tests, build, `npm run audit`, headless Chrome on `#/editor` (two readln, one line per Enter). E2E left to CI (was in progress at handoff); check its result next session.
+- Report: `~/sync/ai/web-modernize/2026-11-15/in-memoriam-pascal.md`. No open proposals. Project still has no `AGENTS.md` (no browser policy, no named publish command; publish = push to `main` via the notify workflow).
+- Note for later sessions: the app uses `HashRouter`, so the editor is at `/#/editor`; seed editor code through localStorage `editor-storage` (`state.freeCode`).
