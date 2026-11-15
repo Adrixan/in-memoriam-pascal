@@ -43,10 +43,20 @@
         "noOutput": "No output yet. Run your program to see results.",
         "inputLabel": "Enter input for program",
         "inputPlaceholder": "Type input and press Enter...",
-        "executionTime": "Execution time: {{time}}ms"
+        "executionTime": "Execution time: {{time}}ms",
+        "section": "Code editor",
+        "ariaLabel": "Pascal code editor",
+        "loadingEditor": "Loading editor...",
+        "interactive": "Interactive",
+        "interactiveMode": "Enter your own input instead of using test data"
     },
     "tutorial": {
-        "progress": "Tutorial progress"
+        "levels": "Lessons",
+        "progress": "Progress",
+        "completed": "completed",
+        "objectives": "Learning Objectives",
+        "hints": "Hints",
+        "hintsAvailable": "{{count}} hints available"
     },
     "home": {
         "startLearning": "Start Learning",
@@ -95,15 +105,12 @@
             "title": "Ready to start?",
             "description": "Begin your journey into the world of programming with Pascal.",
             "button": "Start Tutorial"
+        },
+        "about": {
+            "pascal": "is a programming language that Niklaus Wirth developed in 1970.",
+            "turboPascal": ", released by Borland in 1983, made Pascal the leading language for PC development in the 1980s.",
+            "tribute": "Many of today’s developers took their first steps in Pascal. This application is a tribute to that era."
         }
-    },
-    "tutorial": {
-        "levels": "Lessons",
-        "progress": "Progress",
-        "completed": "completed",
-        "objectives": "Learning Objectives",
-        "hints": "Hints",
-        "hintsAvailable": "{{count}} hints available"
     },
     "accessibility": {
         "skipToContent": "Skip to main content",
@@ -112,5 +119,36 @@
     },
     "footer": {
         "tagline": "Turbo Pascal • 1983 • Forever in our hearts"
+    },
+    "hints": {
+        "section": "Hints",
+        "title": "Hints",
+        "pointsRemaining_one": "{{count}} point",
+        "pointsRemaining_other": "{{count}} points",
+        "showHint": "Show hint {{level}}",
+        "cost_one": "{{count}} point",
+        "cost_other": "{{count}} points",
+        "free": "free",
+        "confirmMessage_one": "Are you sure? This hint costs {{count}} point.",
+        "confirmMessage_other": "Are you sure? This hint costs {{count}} points.",
+        "confirm": "Yes, show it",
+        "cancel": "Cancel",
+        "remainingPoints": "Hint points left: {{count}}",
+        "allRevealed": "All hints have been shown.",
+        "revealed": "Hint {{level}} shown",
+        "notRevealed": "Hint {{level}} available",
+        "levelLabel": "Level {{level}}",
+        "levelAria": "Hint level {{level}}",
+        "kind": {
+            "gentle": "Gentle nudge",
+            "specific": "Specific guidance",
+            "detailed": "Detailed help"
+        }
+    },
+    "validation": {
+        "success": "Success",
+        "levelComplete": "Level complete!",
+        "congratulations": "Congratulations! You have completed this level.",
+        "failed": "Validation failed"
     }
 }

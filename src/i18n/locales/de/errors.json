@@ -200,5 +200,16 @@
             "2": "Der Rückgabetyp wird nach dem Funktionsnamen angegeben.",
             "3": "function Square(n: Integer): Integer; begin Square := n * n; end;"
         }
+    },
+    "analysis": {
+        "syntax": "Dein Code enthält einen Syntaxfehler. Prüfe Schreibweise und Aufbau.",
+        "runtime": "Dein Code hat einen Laufzeitfehler ausgelöst. Prüfe Berechnungen und Variablen.",
+        "outputMismatch": "Die Ausgabe entspricht nicht dem erwarteten Ergebnis.",
+        "outputMismatchDetail": "Die Ausgabe stimmt nicht. Erwartet: „{{expected}}“, erhalten: „{{actual}}“",
+        "missingKeyword": "In deinem Code fehlt ein benötigtes Schlüsselwort.",
+        "missingKeywordDetail": "Dein Code muss „{{expected}}“ enthalten.",
+        "compilation": "Dein Code konnte nicht übersetzt werden. Prüfe die Deklarationen.",
+        "logic": "Das Programm läuft, aber das Ergebnis stimmt nicht.",
+        "unknown": "Es ist ein Fehler aufgetreten. Prüfe deinen Code."
     }
 }

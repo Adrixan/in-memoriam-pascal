@@ -1,3 +1,0 @@
-[submodule "llvm.js"]
-	path = llvm.js
-	url = https://github.com/kripken/llvm.js

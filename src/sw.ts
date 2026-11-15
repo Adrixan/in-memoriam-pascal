@@ -59,22 +59,13 @@ registerRoute(
     })
 );
 
-// Cache Pascal.js interpreter files from external directory
-registerRoute(
-    /external\/pascal\.js/,
-    new CacheFirst({
-        cacheName: 'interpreter-cache',
-        plugins: [
-            new CacheableResponsePlugin({
-                statuses: [200],
-            }) as WorkboxPlugin,
-            new ExpirationPlugin({
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-            }) as WorkboxPlugin,
-        ],
-    })
-);
+// The compiler ships inside the worker chunk. Older versions also cached an unused
+// copy of Pascal.js from /external/pascal.js; drop that cache from existing installs.
+self.addEventListener('activate', (event) => {
+    (event as Event & { waitUntil(promise: Promise<unknown>): void }).waitUntil(
+        caches.delete('interpreter-cache'),
+    );
+});
 
 // Cache static assets (images, fonts)
 registerRoute(

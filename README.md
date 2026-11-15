@@ -193,7 +193,7 @@ Contributions are welcome! Please read our contributing guidelines before submit
 - Commercial use of code and content is reserved to Peter Aufner (contact: https://prof.aufner.org).
 - Contributions are accepted only with a written agreement that lets Peter Aufner license them commercially.
 - Code licence PolyForm Noncommercial 1.0.0 since 2026-11-07 (Peter): only Peter may use it commercially; versions published before that date stay available under AGPL-3.0 to those who received them.
-- Third-party parts keep their own licences and are not covered by the PolyForm licence: the Pascal.js submodule `external/pascal.js` and its copy in `public/external/pascal.js` (MPL-2.0), the forked compiler in `engine/` (MPL-2.0, `engine/LICENSE.MPL-2.0`; `engine/llvm.js/long.js` Apache-2.0, `engine/ieee754.js` BSD-style, both with their headers), Monaco Editor, React and i18next (MIT), and the fonts IBM Plex Mono, Press Start 2P and VT323 (SIL OFL 1.1, texts in `public/fonts/`).
+- Third-party parts keep their own licences and are not covered by the PolyForm licence: the Pascal.js submodule `external/pascal.js` (MPL-2.0), the forked compiler in `engine/` (MPL-2.0, `engine/LICENSE.MPL-2.0`; `engine/llvm.js/long.js` Apache-2.0, `engine/ieee754.js` BSD-style, both with their headers), Monaco Editor, React and i18next (MIT), and the fonts IBM Plex Mono, Press Start 2P and VT323 (SIL OFL 1.1, texts in `public/fonts/`).
 
 ## Acknowledgments
 

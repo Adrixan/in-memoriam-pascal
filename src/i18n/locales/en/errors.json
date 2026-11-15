@@ -200,5 +200,16 @@
             "2": "The return type is specified after the function name.",
             "3": "function Square(n: Integer): Integer; begin Square := n * n; end;"
         }
+    },
+    "analysis": {
+        "syntax": "Your code contains a syntax error. Check the spelling and structure.",
+        "runtime": "Your code caused a runtime error. Check calculations and variables.",
+        "outputMismatch": "The output does not match the expected result.",
+        "outputMismatchDetail": "Output mismatch. Expected: \"{{expected}}\", got: \"{{actual}}\"",
+        "missingKeyword": "Your code is missing a required keyword.",
+        "missingKeywordDetail": "Your code must contain \"{{expected}}\".",
+        "compilation": "Your code could not be compiled. Check the declarations.",
+        "logic": "The program runs, but the result is not correct.",
+        "unknown": "An error occurred. Check your code."
     }
 }

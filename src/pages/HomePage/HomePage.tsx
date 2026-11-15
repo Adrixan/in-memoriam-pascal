@@ -329,17 +329,15 @@ function HomePage(): ReactElement {
                         <RetroPanel variant="terminal" title="ABOUT.PAS" className="p-6">
                             <div className="font-mono text-base leading-relaxed">
                                 <p className="text-[var(--color-text)] mb-4">
-                                    <span className="text-[var(--color-primary)]">{'{ '}Pascal</span> — eine Programmiersprache,
-                                    die 1970 von Niklaus Wirth entwickelt wurde.
+                                    <span className="text-[var(--color-primary)]">{'{ '}Pascal</span>{' '}
+                                    {t('home.about.pascal')}
                                 </p>
                                 <p className="text-[var(--color-text-muted)] mb-4">
-                                    <span className="text-[var(--color-secondary)]">Turbo Pascal</span>,
-                                    veröffentlicht 1983 von Borland, machte Pascal zur dominierenden
-                                    Sprache für PC-Entwicklung in den 1980er Jahren.
+                                    <span className="text-[var(--color-secondary)]">Turbo Pascal</span>
+                                    {t('home.about.turboPascal')}
                                 </p>
                                 <p className="text-[var(--color-text-muted)] mb-4">
-                                    Viele heutige Entwickler haben ihre ersten Schritte in Pascal gemacht.
-                                    Diese Anwendung ist eine Hommage an diese Ära.
+                                    {t('home.about.tribute')}
                                 </p>
                                 <p className="text-[var(--color-primary)]">
                                     {'}'} <span className="cursor-blink">_</span>
