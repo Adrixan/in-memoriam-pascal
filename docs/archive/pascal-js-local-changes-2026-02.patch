@@ -1,0 +1,1989 @@
+# Local, never-committed changes to the Pascal.js submodule (external/pascal.js, upstream kanaka/pascal.js c461125),
+# last edited 2026-02-24 to 2026-02-28, before the compiler fork in engine/ (2026-10-13).
+# Kept here so they survive the clean-up of the submodule (ws-sync, 2026-11-16).
+# Restore: cd external/pascal.js && git apply ../../docs/archive/pascal-js-local-changes-2026-02.patch
+# Licence of the patched files: MPL-2.0 (upstream).
+diff --git a/ir.js b/ir.js
+index 1926bea..5eceb1d 100644
+--- a/ir.js
++++ b/ir.js
+@@ -14,7 +14,7 @@ function isNode() {
+ 
+ function SymbolTable() {
+   var data = [{}],
+-      name_cnt = 0;
++    name_cnt = 0;
+ 
+   function begin_scope() {
+     data.push({});
+@@ -27,7 +27,7 @@ function SymbolTable() {
+   }
+ 
+   function indexOf(name) {
+-    for(var idx = data.length-1; idx >= 0; idx--) {
++    for (var idx = data.length - 1; idx >= 0; idx--) {
+       if (data[idx][name]) {
+         return idx;
+       }
+@@ -37,36 +37,38 @@ function SymbolTable() {
+ 
+   function lookup(name) {
+     var name = name.toUpperCase(),
+-        idx = indexOf(name);
+-    if (typeof(idx) !== "undefined") {
++      idx = indexOf(name);
++    if (typeof (idx) !== "undefined") {
+       return data[idx][name];
+     }
+     throw new Error("Name '" + name + "' not found in symbol table");
+   }
+ 
+   function insert(name, value, level) {
+-    if (typeof level === 'undefined') { level = data.length-1; }
++    if (typeof level === 'undefined') { level = data.length - 1; }
+     data[level][name.toUpperCase()] = value;
+   }
+ 
+   // insert a definition for unit procedure/function
+   function unit_pinsert(name, evalfn, fparams, rettype) {
+     var kind = rettype ? 'func' : 'proc',
+-        decl = {node:kind + '_decl',name:name,evalfn:evalfn,level:0,
+-                type:rettype,lparams:[],fparams:[]};
+-    for (var i=0; i < fparams.length; i++) {
++      decl = {
++        node: kind + '_decl', name: name, evalfn: evalfn, level: 0,
++        type: rettype, lparams: [], fparams: []
++      };
++    for (var i = 0; i < fparams.length; i++) {
+       var fparam = fparams[i];
+       fparam.node = 'param';
+       fparam.id = "param" + i;
+       decl.fparams.push(fparam);
+     }
+-    insert(name,decl);
++    insert(name, decl);
+   }
+ 
+   function replace(name, value) {
+     var name = name.toUpperCase(),
+-        idx = indexOf(name);
+-    if (typeof(idx) !== "undefined") {
++      idx = indexOf(name);
++    if (typeof (idx) !== "undefined") {
+       data[idx][name] = value;
+     } else {
+       throw new Error("Name '" + name + "' not found to replace");
+@@ -79,9 +81,9 @@ function SymbolTable() {
+ 
+   function display(all) {
+     console.warn("-------------");
+-    for(var idx = 0; idx < data.length; idx++) {
++    for (var idx = 0; idx < data.length; idx++) {
+       console.warn("--- " + idx + " ---");
+-      for(var name in data[idx]) {
++      for (var name in data[idx]) {
+         if (all || !data[idx][name].evalfn) {
+           console.warn(name + ": ", data[idx][name]);
+         }
+@@ -90,36 +92,37 @@ function SymbolTable() {
+     console.warn("-------------");
+   }
+ 
+-  return {lookup: lookup,
+-          insert: insert,
+-          unit_pinsert: unit_pinsert,
+-          replace: replace,
+-          begin_scope: begin_scope,
+-          end_scope: end_scope,
+-          new_name: new_name,
+-          display: display};
++  return {
++    lookup: lookup,
++    insert: insert,
++    unit_pinsert: unit_pinsert,
++    replace: replace,
++    begin_scope: begin_scope,
++    end_scope: end_scope,
++    new_name: new_name,
++    display: display
++  };
+ };
+ 
+ function IR(theAST) {
+ 
+   var st = new SymbolTable(),
+-      str_cnt = 0,
+-      default_units = ['SYSTEM'];
++    str_cnt = 0,
++    default_units = ['SYSTEM'];
+ 
+   // Store global settings in the symbol table
+   st.insert('_settings_', {});
+ 
+   function load_unit(unit) {
+     var lib = null,
+-        unit_path = './units/' + unit.toLowerCase() + ".js",
+-        unit_name = unit.toUpperCase();
++      unit_path = './units/' + unit.toLowerCase() + ".js",
++      unit_name = unit.toUpperCase();
+     if (isNode()) {
+       // Node.js
+       var rlib = require(unit_path),
+-      lib = new rlib[unit_name](st);
++        lib = new rlib[unit_name](st);
+     } else if (typeof window[unit_name] !== 'undefined') {
+       // Browser - already loaded
+-      console.log("unit_name: " + unit_name);
+       lib = new window[unit_name](st);
+     } else {
+       // Browser - Synchronous AJAX request
+@@ -153,15 +156,15 @@ function IR(theAST) {
+   // a base type first.
+   function normalize_type(type) {
+     var t = expand_type(type), // implicit copy
+-        lltype, vdef = "0",
+-        name = (typeof t.origname !== 'undefined') ? t.origname : t.name;
++      lltype, vdef = "0",
++      name = (typeof t.origname !== 'undefined') ? t.origname : t.name;
+     switch (name) {
+-      case 'REAL':      lltype = "float"; vdef = "0.0"; break;
++      case 'REAL': lltype = "float"; vdef = "0.0"; break;
+ 
+       // structured datatypes
+       case 'STRING':
+         if (typeof t.type === 'undefined') {
+-          t.type = {node:'type',name:'CHARACTER'};
++          t.type = { node: 'type', name: 'CHARACTER' };
+         }
+         t.type = normalize_type(t.type);
+         lltype = "i8*";
+@@ -175,17 +178,17 @@ function IR(theAST) {
+         end = t.index.end;
+         vdefs = [];
+         ttype = t.type;
+-        lltype = '[' + (end-start+1) + ' x ' + ttype.lltype + ']';
+-        for (var i=0; i < end-start+1; i++) {
++        lltype = '[' + (end - start + 1) + ' x ' + ttype.lltype + ']';
++        for (var i = 0; i < end - start + 1; i++) {
+           vdefs.push(ttype.lltype + ' ' + ttype.default_value);
+         }
+         vdef = '[' + vdefs.join(', ') + ']';
+         break;
+       case 'RECORD':
+         var comps = [], vdefs = [],
+-            sections = t.sections;
++          sections = t.sections;
+         t.component_map = {};
+-        for (var i=0; i<sections.length; i++) {
++        for (var i = 0; i < sections.length; i++) {
+           var comp = sections[i];
+           comp.type = normalize_type(comp.type);
+           comps.push(comp.type.lltype);
+@@ -230,11 +233,11 @@ function IR(theAST) {
+         vdef = 0;
+ 
+         var start = t.start,
+-            end = t.end,
+-            stype1, stype2;
++          end = t.end,
++          stype1, stype2;
+         if (start.stype === 'variable') {
+           var decl1 = st.lookup(t.start.val),
+-              type1 = normalize_type(decl1.type);
++            type1 = normalize_type(decl1.type);
+           stype1 = type1.name;
+           start = type1.default_value;
+ 
+@@ -253,17 +256,17 @@ function IR(theAST) {
+           t.origname = stype1;
+ 
+           switch (stype1) {
+-            case 'BOOLEAN':   t.lltype = 'i1'; break;
+-            case 'BYTE':      t.lltype = 'i8'; break;
++            case 'BOOLEAN': t.lltype = 'i1'; break;
++            case 'BYTE': t.lltype = 'i8'; break;
+             case 'CHARACTER': t.lltype = 'i8'; break;
+-            case 'INTEGER':   t.lltype = 'i32'; break;
++            case 'INTEGER': t.lltype = 'i32'; break;
+             default: throw new Error("Unknown SUBRANGE type: " + stype1);
+           }
+         }
+ 
+         if (end.stype === 'variable') {
+           var decl2 = st.lookup(t.end.val),
+-              type2 = normalize_type(decl2.type);
++            type2 = normalize_type(decl2.type);
+           stype2 = type2.name;
+           end = type2.default_value;
+         } else {
+@@ -283,7 +286,7 @@ function IR(theAST) {
+         t.origname = 'BOOLEAN';
+         t.ids = ['FALSE', 'TRUE'];
+         lltype = 'i1';
+-        // fall through since BOOLEAN is an enumeration type
++      // fall through since BOOLEAN is an enumeration type
+       case 'ENUMERATION':
+         t.name = 'INTEGER';
+         vdef = 0;
+@@ -325,8 +328,8 @@ function IR(theAST) {
+     // BOOLEAN, BYTE, CHARACTER, etc are all name INTEGER with an
+     // origname subtype
+     switch (t.name) {
+-      case 'INTEGER':   res = true; break;
+-      case 'REAL':      res = true; break;
++      case 'INTEGER': res = true; break;
++      case 'REAL': res = true; break;
+     }
+     return res;
+   }
+@@ -342,11 +345,11 @@ function IR(theAST) {
+ 
+   function deref_name(lvalue) {
+     var id = null,
+-        lv = lvalue,
+-        cnames = "";
++      lv = lvalue,
++      cnames = "";
+     do {
+       if (lv.node === 'expr_record_deref') {
+-        cnames = "." + lv.component + cnames ;
++        cnames = "." + lv.component + cnames;
+       } else if (lv.node === 'expr_array_deref') {
+         cnames = "_sub" + cnames;
+       } else {
+@@ -357,11 +360,11 @@ function IR(theAST) {
+     return cnames;
+   }
+ 
+-  function allocate_variable(ir,node,id,fname,type,defval) {
++  function allocate_variable(ir, node, id, fname, type, defval) {
+     var pdecl = st.lookup(fname),
+-        level = pdecl.level,
+-        vtype = copy_type(type),
+-        vdef = typeof defval !== 'undefined' ? defval : vtype.default_value;
++      level = pdecl.level,
++      vtype = copy_type(type),
++      vdef = typeof defval !== 'undefined' ? defval : vtype.default_value;
+     vtype.default_value = vdef;
+ 
+     if (level === 0) {
+@@ -375,13 +378,13 @@ function IR(theAST) {
+       ir.push('  store ' + vtype.lltype + ' ' + vdef + ', ' + vtype.lltype + '* ' + sname);
+     }
+ 
+-    st.insert(id,{node:node,type:vtype,sname:sname,level:pdecl.level});
++    st.insert(id, { node: node, type: vtype, sname: sname, level: pdecl.level });
+     return sname;
+   }
+ 
+-  function allocate_enums(ir,ids,fname,type,lltype) {
++  function allocate_enums(ir, ids, fname, type, lltype) {
+     var ecnt = ids.length,
+-        vlist = [];
++      vlist = [];
+     type.enum_type = '[' + ecnt + ' x i8*]';
+     type.enum_var = '@' + st.new_name(type.name);
+     type.origname = type.name;
+@@ -389,16 +392,16 @@ function IR(theAST) {
+     type.lltype = lltype;
+ 
+     // Declare each ID
+-    for (var i=0; i < ecnt; i++) {
++    for (var i = 0; i < ecnt; i++) {
+       var eid = ids[i],
+-          elen = eid.length + 1,
+-          eidstr = st.new_name(type.enum_var + '.' + eid),
+-          eitype = '[' + elen + ' x i8]',
+-          estr = 'c"' + eid + '\\00"';
++        elen = eid.length + 1,
++        eidstr = st.new_name(type.enum_var + '.' + eid),
++        eitype = '[' + elen + ' x i8]',
++        estr = 'c"' + eid + '\\00"';
+       vlist.push('i8* getelementptr inbounds (' + eitype + '* ' + eidstr + ', i32 0, i32 0)');
+       ir.push([eidstr + ' = private unnamed_addr constant ' + eitype + ' ' + estr]);
+       // Each enumeration element is a var declaration
+-      allocate_variable(ir,'var_decl',eid.toUpperCase(),fname,type,i);
++      allocate_variable(ir, 'var_decl', eid.toUpperCase(), fname, type, i);
+     }
+     // Declare the array of strings for the enum values so that
+     // we can print them out if needed
+@@ -410,8 +413,8 @@ function IR(theAST) {
+   function normalizeIR(ir) {
+     var prefix = [], body = [];
+     body.push("");
+-    for (var i=0; i < ir.length; i++) {
+-      if (typeof(ir[i]) === "object") {
++    for (var i = 0; i < ir.length; i++) {
++      if (typeof (ir[i]) === "object") {
+         prefix.push.apply(prefix, ir[i]);
+       } else {
+         body.push(ir[i]);
+@@ -422,17 +425,17 @@ function IR(theAST) {
+ 
+   function toIR(astTree, level, fnames) {
+     var ast = (typeof astTree === 'undefined') ? theAST : astTree,
+-        indent = "",
+-        fname, node,
+-        ir = [];
+-    if (! ast) {
++      indent = "",
++      fname, node,
++      ir = [];
++    if (!ast) {
+       throw new Error("Warning: toIR called with empty/null AST");
+     }
+     node = ast.node,
+-    level = level ? level : 0;
++      level = level ? level : 0;
+     fnames = fnames ? fnames : [];
+-    fname = fnames[fnames.length-1];
+-    for (var i=0; i < level; i++) {
++    fname = fnames[fnames.length - 1];
++    for (var i = 0; i < level; i++) {
+       indent = indent + "  ";
+     }
+ 
+@@ -443,26 +446,26 @@ function IR(theAST) {
+         // Similar to a proc_decl but with declarations and called by
+         // @main
+         var id = ast.id,
+-            fparams = ast.fparams,
+-            block = ast.block;
++          fparams = ast.fparams,
++          block = ast.block;
+ 
+-        st.insert(id,{name:id,level:level,fparams:fparams,lparams:[]});
++        st.insert(id, { name: id, level: level, fparams: fparams, lparams: [] });
+ 
+         // Define some predefined variables/constants
+-        allocate_enums(ir,['FALSE','TRUE'],id,
+-            {node:'type',name:'BOOLEAN'},'i1');
+-        allocate_variable(ir,'const_decl','PI',id,
+-            normalize_type({node:'type',name:'REAL'}),
+-            ieee754.llvm_float_hex(3.1415926536));
+-        allocate_variable(ir,'const_decl','MAXINT',id,
+-            normalize_type({node:'type',name:'INTEGER'}),32767);
++        allocate_enums(ir, ['FALSE', 'TRUE'], id,
++          { node: 'type', name: 'BOOLEAN' }, 'i1');
++        allocate_variable(ir, 'const_decl', 'PI', id,
++          normalize_type({ node: 'type', name: 'REAL' }),
++          ieee754.llvm_float_hex(3.1415926536));
++        allocate_variable(ir, 'const_decl', 'MAXINT', id,
++          normalize_type({ node: 'type', name: 'INTEGER' }), 32767);
+ 
+         block.param_list = [];
+         try {
+-          ir.push.apply(ir, toIR(block,level,fnames.concat([id])));
+-        } catch(e) {
++          ir.push.apply(ir, toIR(block, level, fnames.concat([id])));
++        } catch (e) {
+           // Catch and report errors with line numbers
+-          console.error(e.toString() + " [line " + (e.lineno+1) + "]");
++          console.error(e.toString() + " [line " + (e.lineno + 1) + "]");
+           throw e;
+         }
+ 
+@@ -481,18 +484,18 @@ function IR(theAST) {
+ 
+       case 'block':
+         var uses = ast.uses,
+-            decls = ast.decls,
+-            stmts = ast.stmts,
+-            pdecl = st.lookup(fname),
+-            lparams = pdecl.lparams,
+-            fparams = pdecl.fparams,
+-            param_list = [],
+-            lparam_list = [],
+-            unit_init_ir = [],
+-            unit_stop_ir = [],
+-            pdecl_ir = [],
+-            vdecl_ir = [],
+-            stmts_ir = [];
++          decls = ast.decls,
++          stmts = ast.stmts,
++          pdecl = st.lookup(fname),
++          lparams = pdecl.lparams,
++          fparams = pdecl.fparams,
++          param_list = [],
++          lparam_list = [],
++          unit_init_ir = [],
++          unit_stop_ir = [],
++          pdecl_ir = [],
++          vdecl_ir = [],
++          stmts_ir = [];
+ 
+         /* Evaluate libraries specified in the 'uses' declaration */
+         if (uses) {
+@@ -500,28 +503,28 @@ function IR(theAST) {
+           var unit_list = default_units.slice();
+ 
+           /* user specified */
+-          for (var i=0; i<uses.length; i++) {
++          for (var i = 0; i < uses.length; i++) {
+             if (unit_list.indexOf(uses[i]) < 0) {
+               unit_list.push(uses[i]);
+             }
+           }
+ 
+-          for (var i=0; i<unit_list.length; i++) {
++          for (var i = 0; i < unit_list.length; i++) {
+             var unit = unit_list[i],
+-                lib = load_unit(unit);
++              lib = load_unit(unit);
+             unit_init_ir.push.apply(unit_init_ir, lib.init());
+             unit_stop_ir.push.apply(unit_stop_ir, lib.stop());
+           }
+         }
+ 
+         // Regular formal parameters
+-        for (var i=0; i < fparams.length; i++) {
++        for (var i = 0; i < fparams.length; i++) {
+           var fparam = fparams[i];
+           fparam.type = normalize_type(fparam.type);
+           var ftype = fparam.type,
+-              lltype = ftype.lltype,
+-              pname = "%" + st.new_name(fparam.id + "_fparam"),
+-              sname = "%" + st.new_name(fparam.id + "_fparam_stack");
++            lltype = ftype.lltype,
++            pname = "%" + st.new_name(fparam.id + "_fparam"),
++            sname = "%" + st.new_name(fparam.id + "_fparam_stack");
+           if (fparam.var) {
+             vdecl_ir.push('  ' + pname + ' = load ' + lltype + '* ' + sname);
+             param_list.push(lltype + '* ' + sname);
+@@ -530,7 +533,7 @@ function IR(theAST) {
+             vdecl_ir.push('  store ' + lltype + ' ' + pname + ', ' + lltype + '* ' + sname);
+             param_list.push(lltype + ' ' + pname);
+           }
+-          st.insert(fparam.id,{node:'var_decl',type:ftype,pname:pname,sname:sname,var:fparam.var,level:level});
++          st.insert(fparam.id, { node: 'var_decl', type: ftype, pname: pname, sname: sname, var: fparam.var, level: level });
+         }
+ 
+         // Evaluate the children. We might need to modify the
+@@ -538,18 +541,18 @@ function IR(theAST) {
+         // level lexical scope
+         var curAst = null;
+         try {
+-          for (var i=0; i < decls.length; i++) {
++          for (var i = 0; i < decls.length; i++) {
+             var decl = decls[i];
+             curAst = decl;
+             if (decl.node === 'proc_decl' || decl.node === 'func_decl') {
+-              pdecl_ir.push.apply(pdecl_ir, toIR(decl,level,fnames));
++              pdecl_ir.push.apply(pdecl_ir, toIR(decl, level, fnames));
+             } else {
+-              vdecl_ir.push.apply(vdecl_ir, toIR(decl,level,fnames));
++              vdecl_ir.push.apply(vdecl_ir, toIR(decl, level, fnames));
+             }
+           }
+-          for (var i=0; i < stmts.length; i++) {
++          for (var i = 0; i < stmts.length; i++) {
+             curAst = stmts[i];
+-            stmts_ir.push.apply(stmts_ir, toIR(stmts[i],level,fnames));
++            stmts_ir.push.apply(stmts_ir, toIR(stmts[i], level, fnames));
+           }
+         } catch (e) {
+           // Add the line number to the exception but only if it's not
+@@ -562,10 +565,10 @@ function IR(theAST) {
+         }
+ 
+         // Variables that refer to higher lexical scope
+-        for (var i=0; i < lparams.length; i++) {
++        for (var i = 0; i < lparams.length; i++) {
+           var lparam = lparams[i],
+-              ldecl = st.lookup(lparam.id),
+-              sname = ldecl.sname;
++            ldecl = st.lookup(lparam.id),
++            sname = ldecl.sname;
+           ldecl.type = normalize_type(ldecl.type);
+           lparam_list.push(ldecl.type.lltype + '* ' + sname);
+         }
+@@ -576,7 +579,7 @@ function IR(theAST) {
+         var pitype = pdecl.itype || "i32";
+         ir.push.apply(ir, pdecl_ir);
+         ir.push('');
+-        ir.push('define ' + pitype + ' @' + pdecl.name + '(' + param_list.join(", ") +') {');
++        ir.push('define ' + pitype + ' @' + pdecl.name + '(' + param_list.join(", ") + ') {');
+         ir.push('entry:');
+         ir.push.apply(ir, unit_init_ir);
+         // For functions, add the return parameter
+@@ -601,29 +604,29 @@ function IR(theAST) {
+         var id = ast.id;
+         ast.type = expand_type(ast.type);
+         if (ast.type.name === 'ENUMERATION') {
+-          ast.type = allocate_enums(ir,ast.type.ids,fname,ast.type,'i8');
++          ast.type = allocate_enums(ir, ast.type.ids, fname, ast.type, 'i8');
+         }
+         ast.type = normalize_type(ast.type);
+-        st.insert(id,{node:'type_decl',id:id,type:ast.type});
++        st.insert(id, { node: 'type_decl', id: id, type: ast.type });
+         break;
+ 
+       case 'var_decl':
+         ast.type = expand_type(ast.type);
+         if (ast.type.name === 'ENUMERATION') {
+-          allocate_enums(ir,ast.type.ids,fname,ast.type,'i8');
++          allocate_enums(ir, ast.type.ids, fname, ast.type, 'i8');
+         }
+         ast.type = normalize_type(ast.type);
+-        allocate_variable(ir,'var_decl',ast.id,fname,ast.type);
++        allocate_variable(ir, 'var_decl', ast.id, fname, ast.type);
+         break;
+ 
+       case 'const_decl':
+         var id = ast.id,
+-            expr = ast.expr;
++          expr = ast.expr;
+ 
+-        ir.push.apply(ir, toIR(expr,level,fnames));
++        ir.push.apply(ir, toIR(expr, level, fnames));
+         expr.type = normalize_type(expr.type);
+ 
+-        var sname = allocate_variable(ir,'const_decl',id,fname,expr.type,expr.val);
++        var sname = allocate_variable(ir, 'const_decl', id, fname, expr.type, expr.val);
+ 
+         ir.push('  store ' + expr.itype + ' ' + expr.ilocal + ', ' + expr.itype + '* ' + sname);
+         break;
+@@ -631,24 +634,24 @@ function IR(theAST) {
+       case 'proc_decl':
+       case 'func_decl':
+         var id = ast.id,
+-            type = ast.type,
+-            fparams = ast.fparams,
+-            block = ast.block,
+-            new_level = level+1;
++          type = ast.type,
++          fparams = ast.fparams,
++          block = ast.block,
++          new_level = level + 1;
+ 
+-        st.insert(id, {name: id, type:type, level: new_level,fparams:fparams,lparams:[]});
++        st.insert(id, { name: id, type: type, level: new_level, fparams: fparams, lparams: [] });
+         if (block !== 'forward') {
+           st.begin_scope();
+-          ir.push.apply(ir, toIR(block,new_level,fnames.concat([id])));
++          ir.push.apply(ir, toIR(block, new_level, fnames.concat([id])));
+           st.end_scope();
+         }
+         break;
+ 
+       case 'stmt_assign':
+         var lvalue = ast.lvalue,
+-            expr = ast.expr;
++          expr = ast.expr;
+         ir.push('  ; ASSIGN start');
+-        ir.push.apply(ir,toIR(expr,level,fnames));
++        ir.push.apply(ir, toIR(expr, level, fnames));
+         var litype = null, listack = null;
+ 
+         if (lvalue.id === fname) {
+@@ -661,11 +664,11 @@ function IR(theAST) {
+           lvalue.itype = pdecl.type.lltype;
+           pdecl.ireturn = true;
+           pdecl.itype = lvalue.itype;
+-          st.replace(fname,pdecl);
++          st.replace(fname, pdecl);
+           litype = lvalue.itype;
+           listack = "%retval";
+         } else {
+-          ir.push.apply(ir,toIR(lvalue,level,fnames));
++          ir.push.apply(ir, toIR(lvalue, level, fnames));
+           litype = lvalue.itype;
+           listack = lvalue.istack;
+         }
+@@ -676,12 +679,12 @@ function IR(theAST) {
+         } else if (lvalue.type.name === 'STRING' && expr.type.name === 'STRING') {
+           // string being assigned to string so malloc and copy
+           var slen1 = '%' + st.new_name('slen'),
+-              slen2 = '%' + st.new_name('slen'),
+-              lvar = '%' + st.new_name('lvar'),
+-              decay1 = '%' + st.new_name('arraydecay'),
+-              decay2 = '%' + st.new_name('arraydecay'),
+-              chr = '%' + st.new_name('chr'),
+-              res = '%' + st.new_name('res');
++            slen2 = '%' + st.new_name('slen'),
++            lvar = '%' + st.new_name('lvar'),
++            decay1 = '%' + st.new_name('arraydecay'),
++            decay2 = '%' + st.new_name('arraydecay'),
++            chr = '%' + st.new_name('chr'),
++            res = '%' + st.new_name('res');
+           ir.push('  ' + slen1 + ' = call i64 @strlen(i8* ' + expr.ilocal + ')');
+           ir.push('  ' + slen2 + ' = add i64 1, ' + slen1);
+           ir.push('  ' + lvar + ' = call i8* @malloc(i64 ' + slen2 + ')');
+@@ -704,7 +707,7 @@ function IR(theAST) {
+         } else {
+           ir.push('  store ' + expr.itype + ' ' + expr.ilocal + ', ' + litype + '* ' + listack);
+         }
+-        
++
+         ast.itype = litype;
+         ast.istack = listack;
+         ast.ilocal = expr.ilocal;
+@@ -720,22 +723,22 @@ function IR(theAST) {
+           throw new Error("Unknown function '" + id + "'");
+         }
+         var lparams = pdecl.lparams,
+-            fparams = pdecl.fparams,
+-            cparams = (ast.call_params || []);
++          fparams = pdecl.fparams,
++          cparams = (ast.call_params || []);
+         // evaluate the parameters
+-        for(var i=0; i < cparams.length; i++) {
+-          ir.push.apply(ir, toIR(cparams[i],level,fnames));
++        for (var i = 0; i < cparams.length; i++) {
++          ir.push.apply(ir, toIR(cparams[i], level, fnames));
+         }
+         // Check that call params and formal params match length and
+         // types
+         if (fparams.length === 0 && cparams.length !== 0) {
+           throw new Error("Parameter mismatch calling " + id + ": " +
+-                          "parameter(s) given but none defined");
++            "parameter(s) given but none defined");
+         }
+-        for(var i=0; i < fparams.length; i++) {
++        for (var i = 0; i < fparams.length; i++) {
+           var cparam = cparams[i],
+-              fparam = fparams[i],
+-              ftype = fparam.type.name;
++            fparam = fparams[i],
++            ftype = fparam.type.name;
+           if (ftype === 'varargs') {
+             // We've checked as far as we can go on this side.
+             // 'varargs' only applies to built-in unit routines and
+@@ -751,27 +754,27 @@ function IR(theAST) {
+           }
+           if (!cparam) {
+             throw new Error("Parameter mismatch calling " +
+-                            id + ": more than " + i +
+-                            " parameter(s) required but " + i +
+-                            " given")
++              id + ": more than " + i +
++              " parameter(s) required but " + i +
++              " given")
+           }
+           var cname = cparam.id ? cparam.id : "'" + cparam.val + "'",
+-              ctype = cparam.type,
+-              ctname = ctype.name,
+-              ctoname = ctype.origname;
++            ctype = cparam.type,
++            ctname = ctype.name,
++            ctoname = ctype.origname;
+           if (ftype === 'multiple') {
+             var ftypes = fparam.type.names;
+             if (ftypes.indexOf(ctname) < 0 &&
+-                ftypes.indexOf(ctoname) < 0) {
++              ftypes.indexOf(ctoname) < 0) {
+               throw new Error("Parameter mismatch calling " +
+-                              id + ": " + cname + ":" + ctname +
+-                              " given, but definition is " + ftypes);
++                id + ": " + cname + ":" + ctname +
++                " given, but definition is " + ftypes);
+             }
+           } else {
+             if (ctname !== ftype) {
+               throw new Error("Parameter mismatch calling " +
+-                              id + ": " + cname + ":" + ctname +
+-                              " given, but definition is " + ftype);
++                id + ": " + cname + ":" + ctname +
++                " given, but definition is " + ftype);
+             }
+           }
+         }
+@@ -784,16 +787,16 @@ function IR(theAST) {
+           }
+         } else {
+           var param_list = [];
+-          for(var i=0; i < lparams.length; i++) {
++          for (var i = 0; i < lparams.length; i++) {
+             var lparam = lparams[i],
+-                lltype = null;
+-            ir.push.apply(ir, toIR(lparam,level,fnames));
++              lltype = null;
++            ir.push.apply(ir, toIR(lparam, level, fnames));
+             lparam.type = normalize_type(lparam.type),
+-            param_list.push(lparam.type.lltype + "* " + lparam.istack);
++              param_list.push(lparam.type.lltype + "* " + lparam.istack);
+           }
+-          for(var i=0; i < cparams.length; i++) {
++          for (var i = 0; i < cparams.length; i++) {
+             var cparam = cparams[i],
+-                fparam = fparams[i];
++              fparam = fparams[i];
+             if (cparams[i].lparam) {
+               throw new Error("TODO handle lparam in call");
+             } else if (fparam.var) {
+@@ -821,33 +824,33 @@ function IR(theAST) {
+         break;
+ 
+       case 'stmt_compound':
+-        for (var i=0; i < ast.stmts.length; i++) {
+-          ir.push.apply(ir,toIR(ast.stmts[i],level,fnames));
++        for (var i = 0; i < ast.stmts.length; i++) {
++          ir.push.apply(ir, toIR(ast.stmts[i], level, fnames));
+         }
+         break;
+ 
+       case 'stmt_if':
+         var expr = ast.expr,
+-            tstmt = ast.tstmt,
+-            fstmt = ast.fstmt;
++          tstmt = ast.tstmt,
++          fstmt = ast.fstmt;
+         ir.push('');
+         ir.push('  ; if statement start');
+-        ir.push.apply(ir, toIR(expr,level,fnames));
++        ir.push.apply(ir, toIR(expr, level, fnames));
+         var br_name = st.new_name('br'),
+-            br_true = br_name + '_true',
+-            br_false = br_name + '_false',
+-            br_done = br_name + '_done';
++          br_true = br_name + '_true',
++          br_false = br_name + '_false',
++          br_done = br_name + '_done';
+         ir.push('  br ' + expr.itype + ' ' + expr.ilocal + ', label %' + br_true + ', label %' + br_false);
+         ir.push(br_true + ':');
+         if (tstmt) {
+-          ir.push.apply(ir, toIR(tstmt,level,fnames));
++          ir.push.apply(ir, toIR(tstmt, level, fnames));
+         }
+-        ir.push('  br label %' + br_done); 
++        ir.push('  br label %' + br_done);
+         ir.push(br_false + ':');
+         if (fstmt) {
+-          ir.push.apply(ir, toIR(fstmt,level,fnames));
++          ir.push.apply(ir, toIR(fstmt, level, fnames));
+         }
+-        ir.push('  br label %' + br_done); 
++        ir.push('  br label %' + br_done);
+         ir.push(br_done + ':');
+         ir.push('  ; if statement finish');
+         ir.push('');
+@@ -855,25 +858,25 @@ function IR(theAST) {
+ 
+       case 'stmt_case':
+         var expr = ast.expr,
+-            cases = ast.cases,
+-            otherwise_stmt = ast.otherwise_stmt,
+-            br_name = st.new_name('br'),
+-            br_done = br_name + '_done';
++          cases = ast.cases,
++          otherwise_stmt = ast.otherwise_stmt,
++          br_name = st.new_name('br'),
++          br_done = br_name + '_done';
+ 
+         ir.push('');
+         ir.push('  ; case statement start');
+-        ir.push.apply(ir, toIR(expr,level,fnames));
++        ir.push.apply(ir, toIR(expr, level, fnames));
+ 
+-        for (var i=0; i < cases.length; i++) {
++        for (var i = 0; i < cases.length; i++) {
+           var indexes = cases[i].indexes,
+-              stmt = cases[i].stmt;
+-          for (var j=0; j < indexes.length; j++) {
++            stmt = cases[i].stmt;
++          for (var j = 0; j < indexes.length; j++) {
+             var index = indexes[j],
+-                cmp = st.new_name('%' + br_name + '_cmp'),
+-                cmp2 = st.new_name('%' + br_name + '_cmp'),
+-                br_curr = st.new_name(br_name),
+-                br_curr2 = st.new_name(br_name),
+-                br_next = st.new_name(br_name);
++              cmp = st.new_name('%' + br_name + '_cmp'),
++              cmp2 = st.new_name('%' + br_name + '_cmp'),
++              br_curr = st.new_name(br_name),
++              br_curr2 = st.new_name(br_name),
++              br_next = st.new_name(br_name);
+             if (index.node === 'constant') {
+               ir.push('  ' + cmp + ' = icmp eq i32 ' + index.val + ', ' + expr.ilocal);
+               ir.push('  br i1 ' + cmp + ', label %' + br_curr + ', label %' + br_next);
+@@ -885,14 +888,14 @@ function IR(theAST) {
+               ir.push('  br i1 ' + cmp2 + ', label %' + br_next + ', label %' + br_curr);
+             }
+             ir.push(br_curr + ':');
+-            ir.push.apply(ir, toIR(stmt,level,fnames));
++            ir.push.apply(ir, toIR(stmt, level, fnames));
+             ir.push('  br label %' + br_done);
+             ir.push(br_next + ':');
+           }
+         }
+         if (otherwise_stmt) {
+           ir.push('  ; case statement otherwise');
+-          ir.push.apply(ir, toIR(otherwise_stmt,level,fnames));
++          ir.push.apply(ir, toIR(otherwise_stmt, level, fnames));
+         }
+         ir.push('  br label %' + br_done);
+         ir.push(br_done + ':');
+@@ -901,30 +904,30 @@ function IR(theAST) {
+ 
+       case 'stmt_for':
+         var index = ast.index,
+-            start = ast.start,
+-            by = ast.by,
+-            end = ast.end,
+-            stmt = ast.stmt,
+-            for_label = st.new_name('for'),
+-            for_start = for_label + 'start',
+-            for_cond = for_label + 'cond',
+-            for_body = for_label + 'body',
+-            for_inc = for_label + 'inc',
+-            for_end = for_label + 'end',
+-            for_cmp = '%' + for_label + 'cmp',
+-            for_cmp1 = '%' + for_label + 'cmp1',
+-            for_cmp2 = '%' + for_label + 'cmp2',
+-            for_inc1 = '%' + for_label + 'inc1',
+-            for1 = '%' + for_label + '1',
+-            for2 = '%' + for_label + '2',
+-            for3 = '%' + for_label + '3';
++          start = ast.start,
++          by = ast.by,
++          end = ast.end,
++          stmt = ast.stmt,
++          for_label = st.new_name('for'),
++          for_start = for_label + 'start',
++          for_cond = for_label + 'cond',
++          for_body = for_label + 'body',
++          for_inc = for_label + 'inc',
++          for_end = for_label + 'end',
++          for_cmp = '%' + for_label + 'cmp',
++          for_cmp1 = '%' + for_label + 'cmp1',
++          for_cmp2 = '%' + for_label + 'cmp2',
++          for_inc1 = '%' + for_label + 'inc1',
++          for1 = '%' + for_label + '1',
++          for2 = '%' + for_label + '2',
++          for3 = '%' + for_label + '3';
+ 
+         ir.push('');
+         ir.push('  ; for statement start');
+ 
+-        ir.push.apply(ir, toIR(index,level,fnames));
+-        ir.push.apply(ir, toIR(start,level,fnames));
+-        ir.push.apply(ir, toIR(end,level,fnames));
++        ir.push.apply(ir, toIR(index, level, fnames));
++        ir.push.apply(ir, toIR(start, level, fnames));
++        ir.push.apply(ir, toIR(end, level, fnames));
+ 
+         if (by === 1) {
+           ir.push('  ' + for_cmp + ' = icmp sgt i32 ' + start.ilocal + ', ' + end.ilocal);
+@@ -933,12 +936,12 @@ function IR(theAST) {
+         }
+         ir.push('  br i1 ' + for_cmp + ', label %' + for_end + ', label %' + for_start);
+ 
+-        ir.push('  br label %' + for_start); 
++        ir.push('  br label %' + for_start);
+ 
+         ir.push('');
+         ir.push(for_start + ':');
+         ir.push('  store ' + start.itype + ' ' + start.ilocal + ', ' + index.itype + '* ' + index.istack);
+-        ir.push('  br label %' + for_cond); 
++        ir.push('  br label %' + for_cond);
+ 
+         ir.push('');
+         ir.push(for_cond + ':');
+@@ -952,7 +955,7 @@ function IR(theAST) {
+ 
+         ir.push('');
+         ir.push(for_body + ':');
+-        ir.push.apply(ir, toIR(stmt,level,fnames));
++        ir.push.apply(ir, toIR(stmt, level, fnames));
+         ir.push('  ' + for2 + ' = load i32* ' + index.istack);
+         ir.push('  ' + for_cmp2 + ' = icmp eq i32 ' + for2 + ', ' + end.ilocal);
+         ir.push('  br i1 ' + for_cmp2 + ', label %' + for_end + ', label %' + for_inc);
+@@ -973,27 +976,27 @@ function IR(theAST) {
+ 
+       case 'stmt_repeat':
+         var expr = ast.expr,
+-            stmts = ast.stmts,
+-            repeat_label = st.new_name('repeat'),
+-            repeat_cond = repeat_label + 'cond',
+-            repeat_body = repeat_label + 'body',
+-            repeat_end = repeat_label + 'end';
++          stmts = ast.stmts,
++          repeat_label = st.new_name('repeat'),
++          repeat_cond = repeat_label + 'cond',
++          repeat_body = repeat_label + 'body',
++          repeat_end = repeat_label + 'end';
+ 
+         ir.push('');
+         ir.push('  ; repeat statement start');
+ 
+-        ir.push('  br label %' + repeat_body); 
++        ir.push('  br label %' + repeat_body);
+ 
+         ir.push('');
+         ir.push(repeat_body + ':');
+-        for (var i=0; i < stmts.length; i++) {
+-          ir.push.apply(ir,toIR(stmts[i],level,fnames));
++        for (var i = 0; i < stmts.length; i++) {
++          ir.push.apply(ir, toIR(stmts[i], level, fnames));
+         }
+         ir.push('  br label %' + repeat_cond);
+ 
+         ir.push('');
+         ir.push(repeat_cond + ':');
+-        ir.push.apply(ir, toIR(expr,level,fnames));
++        ir.push.apply(ir, toIR(expr, level, fnames));
+         ir.push('  br i1 ' + expr.ilocal + ', label %' + repeat_end + ', label %' + repeat_body);
+ 
+         ir.push('');
+@@ -1005,25 +1008,25 @@ function IR(theAST) {
+ 
+       case 'stmt_while':
+         var expr = ast.expr,
+-            stmt = ast.stmt,
+-            while_label = st.new_name('while'),
+-            while_cond = while_label + 'cond',
+-            while_body = while_label + 'body',
+-            while_end = while_label + 'end';
++          stmt = ast.stmt,
++          while_label = st.new_name('while'),
++          while_cond = while_label + 'cond',
++          while_body = while_label + 'body',
++          while_end = while_label + 'end';
+ 
+         ir.push('');
+         ir.push('  ; while statement start');
+ 
+-        ir.push('  br label %' + while_cond); 
++        ir.push('  br label %' + while_cond);
+ 
+         ir.push('');
+         ir.push(while_cond + ':');
+-        ir.push.apply(ir, toIR(expr,level,fnames));
++        ir.push.apply(ir, toIR(expr, level, fnames));
+         ir.push('  br i1 ' + expr.ilocal + ', label %' + while_body + ', label %' + while_end);
+ 
+         ir.push('');
+         ir.push(while_body + ':');
+-        ir.push.apply(ir, toIR(stmt,level,fnames));
++        ir.push.apply(ir, toIR(stmt, level, fnames));
+         ir.push('  br label %' + while_cond);
+ 
+         ir.push('');
+@@ -1035,43 +1038,49 @@ function IR(theAST) {
+ 
+       case 'expr_binop':
+         var left = ast.left, ltype,
+-            right = ast.right, rtype,
+-            resType = null, op,
+-            dest_name = '%' + st.new_name("binop"),
+-            boolLookup = {gt:'sgt',lt:'slt',
+-                          geq:'sge',leq:'sle',
+-                          eq:'eq',neq:'ne'},
+-            intLookup = {plus:'add',minus:'sub',
+-                         star:'mul',slash:'sdiv',
+-                         div:'sdiv',mod:'urem'},
+-            fltLookup = {plus:'fadd',minus:'fsub',
+-                         star:'fmul',slash:'fdiv'};
+-          
+-        ir.push.apply(ir, toIR(left,level,fnames));
+-        ir.push.apply(ir, toIR(right,level,fnames));
++          right = ast.right, rtype,
++          resType = null, op,
++          dest_name = '%' + st.new_name("binop"),
++          boolLookup = {
++            gt: 'sgt', lt: 'slt',
++            geq: 'sge', leq: 'sle',
++            eq: 'eq', neq: 'ne'
++          },
++          intLookup = {
++            plus: 'add', minus: 'sub',
++            star: 'mul', slash: 'sdiv',
++            div: 'sdiv', mod: 'urem'
++          },
++          fltLookup = {
++            plus: 'fadd', minus: 'fsub',
++            star: 'fmul', slash: 'fdiv'
++          };
++
++        ir.push.apply(ir, toIR(left, level, fnames));
++        ir.push.apply(ir, toIR(right, level, fnames));
+         ltype = left.type = normalize_type(left.type);
+         rtype = left.type = normalize_type(right.type);
+-        if (ast.op in {gt:1,lt:1,geq:1,leq:1,eq:1,neq:1}) {
++        if (ast.op in { gt: 1, lt: 1, geq: 1, leq: 1, eq: 1, neq: 1 }) {
+           var msgPrefix = "Operands for '" + ast.op + "' ";
+           // Type-check
+           if (ltype.name !== rtype.name) {
+             throw new Error(msgPrefix + "are not the same type: " + JSON.stringify(ast));
+           }
+-          if (ast.op in {gt:1,lt:1}) {
++          if (ast.op in { gt: 1, lt: 1 }) {
+             // scalar, string
+-            if (! (isScalarOrString(ltype) && isScalarOrString(rtype))) {
++            if (!(isScalarOrString(ltype) && isScalarOrString(rtype))) {
+               throw new Error(msgPrefix + "are not scalar or string");
+             }
+-          } else if (ast.op in {geq:1,leq:1}) {
++          } else if (ast.op in { geq: 1, leq: 1 }) {
+             // scalar, string, set
+             // TODO: sets
+-            if (! (isScalarOrString(ltype) && isScalarOrString(rtype))) {
++            if (!(isScalarOrString(ltype) && isScalarOrString(rtype))) {
+               throw new Error(msgPrefix + "are not scalar or string");
+             }
+-          } else if (ast.op in {eq:1,neq:1}) {
++          } else if (ast.op in { eq: 1, neq: 1 }) {
+             // scalar, string, set or pointer types
+             // TODO: sets and pointers
+-            if (! (isScalarOrString(ltype) && isScalarOrString(rtype))) {
++            if (!(isScalarOrString(ltype) && isScalarOrString(rtype))) {
+               throw new Error(msgPrefix + "are not scalar or string");
+             }
+           }
+@@ -1080,17 +1089,17 @@ function IR(theAST) {
+           } else {
+             op = 'icmp ' + boolLookup[ast.op];
+           }
+-          resType = normalize_type({node:'type',name:'BOOLEAN'});
++          resType = normalize_type({ node: 'type', name: 'BOOLEAN' });
+         } else if (ast.op === "plus" &&
+-            (ltype.name === 'STRING' || ltype.origname === 'CHARACTER') &&
+-            (rtype.name === 'STRING' || rtype.origname === 'CHARACTER')) {
+-         // string concatenation shorthand
+-         resType = normalize_type({node:'type',name:'STRING'});
+-        } else if (ast.op in {plus:1,minus:1,star:1,slash:1,div:1,mod:1}) {
++          (ltype.name === 'STRING' || ltype.origname === 'CHARACTER') &&
++          (rtype.name === 'STRING' || rtype.origname === 'CHARACTER')) {
++          // string concatenation shorthand
++          resType = normalize_type({ node: 'type', name: 'STRING' });
++        } else if (ast.op in { plus: 1, minus: 1, star: 1, slash: 1, div: 1, mod: 1 }) {
+           if (ast.op === 'slash') {
+-            resType = normalize_type({node:'type',name:'REAL'});
++            resType = normalize_type({ node: 'type', name: 'REAL' });
+           } else if ((ltype.name === 'INTEGER' && rtype.name === 'INTEGER') ||
+-                     (ltype.name === 'REAL' && rtype.name === 'REAL')) {
++            (ltype.name === 'REAL' && rtype.name === 'REAL')) {
+             resType = ltype;
+           } else if (ltype.name === 'REAL' && rtype.name === 'INTEGER') {
+             resType = ltype;
+@@ -1098,7 +1107,7 @@ function IR(theAST) {
+             resType = rtype;
+           } else {
+             throw new Error("No defined behavior for " +
+-                            ltype.name + " " + ast.op + " " + rtype.name);
++              ltype.name + " " + ast.op + " " + rtype.name);
+           }
+           if (resType.name === 'REAL' && ast.op === 'div') {
+             throw new Error("div can only be used with Integers");
+@@ -1108,7 +1117,7 @@ function IR(theAST) {
+           } else {
+             op = intLookup[ast.op];
+           }
+-        } else if (ast.op in {and:1,or:1}) {
++        } else if (ast.op in { and: 1, or: 1 }) {
+           op = ast.op;
+           resType = left.type;
+         } else {
+@@ -1128,8 +1137,8 @@ function IR(theAST) {
+         }
+         if (resType.name === 'STRING') {
+           // string concatenation shorthand
+-          var fake_expr = {node:'expr_call',id:'CONCAT',call_params:[left, right]};
+-          ir.push.apply(ir, toIR(fake_expr,level,fnames));
++          var fake_expr = { node: 'expr_call', id: 'CONCAT', call_params: [left, right] };
++          ir.push.apply(ir, toIR(fake_expr, level, fnames));
+           dest_name = fake_expr.ilocal;
+         } else {
+           ir.push('  ' + dest_name + ' = ' + op + ' ' + left.itype + ' ' + left.ilocal + ', ' + right.ilocal);
+@@ -1141,9 +1150,9 @@ function IR(theAST) {
+ 
+       case 'expr_unop':
+         var expr = ast.expr,
+-            dest_name = '%' + st.new_name("unop"),
+-            op;
+-        ir.push.apply(ir, toIR(expr,level,fnames));
++          dest_name = '%' + st.new_name("unop"),
++          op;
++        ir.push.apply(ir, toIR(expr, level, fnames));
+         // TODO: real typechecking comparison
+         switch (ast.op) {
+           case 'minus':
+@@ -1161,17 +1170,17 @@ function IR(theAST) {
+ 
+       case 'expr_array_deref':
+         var lvalue = ast.lvalue,
+-            expr = ast.expr;
+-        ir.push.apply(ir, toIR(expr,level,fnames));
+-        ir.push.apply(ir, toIR(lvalue,level,fnames));
++          expr = ast.expr;
++        ir.push.apply(ir, toIR(expr, level, fnames));
++        ir.push.apply(ir, toIR(lvalue, level, fnames));
+ 
+         var atype = lvalue.type,
+-            start, rtype, ritype,
+-            aname = '%' + st.new_name(deref_name(ast)),
+-            sub = aname + 'sub',
+-            aptr1 = aname + 'ptr1',
+-            aoff = aname + 'off',
+-            aval = aname + 'val';
++          start, rtype, ritype,
++          aname = '%' + st.new_name(deref_name(ast)),
++          sub = aname + 'sub',
++          aptr1 = aname + 'ptr1',
++          aoff = aname + 'off',
++          aval = aname + 'val';
+         // TODO: bounds checking
+         start = atype.index.start;
+         rtype = atype.type;
+@@ -1194,14 +1203,14 @@ function IR(theAST) {
+ 
+       case 'expr_record_deref':
+         var lvalue = ast.lvalue,
+-            comp = ast.component;
+-        ir.push.apply(ir, toIR(lvalue,level,fnames));
++          comp = ast.component;
++        ir.push.apply(ir, toIR(lvalue, level, fnames));
+         var cidx = lvalue.type.component_map[comp],
+-            ctype = lvalue.type.sections[cidx].type,
+-            clltype = ctype.lltype,
+-            rname = '%' + st.new_name(deref_name(ast)),
+-            roff = rname + '_off',
+-            rval = rname + '_val';
++          ctype = lvalue.type.sections[cidx].type,
++          clltype = ctype.lltype,
++          rname = '%' + st.new_name(deref_name(ast)),
++          roff = rname + '_off',
++          rval = rname + '_val';
+         ir.push('  ' + roff + ' = getelementptr inbounds ' + lvalue.itype + '* ' + lvalue.istack + ', i32 0, i32 ' + cidx);
+         ir.push('  ' + rval + ' = load ' + clltype + '* ' + roff);
+         ast.type = ctype;
+@@ -1226,15 +1235,15 @@ function IR(theAST) {
+         ast.ilocal = ast.val;
+         break;
+       case 'string':
+-        var slen = ast.val.length+1,
+-            re = /"/g,
+-            itype = '[' + slen + ' x i8]',
+-            sval = 'c"' + ast.val.replace(re, '\\22') + '\\00"',
+-            lname = '%' + st.new_name('string' + str_cnt),
+-            sname = '@.string' + (str_cnt++),
+-            lname;
++        var slen = ast.val.length + 1,
++          re = /"/g,
++          itype = '[' + slen + ' x i8]',
++          sval = 'c"' + ast.val.replace(re, '\\22') + '\\00"',
++          lname = '%' + st.new_name('string' + str_cnt),
++          sname = '@.string' + (str_cnt++),
++          lname;
+         ir.push([sname + ' = global ' + itype + ' ' + sval]);
+-        ir.push('  ' + lname + ' = getelementptr inbounds ' + itype + '* ' + sname + ', i32 0'); 
++        ir.push('  ' + lname + ' = getelementptr inbounds ' + itype + '* ' + sname + ', i32 0');
+         ast.itype = itype + '*';
+         ast.ilocal = lname;
+         ast.istack = sname;
+@@ -1247,7 +1256,7 @@ function IR(theAST) {
+         if (ast.id.length === 1) {
+           try {
+             var pdecl = st.lookup(ast.id);
+-          } catch(e) {
++          } catch (e) {
+             // HACK: we could't determine at normal parse time if this is
+             // a single character routine or if it's a control character
+             // literal. If it's a single character and defined in the
+@@ -1267,7 +1276,7 @@ function IR(theAST) {
+               default: throw new Error("Unknown control character " + ast.id);
+             }
+             ast.node = 'character';
+-            ast.type = {node:'type',name:'INTEGER',origname:'CHARACTER'};
++            ast.type = { node: 'type', name: 'INTEGER', origname: 'CHARACTER' };
+             ast.itype = "i8";
+             ast.ilocal = ast.val;
+             delete ast.id;
+@@ -1291,7 +1300,7 @@ function IR(theAST) {
+           // AST with a function and evalutate it
+           ast.node = 'expr_call';
+           ast.call_params = [];
+-          ir.push.apply(ir, toIR(ast,level,fnames));
++          ir.push.apply(ir, toIR(ast, level, fnames));
+           break;
+         } else if (!vdecl) {
+           throw new Error("Variable '" + ast.id + "' not found in symbol table or in libraries");
+@@ -1299,9 +1308,9 @@ function IR(theAST) {
+ 
+         vdecl.type = normalize_type(vdecl.type);
+         var id = ast.id,
+-            vtype = vdecl.type,
+-            vlevel = vdecl.level,
+-            lname = "%" + st.new_name(id + "_local");
++          vtype = vdecl.type,
++          vlevel = vdecl.level,
++          lname = "%" + st.new_name(id + "_local");
+ 
+         // Add variables from a higher lexical scope to our current
+         // subprogram param list
+@@ -1310,17 +1319,17 @@ function IR(theAST) {
+           // link by passing the variable through intervening
+           // sub-programs
+           var new_pname, new_sname;
+-          for(var l = vlevel+1; l <= level; l++) {
++          for (var l = vlevel + 1; l <= level; l++) {
+             var fname = fnames[l],
+-                pdecl = st.lookup(fname);
++              pdecl = st.lookup(fname);
+             new_pname = "%" + st.new_name(id + "_lparam");
+             new_sname = new_pname + "_stack";
+             // replace vdecl and insert it at this level
+-            vdecl = {node:'var_decl',type:vtype,pname:new_pname,sname:new_sname,var:true,lparam:true,level:l};
+-            st.insert(id,vdecl,l);
++            vdecl = { node: 'var_decl', type: vtype, pname: new_pname, sname: new_sname, var: true, lparam: true, level: l };
++            st.insert(id, vdecl, l);
+             // add the variable to the lparams (lexical variables) 
+-            pdecl.lparams.push({node:'variable',id:id,type:vtype});
+-            st.replace(fname,pdecl);
++            pdecl.lparams.push({ node: 'variable', id: id, type: vtype });
++            st.replace(fname, pdecl);
+           }
+           ir.push('  ' + new_pname + ' = load ' + vtype.lltype + '* ' + new_sname + ' ; ' + l);
+           ast.ilocal = new_pname;
+@@ -1341,15 +1350,17 @@ function IR(theAST) {
+     return ir;
+   }
+ 
+-  return {toIR: toIR,
+-          normalizeIR: normalizeIR,
+-          displayST: function() { st.display(); },
+-          getAST: function() { return theAST; }};
++  return {
++    toIR: toIR,
++    normalizeIR: normalizeIR,
++    displayST: function () { st.display(); },
++    getAST: function () { return theAST; }
++  };
+ }
+ 
+ if (typeof module !== 'undefined') {
+   var Parse = require('./parse'),
+-      ieee754 = require('./ieee754');
++    ieee754 = require('./ieee754');
+ 
+   exports.IR = IR;
+   exports.toIR = function (ast) {
+@@ -1359,11 +1370,11 @@ if (typeof module !== 'undefined') {
+ 
+   exports.main = function commonjsMain(args) {
+     if (!args[1]) {
+-        console.log('Usage: '+args[0]+' FILE');
+-        process.exit(1);
++      console.log('Usage: ' + args[0] + ' FILE');
++      process.exit(1);
+     }
+     var source = require('fs').readFileSync(require('path').normalize(args[1]), "utf8"),
+-        ast = Parse.parser.parse(source);
++      ast = Parse.parser.parse(source);
+     console.log(exports.toIR(ast));
+   }
+   if (require.main === module) {
+diff --git a/units/system.js b/units/system.js
+index e50c1cc..8c1b0b3 100644
+--- a/units/system.js
++++ b/units/system.js
+@@ -2,15 +2,17 @@
+ 
+ "use strict";
+ 
+-function SYSTEM (st) {
++function SYSTEM(st) {
+   function init() {
+     var ir = [];
+ 
+     ir.push(['declare i32 @printf(i8*, ...)']);
+     ir.push(['declare i32 @scanf(i8*, ...)']);
++    ir.push(['declare i32 @_pascal_read_string(i8*, i32)']);  // Custom string READ function
+     ir.push(['declare double @drand48()']);
+     ir.push(['declare i32 @lrand48()']);
+     ir.push(['declare void @exit(i32) noreturn nounwind']);
++    ir.push(['declare void @memset(i8*, i8, i64)']);
+     ir.push(['']);
+     ir.push(['%struct._IO_FILE = type { i32, i8* }']);
+     ir.push(['@stdout = external global %struct._IO_FILE*']);
+@@ -27,49 +29,131 @@ function SYSTEM (st) {
+   }
+ 
+   function stop() {
+-      return [];
++    return [];
+   }
+ 
+   // 
+   // I/O routines
+   //
++  // Custom string READ function that uses input queue instead of blocking scanf
++  // This is called by the generated IR for STRING READ operations
++  function _pascal_read_string(bufferPtr, maxLen) {
++    // This function will be injected via Module.addFunction at runtime
++    // It reads from the Pascal input queue
++    return 0; // Default implementation
++  }
++
+   function READ(ast, cparams) {
+     var ir = [];
+     ir.push('  ; READ start');
+-    for(var i=0; i < cparams.length; i++) {
++
++    // Check if we're reading a string - if so, use custom function instead of scanf
++    var hasStringParam = cparams.some(function (p) { return p.type && p.type.name === 'STRING'; });
++
++    if (hasStringParam) {
++      // For string parameters, generate call to custom _pascal_read_string function
++      for (var i = 0; i < cparams.length; i++) {
++        var param = cparams[i];
++        if (param.type && param.type.name === 'STRING') {
++          var pre = st.new_name('READ_STRING');
++          var buf = '%' + pre + 'buf';
++          var bufsize = 256;
++          var bufPtr = '%' + pre + 'bufptr';
++          var call = '%' + pre + 'call';
++
++          // Allocate buffer
++          ir.push('  ' + buf + ' = alloca [' + bufsize + ' x i8]');
++          ir.push('  ' + bufPtr + ' = getelementptr inbounds [' + bufsize + ' x i8]* ' + buf + ', i32 0, i32 0');
++
++          // Initialize buffer to zeros
++          ir.push('  call void @memset(i8* ' + bufPtr + ', i8 0, i64 ' + bufsize + ')');
++
++          // Call custom read string function instead of scanf
++          ir.push('  ' + call + ' = call i32 @_pascal_read_string(i8* ' + bufPtr + ', i32 ' + bufsize + ')');
++
++          // Store buffer pointer to parameter
++          ir.push('  store i8* ' + bufPtr + ', i8** ' + param.istack);
++
++          ir.push('  ; STRING READ using custom function');
++        }
++      }
++      ir.push('  ; READ finish');
++      return ir;
++    }
++
++    // Original scanf-based logic for non-string types
++    for (var i = 0; i < cparams.length; i++) {
+       var param = cparams[i],
+-          settings = st.lookup('_settings_'),
+-          scanf_name = settings.scanf_name,
+-          scanf_var_args = settings.scanf_var_args,
+-          pre = st.new_name('READ'),
+-          str = '%' + pre + 'str',
+-          call = '%' + pre + 'call',
+-          cast = '%' + pre + 'cast',
+-          format = null,
+-          flen = 3;
++        settings = st.lookup('_settings_'),
++        scanf_name = settings.scanf_name,
++        scanf_var_args = settings.scanf_var_args,
++        pre = st.new_name('READ'),
++        str = '%' + pre + 'str',
++        call = '%' + pre + 'call',
++        cast = '%' + pre + 'cast',
++        format = null,
++        flen = 3;
+       switch (param.type.name) {
+         case 'INTEGER':
+-            if (param.type.origname === 'CHARACTER') {
+-                format = "@.chr_format";
+-            } else {
+-                format = "@.int_format";
+-            }
+-            break;
+-        case 'CHARACTER':
++          if (param.type.origname === 'CHARACTER') {
+             format = "@.chr_format";
+-            break;
++          } else {
++            format = "@.int_format";
++          }
++          break;
++        case 'CHARACTER':
++          format = "@.chr_format";
++          break;
++        case 'STRING':
++          format = "@.str_format";
++          break;
+         default:
+           throw new Error("Unknown READ type: " + param.type.name);
+       }
+       ir.push('  ' + str + ' = getelementptr inbounds [' + flen + ' x i8]* ' +
+-              format + ', i32 0, i32 0');
+-      if (scanf_var_args) {
++        format + ', i32 0, i32 0');
++
++      // STRING requires special handling because scanf with stdin can block in browser.
++      // We use stack-allocated buffer to avoid malloc issues.
++      // Buffer is initialized with memset before scanf reads into it.
++      if (param.type.name === 'STRING') {
++        // Allocate buffer for the string on stack (256 bytes is standard for Pascal strings)
++        var buf = '%' + pre + 'buf';
++        var bufsize = 256;
++
++        ir.push('  ; STRING READ - stack-allocated buffer with initialization');
++
++        // Allocate stack buffer
++        ir.push('  ' + buf + ' = alloca [' + bufsize + ' x i8]');
++        var buf_ptr = '%' + pre + 'buf_ptr';
++        ir.push('  ' + buf_ptr + ' = getelementptr inbounds [' + bufsize + ' x i8]* ' + buf + ', i32 0, i32 0');
++
++        // Store the buffer pointer to the parameter
++        ir.push('  store i8* ' + buf_ptr + ', i8** ' + param.istack);
++
++        // Initialize buffer to empty string with memset
++        ir.push('  call void @memset(i8* ' + buf_ptr + ', i8 0, i64 ' + bufsize + ')');
++
++        // Use scanf to read string from stdin
++        if (scanf_var_args) {
++          var bufptr = '%' + pre + 'bufptr';
++          ir.push('  ' + bufptr + ' = alloca i8*');
++          ir.push('  store i8* ' + buf_ptr + ', i8** ' + bufptr);
++          ir.push('  ' + call + ' = call i32 (i8*, ...)* @' + scanf_name +
++            '(i8* ' + str + ', i8** ' + bufptr + ')');
++        } else {
++          ir.push('  ' + call + ' = call i32 (i8*, i8*)* @' + scanf_name +
++            '(i8* ' + str + ', i8* ' + buf_ptr + ')');
++        }
++
++        ir.push('  ; STRING READ end');
++      } else if (scanf_var_args) {
+         ir.push('  ' + call + ' = call i32 (i8*, ...)* @' + scanf_name +
+-                '(i8* ' + str + ', ' + param.itype + '* ' + param.istack + ')');
++          '(i8* ' + str + ', ' + param.itype + '* ' + param.istack + ')');
+       } else {
+-          ir.push('  ' + cast + ' = bitcast ' + param.itype + '* ' + param.istack + ' to i8*');
+-          ir.push('  ' + call + ' = call i32 (i8*, i8*)* @' + scanf_name +
+-                  '(i8* ' + str + ', i8* ' + cast + ')');
++        ir.push('  ' + cast + ' = bitcast ' + param.itype + '* ' + param.istack + ' to i8*');
++        ir.push('  ' + call + ' = call i32 (i8*, i8*)* @' + scanf_name +
++          '(i8* ' + str + ', i8* ' + cast + ')');
+       }
+     }
+     ir.push('  ; READ finish');
+@@ -77,53 +161,53 @@ function SYSTEM (st) {
+   }
+ 
+   function READLN(ast, cparams) {
+-      return READ(ast, cparams);
++    return READ(ast, cparams);
+   }
+ 
+   function WRITE(ast, cparams) {
+     var ir = [];
+     ir.push('  ; WRITE start');
+-    for(var i=0; i < cparams.length; i++) {
++    for (var i = 0; i < cparams.length; i++) {
+       var param = cparams[i],
+-          pitype = param.itype,
+-          pilocal = param.ilocal,
+-          pre = st.new_name('WRITE'),
+-          str = '%' + pre + 'str',
+-          sout = '%' + pre + 'sout',
+-          call1 = '%' + pre + 'call1',
+-          call2 = '%' + pre + 'call2',
+-          format = null,
+-          flen = 3;
++        pitype = param.itype,
++        pilocal = param.ilocal,
++        pre = st.new_name('WRITE'),
++        str = '%' + pre + 'str',
++        sout = '%' + pre + 'sout',
++        call1 = '%' + pre + 'call1',
++        call2 = '%' + pre + 'call2',
++        format = null,
++        flen = 3;
+       switch (param.type.name) {
+         case 'INTEGER':
+-            switch (param.type.origname) {
+-              case 'BOOLEAN':
+-              case 'ENUMERATION':
+-                var ctype = param.type,
+-                    offset = st.new_name('%offset'),
+-                    array_idx = st.new_name('%arrayidx'),
+-                    str_local = st.new_name('%' + param.id + "_str");
+-                format = "@.str_format"; 
+-                ir.push('  ' + offset + ' = zext ' + param.itype + ' ' + param.ilocal + ' to i32');
+-                ir.push('  ' + array_idx + ' = getelementptr ' + ctype.enum_type + '* ' + ctype.enum_var + ', i32 0, i32 ' + offset);
+-                ir.push('  ' + str_local + ' = load i8** ' + array_idx);
+-                pitype = 'i8*';
+-                pilocal = str_local;
+-                break;
+-              case 'CHARACTER':
+-                format = '@.chr_format';
+-                break;
+-              default:
+-                format = "@.int_format";
+-                break;
+-            }
+-            break;
+-        case 'STRING':    format = "@.str_format"; break;
++          switch (param.type.origname) {
++            case 'BOOLEAN':
++            case 'ENUMERATION':
++              var ctype = param.type,
++                offset = st.new_name('%offset'),
++                array_idx = st.new_name('%arrayidx'),
++                str_local = st.new_name('%' + param.id + "_str");
++              format = "@.str_format";
++              ir.push('  ' + offset + ' = zext ' + param.itype + ' ' + param.ilocal + ' to i32');
++              ir.push('  ' + array_idx + ' = getelementptr ' + ctype.enum_type + '* ' + ctype.enum_var + ', i32 0, i32 ' + offset);
++              ir.push('  ' + str_local + ' = load i8** ' + array_idx);
++              pitype = 'i8*';
++              pilocal = str_local;
++              break;
++            case 'CHARACTER':
++              format = '@.chr_format';
++              break;
++            default:
++              format = "@.int_format";
++              break;
++          }
++          break;
++        case 'STRING': format = "@.str_format"; break;
+         case 'CHARACTER': format = "@.chr_format"; break;
+         case 'REAL':
+           var conv = '%' + pre + 'conv';
+           ir.push('  ' + conv +
+-                  ' = fpext float ' + param.ilocal + ' to double');
++            ' = fpext float ' + param.ilocal + ' to double');
+           format = "@.float_format";
+           flen = 4;
+           pitype = "double";
+@@ -133,9 +217,9 @@ function SYSTEM (st) {
+           throw new Error("Unknown WRITE type: " + param.type.name);
+       }
+       ir.push('  ' + str + ' = getelementptr inbounds [' + flen + ' x i8]* ' +
+-              format + ', i32 0, i32 0');
++        format + ', i32 0, i32 0');
+       ir.push('  ' + call1 + ' = call i32 (i8*, ...)* @printf(i8* ' + str +
+-              ', ' + pitype + ' ' + pilocal + ')');
++        ', ' + pitype + ' ' + pilocal + ')');
+     }
+     ir.push('  ' + sout + ' = load %struct._IO_FILE** @stdout');
+     ir.push('  ' + call2 + ' = call i32 @fflush(%struct._IO_FILE* ' + sout + ')');
+@@ -143,16 +227,16 @@ function SYSTEM (st) {
+     return ir;
+   }
+ 
+-  function WRITELN (ast, cparams) {
++  function WRITELN(ast, cparams) {
+     var ir = [],
+-        pre = st.new_name('WRITELN'),
+-        str = '%' + pre + 'str',
+-        call = '%' + pre + 'call';
++      pre = st.new_name('WRITELN'),
++      str = '%' + pre + 'str',
++      call = '%' + pre + 'call';
+     ir.push('  ; WRITELN start');
+     if (cparams.length > 0) {
+-        ir.push.apply(ir, WRITE(ast, cparams));
++      ir.push.apply(ir, WRITE(ast, cparams));
+     }
+-    ir.push.apply(ir, WRITE(ast, [{type:{name: 'STRING'},itype:'[2 x i8]*',ilocal:'@.newline'}]));
++    ir.push.apply(ir, WRITE(ast, [{ type: { name: 'STRING' }, itype: '[2 x i8]*', ilocal: '@.newline' }]));
+     ir.push('  ; WRITELN finish');
+     return ir;
+   }
+@@ -166,15 +250,15 @@ function SYSTEM (st) {
+   //
+   function ODD(ast, cparams) {
+     var ir = [],
+-        id = ast.id,
+-        cparam = cparams[0],
+-        rem = st.new_name('%rem'),
+-        lname = st.new_name('%odd');
++      id = ast.id,
++      cparam = cparams[0],
++      rem = st.new_name('%rem'),
++      lname = st.new_name('%odd');
+     ir.push('  ; ' + id + ' start');
+     ir.push('  ' + rem + ' = urem ' + cparam.itype + ' ' + cparam.ilocal + ', 2');
+     ir.push('  ' + lname + ' = icmp eq ' + cparam.itype + ' ' + rem + ', 1');
+     ir.push('  ; ' + id + ' finish');
+-    ast.type = {node:'type',name:'INTEGER',origname:'BOOLEAN'};
++    ast.type = { node: 'type', name: 'INTEGER', origname: 'BOOLEAN' };
+     ast.itype = 'i1';
+     ast.ilocal = lname;
+     return ir;
+@@ -186,16 +270,16 @@ function SYSTEM (st) {
+ 
+   function CHAR(ast, cparams) {
+     var ir = [], clen = cparams.length,
+-        id = ast.id,
+-        cparam = cparams[0],
+-        lname = st.new_name('%char');
++      id = ast.id,
++      cparam = cparams[0],
++      lname = st.new_name('%char');
+     if (clen !== 1) {
+       throw new Error(id + " only accepts one argument (" + clen + " given)");
+     }
+     ir.push('  ; ' + id + ' start');
+     ir.push('  ' + lname + ' = trunc ' + cparam.itype + ' ' + cparam.ilocal + ' to i8');
+     ir.push('  ; ' + id + ' finish');
+-    ast.type = {node:'type',name:'INTEGER',origname:'CHARACTER'};
++    ast.type = { node: 'type', name: 'INTEGER', origname: 'CHARACTER' };
+     ast.itype = 'i8';
+     ast.ilocal = lname;
+     return ir;
+@@ -207,12 +291,12 @@ function SYSTEM (st) {
+ 
+   function ORD(ast, cparams) {
+     var ir = [], clen = cparams.length,
+-        id = ast.id,
+-        cparam = cparams[0],
+-        ctype = cparam.type,
+-        lname = st.new_name('%ord'),
+-        lname1 = lname + '.1',
+-        lname2 = lname + '.2';
++      id = ast.id,
++      cparam = cparams[0],
++      ctype = cparam.type,
++      lname = st.new_name('%ord'),
++      lname1 = lname + '.1',
++      lname2 = lname + '.2';
+     if (clen !== 1) {
+       throw new Error(id + " only accepts one argument (" + clen + " given)");
+     }
+@@ -246,7 +330,7 @@ function SYSTEM (st) {
+         throw new Error("Invalid type passed to ORD: " + ctype.name);
+     }
+     ir.push('  ; ' + id + ' finish');
+-    ast.type = {node:'type',name:'INTEGER'};
++    ast.type = { node: 'type', name: 'INTEGER' };
+     ast.itype = 'i32';
+     ast.ilocal = lname;
+     return ir;
+@@ -254,18 +338,18 @@ function SYSTEM (st) {
+ 
+   function INTEGER(ast, cparams) {
+     var ir = [], clen = cparams.length,
+-        cparam = cparams[0],
+-        lname = st.new_name('%int');
++      cparam = cparams[0],
++      lname = st.new_name('%int');
+     if (clen !== 1) {
+       throw new Error("INTEGER only accepts one argument (" + clen + " given)");
+     }
+     if (cparam.itype !== 'i32') {
+-        ir.push('  ' + lname + ' = zext ' + cparam.itype + ' ' + cparam.ilocal + ' to i32');
+-        ast.type = {node:'type',name:'INTEGER'};
+-        ast.itype = 'i32';
+-        ast.ilocal = lname;
++      ir.push('  ' + lname + ' = zext ' + cparam.itype + ' ' + cparam.ilocal + ' to i32');
++      ast.type = { node: 'type', name: 'INTEGER' };
++      ast.itype = 'i32';
++      ast.ilocal = lname;
+     } else {
+-        throw new Error("TODO: convert " + cparam.type.name + " to INTEGER");
++      throw new Error("TODO: convert " + cparam.type.name + " to INTEGER");
+     }
+     return ir;
+   }
+@@ -276,47 +360,47 @@ function SYSTEM (st) {
+ 
+   function CONCAT(ast, cparams) {
+     var ir = [], ir_after = [],
+-        clen = cparams.length,
+-        cparam,
+-        lname = st.new_name('%concat'),
+-        prev_tsize = st.new_name('%tsize'),
+-        new_tsize = st.new_name('%new_tsize');
++      clen = cparams.length,
++      cparam,
++      lname = st.new_name('%concat'),
++      prev_tsize = st.new_name('%tsize'),
++      new_tsize = st.new_name('%new_tsize');
+     if (clen < 2) {
+       throw new Error("CONCAT requires at least two arguments (" + clen + " given)");
+     }
+     ir.push('  ; CONCAT start');
+     ir.push('  ' + prev_tsize + ' = add i64 0, 0');
+-    for (var i=0; i < cparams.length; i++) {
+-        cparam = cparams[i];
+-        if (cparam.type.name !== 'STRING' && cparam.type.origname !== 'CHARACTER') {
+-            throw new Error("Concat arguments must be STRINGs");
+-        }
+-        var decay = st.new_name('%decay'),
+-            idx1 = st.new_name('%idx'),
+-            idx2 = st.new_name('%idx'),
+-            size = st.new_name('%size'),
+-            tsize = st.new_name('%tsize'),
+-            ret = st.new_name('%ret');
+-
+-        if (cparam.type.origname === 'CHARACTER') {
+-          ir.push('  ' + tsize + ' = add i64 1, ' + prev_tsize);
+-          ir.push('  ' + decay + ' = alloca i8');
+-          ir.push('  store i8 ' + cparam.ilocal + ', i8* ' + decay);
+-          size = 1;
+-        } else {
+-          ir.push('  ' + decay + ' = bitcast ' + cparam.itype + ' ' + cparam.ilocal + ' to i8*');
+-          ir.push('  ' + size + ' = call i64 @strlen(i8* ' + decay + ')');
+-          ir.push('  ' + tsize + ' = add i64 ' + size + ', ' + prev_tsize);
+-        }
+-        ir_after.push('  ' + ret + ' = call i8* @strncat(i8* ' + lname + ', i8* ' + decay + ', i64 ' + size + ')');
+-        prev_tsize = tsize;
++    for (var i = 0; i < cparams.length; i++) {
++      cparam = cparams[i];
++      if (cparam.type.name !== 'STRING' && cparam.type.origname !== 'CHARACTER') {
++        throw new Error("Concat arguments must be STRINGs");
++      }
++      var decay = st.new_name('%decay'),
++        idx1 = st.new_name('%idx'),
++        idx2 = st.new_name('%idx'),
++        size = st.new_name('%size'),
++        tsize = st.new_name('%tsize'),
++        ret = st.new_name('%ret');
++
++      if (cparam.type.origname === 'CHARACTER') {
++        ir.push('  ' + tsize + ' = add i64 1, ' + prev_tsize);
++        ir.push('  ' + decay + ' = alloca i8');
++        ir.push('  store i8 ' + cparam.ilocal + ', i8* ' + decay);
++        size = 1;
++      } else {
++        ir.push('  ' + decay + ' = bitcast ' + cparam.itype + ' ' + cparam.ilocal + ' to i8*');
++        ir.push('  ' + size + ' = call i64 @strlen(i8* ' + decay + ')');
++        ir.push('  ' + tsize + ' = add i64 ' + size + ', ' + prev_tsize);
++      }
++      ir_after.push('  ' + ret + ' = call i8* @strncat(i8* ' + lname + ', i8* ' + decay + ', i64 ' + size + ')');
++      prev_tsize = tsize;
+     }
+     ir.push('  ' + new_tsize + ' = add i64 ' + prev_tsize + ', 1');
+     ir.push('  ' + lname + ' = call i8* @malloc(i64 ' + new_tsize + ')');
+     ir.push('  store i8 0, i8* ' + lname);
+     ir.push.apply(ir, ir_after);
+     ir.push('  ; CONCAT finish');
+-    ast.type = {node:'type',name:'STRING'};
++    ast.type = { node: 'type', name: 'STRING' };
+     ast.itype = 'i8*';
+     ast.ilocal = lname;
+     return ir;
+@@ -332,8 +416,8 @@ function SYSTEM (st) {
+ 
+   function HALT(ast, cparams) {
+     var ir = [], clen = cparams.length,
+-        cparam = cparams[0],
+-        lname = st.new_name('%char');
++      cparam = cparams[0],
++      lname = st.new_name('%char');
+     if (clen !== 1) {
+       throw new Error("HALT only accepts one argument (" + clen + " given)");
+     }
+@@ -346,27 +430,27 @@ function SYSTEM (st) {
+ 
+   function RANDOM(ast, cparams) {
+     var ir = [],
+-        clen = cparams.length, cparam,
+-        pre = st.new_name('RANDOM'),
+-        call = '%' + pre + 'call',
+-        conv = '%' + pre + 'conv';
++      clen = cparams.length, cparam,
++      pre = st.new_name('RANDOM'),
++      call = '%' + pre + 'call',
++      conv = '%' + pre + 'conv';
+ 
+     ir.push('  ; RANDOM start');
+     if (clen === 0) {
+-        // Return a random Real 0 <= x < 1
+-        ir.push('  ' + call + ' = call double @drand48()');
+-        ir.push('  ' + conv + ' = fptrunc double ' + call + ' to float');
+-        ast.type = {node:'type',name:'REAL'};
+-        ast.itype = 'float';
+-        ast.ilocal = conv;
++      // Return a random Real 0 <= x < 1
++      ir.push('  ' + call + ' = call double @drand48()');
++      ir.push('  ' + conv + ' = fptrunc double ' + call + ' to float');
++      ast.type = { node: 'type', name: 'REAL' };
++      ast.itype = 'float';
++      ast.ilocal = conv;
+     } else if (clen === 1) {
+-        // Return a random Integer 0 <= x < Num
+-        cparam = cparams[0];
+-        ir.push('  ' + call + ' = call i32 @lrand48()');
+-        ir.push('  ' + conv + ' = urem i32 ' + call + ', ' + cparam.ilocal);
+-        ast.type = {node:'type',name:'INTEGER',origname:'INTEGER'};
+-        ast.itype = 'i32';
+-        ast.ilocal = conv;
++      // Return a random Integer 0 <= x < Num
++      cparam = cparams[0];
++      ir.push('  ' + call + ' = call i32 @lrand48()');
++      ir.push('  ' + conv + ' = urem i32 ' + call + ', ' + cparam.ilocal);
++      ast.type = { node: 'type', name: 'INTEGER', origname: 'INTEGER' };
++      ast.itype = 'i32';
++      ast.ilocal = conv;
+     } else {
+       throw new Error("Random only accepts one or zero arguments (" + clen + " given)");
+     }
+@@ -379,59 +463,60 @@ function SYSTEM (st) {
+ 
+   // set default scanf function
+   if (!settings.scanf_name) {
+-      settings.scanf_name = 'scanf';
+-      settings.scanf_var_args = true;
+-      st.insert('_settings_', settings);
++    settings.scanf_name = 'scanf';
++    settings.scanf_var_args = true;
++    st.insert('_settings_', settings);
+   }
+ 
+   function pins(nm, efn, fps, rtyp) {
+-      st.unit_pinsert(nm, efn, fps, rtyp);
++    st.unit_pinsert(nm, efn, fps, rtyp);
+   }
+- 
++
+   // I/O routines
+   pins('READ', READ,
+-       [{type:{node:'type',name:'varargs'},var:true}]);
++    [{ type: { node: 'type', name: 'varargs' }, var: true }]);
+   pins('READLN', READLN,
+-       [{type:{node:'type',name:'varargs'},var:true}]);
++    [{ type: { node: 'type', name: 'varargs' }, var: true }]);
+   pins('WRITE', WRITE,
+-       [{type:{node:'type',name:'varargs'}}]);
++    [{ type: { node: 'type', name: 'varargs' } }]);
+   pins('WRITELN', WRITELN,
+-       [{type:{node:'type',name:'varargs'}}]);
++    [{ type: { node: 'type', name: 'varargs' } }]);
+   // Scalar functions
+   pins('ODD', ODD,
+-       [{type:{node:'type',name:'INTEGER'}}],
+-       {node:'type',name:'BOOLEAN'});
++    [{ type: { node: 'type', name: 'INTEGER' } }],
++    { node: 'type', name: 'BOOLEAN' });
+   // Transfer functions
+   pins('CHAR', CHAR,
+-       [{type:{node:'type',name:'INTEGER'}}],
+-       {node:'type',name:'CHARACTER'});
++    [{ type: { node: 'type', name: 'INTEGER' } }],
++    { node: 'type', name: 'CHARACTER' });
+   pins('CHR', CHR,
+-       [{type:{node:'type',name:'INTEGER'}}],
+-       {node:'type',name:'CHARACTER'});
++    [{ type: { node: 'type', name: 'INTEGER' } }],
++    { node: 'type', name: 'CHARACTER' });
+   pins('ORD', ORD,
+-       [{type:{node:'type',name:'any'}}],
+-       {node:'type',name:'INTEGER'});
++    [{ type: { node: 'type', name: 'any' } }],
++    { node: 'type', name: 'INTEGER' });
+   pins('INTEGER', INTEGER,
+-       [{type:{node:'type',name:'multiple',names:['INTEGER', 'CHARACTER']}}],
+-       {node:'type',name:'INTEGER'});
++    [{ type: { node: 'type', name: 'multiple', names: ['INTEGER', 'CHARACTER'] } }],
++    { node: 'type', name: 'INTEGER' });
+   // String routines
+   pins('CONCAT', CONCAT,
+-       [{type:{node:'type',name:'multiple',names:['STRING','CHARACTER']}},
+-        {type:{node:'type',name:'multiple',names:['STRING','CHARACTER']}},
+-        {type:{node:'type',name:'varargs'}}],
+-       {node:'type',name:'STRING'});
++    [{ type: { node: 'type', name: 'multiple', names: ['STRING', 'CHARACTER'] } },
++    { type: { node: 'type', name: 'multiple', names: ['STRING', 'CHARACTER'] } },
++    { type: { node: 'type', name: 'varargs' } }],
++    { node: 'type', name: 'STRING' });
+   // Miscellaneous routines
+   pins('HALT', HALT,
+-       [{type:{node:'type',name:'INTEGER'}}]);
++    [{ type: { node: 'type', name: 'INTEGER' } }]);
+   pins('RANDOM', RANDOM,
+-       [{type:{node:'type',name:'varargs'}}],
+-       {node:'type',name:'any'});
++    [{ type: { node: 'type', name: 'varargs' } }],
++    { node: 'type', name: 'any' });
+ 
+-  return {init: init, stop: stop};
++  return { init: init, stop: stop };
+ };
+ 
+ if (typeof module !== 'undefined') {
+-    exports.SYSTEM = SYSTEM;
+-} else {
+-    SYSTEM;
++  exports.SYSTEM = SYSTEM;
++} else if (typeof window !== 'undefined') {
++  // Browser - expose as global
++  window.SYSTEM = SYSTEM;
+ }
+diff --git a/llvm-pre-init.js b/llvm-pre-init.js
+new file mode 100644
+index 0000000..2f368fe
+--- /dev/null
++++ b/llvm-pre-init.js
+@@ -0,0 +1,83 @@
++/**
++ * LLVM.js Pre-Initialization Script
++ * 
++ * This script MUST be loaded BEFORE compiler.js to set up the correct
++ * environment for browser-based execution.
++ * 
++ * The compiler.js file uses load('utility.js') and read('runtime.js') with
++ * relative paths. In the browser, this would resolve relative to the
++ * current page URL (e.g., /tutorial/utility.js) instead of the llvm.js
++ * directory. This pre-init script uses Object.defineProperty to make
++ * read() and load() non-writable, so compiler.js can't overwrite them.
++ */
++
++(function () {
++    'use strict';
++
++    // Ensure we're in a browser environment
++    if (typeof window === 'undefined') {
++        return;
++    }
++
++    // Base path for LLVM.js files
++    var LLVM_BASE_PATH = '/external/pascal.js/llvm.js/';
++
++    // Internal read function with correct base path
++    function readWithBasePath(filename) {
++        var xhr = new XMLHttpRequest();
++        var url = LLVM_BASE_PATH + filename;
++        xhr.open('GET', url, false); // Synchronous request
++        xhr.send(null);
++
++        if (xhr.status !== 200) {
++            throw new Error('Failed to load: ' + url + ' (status: ' + xhr.status + ')');
++        }
++
++        return xhr.responseText;
++    }
++
++    // Define read() as non-writable so compiler.js can't overwrite it
++    Object.defineProperty(window, 'read', {
++        value: readWithBasePath,
++        writable: false,
++        configurable: false
++    });
++
++    // Define load() as non-writable so compiler.js can't overwrite it
++    Object.defineProperty(window, 'load', {
++        value: function (f) {
++            var content = readWithBasePath(f);
++            eval.call(null, content);
++        },
++        writable: false,
++        configurable: false
++    });
++
++    // Set up print functions - use custom names to avoid conflicts with browser's native print
++    // The OutputCapture module will manage window.print for output capture
++    // Additionally, set global 'print' to no-op to prevent browser print dialog
++    // (Emscripten/LLVM.js code uses global 'print' function)
++    if (!window.pascalPrint) {
++        window.pascalPrint = function (output) {
++            console.log('[LLVM.js]', output);
++        };
++    }
++
++    // CRITICAL: Set global print to no-op to prevent browser print dialog
++    // LLVM.js/Emscripten code uses global 'print' function for output
++    // Without this, it triggers the browser's native print dialog
++    print = function () { };
++
++    if (!window.printErr) {
++        window.printErr = function (output) {
++            console.error('[LLVM.js]', output);
++        };
++    }
++
++    // Set up arguments array for Emscripten
++    if (!window.arguments) {
++        window.arguments = [];
++    }
++
++    console.log('[LLVM.js Pre-Init] Environment configured for browser (non-writable)');
++})();
